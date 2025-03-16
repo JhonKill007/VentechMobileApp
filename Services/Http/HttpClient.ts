@@ -1,8 +1,11 @@
 import axios from "axios";
 
 const Http = axios.create({
-  baseURL: 'https://api.aycoro.com',
+  baseURL: "https://api.ventech.countechrd.com",
 });
 
-export default Http;
+var tuTokenAqui =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VybmFtZSI6ImpyZ3V6bWFuIiwiZW1haWwiOiJqdWFucmVuZWd1em1hbjIzQGdtYWlsLmNvbSIsImZ1bGxuYW1lIjoiSnVhbiBSZW5lIEd1em1hbiBOLiIsImF1dGhDb2RlIjoiMTkyMzciLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoianJndXptYW4iLCJSb2xlIjoiQWRtaW4iLCJwZXJtaXNzaW9ucyI6WyJQb3MiLCJJTG9jYWwiLCJQVGlwb3MiLCJBUHJvZCIsIkVzdFRyYSIsIlByb2QiLCJDb25zdW1lciIsIlNlbGVycyIsIlJlcG9ydCIsImNvbnRhYmxlIiwiZGFzaGJvYXJkIiwiNjA2IiwiNjA3IiwiNjA4IiwiZGlzY291bnQiXSwiZXhwIjoxNzQyMTc0MDUyLCJpc3MiOiJjb250YXNvZnR3ZWIuY29tIiwiYXVkIjoiSldUU2VydmljZVBvc3RtYW5DbGllbnQifQ.HTB1hMN4hacGJeS7RhRckaFs6XaN_XJItX0l6RfqzUU";
+Http.defaults.headers["Authorization"] = `Bearer ${tuTokenAqui}`;
 
+export default Http;

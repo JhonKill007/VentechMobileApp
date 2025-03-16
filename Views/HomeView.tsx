@@ -1,240 +1,277 @@
-import React, { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Text,
-  FlatList,
-} from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import { StyleSheet, View, Text, FlatList, useColorScheme } from "react-native";
 import { useNavigation } from "expo-router";
 
-import {
-  Avatar,
-  Button,
-  List,
-  Surface,
-  Provider,
-  Searchbar,
-} from "react-native-paper";
+import { Button, Surface, Provider, Searchbar } from "react-native-paper";
+import Products from "@/Services/Products/ProductsService";
+import { Product } from "@/Models/Product";
+import ItemProduct from "@/components/ItemProduct";
+import ChargingApp from "@/components/CharginApp";
+import { Colors } from "@/constants/Colors";
+import useGroupedProducts from "@/Hooks/useGroupedProducts";
 
 const HomeView = () => {
-  const [visible, setVisible] = useState(false);
+  const theme = useColorScheme();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsFiltered, setProductsFiltered] = useState<Product[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
   const [search, setsearch] = useState<string>("");
+  const [checking, setChecking] = useState<boolean>(true);
+  const [cantOfProducts, setcantOfProducts] = useState<number>(0);
+  const [descuentos, setDescuentos] = useState<number>(0);
+  const [itebis, setItebis] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
   const navigation = useNavigation();
 
-  const itemsList = [
-    {
-      id: "1",
-      title: "Botellon de agua",
-      description: "DOP 40.00",
-      image: "https://picsum.photos/id/1/200",
-    },
-    {
-      id: "2",
-      title: "Queso Blanco",
-      description: "DOP 230.00",
-      image: "https://picsum.photos/id/2/200",
-    },
-    {
-      id: "3",
-      title: "Queso Amarillo",
-      description: "DOP 250.00.",
-      image: "https://picsum.photos/id/3/200",
-    },
-    {
-      id: "1",
-      title: "Botellon de agua",
-      description: "DOP 40.00",
-      image: "https://picsum.photos/id/1/200",
-    },
-    {
-      id: "2",
-      title: "Queso Blanco",
-      description: "DOP 230.00",
-      image: "https://picsum.photos/id/2/200",
-    },
-    {
-      id: "3",
-      title: "Queso Amarillo",
-      description: "DOP 250.00.",
-      image: "https://picsum.photos/id/3/200",
-    },
-    {
-      id: "1",
-      title: "Botellon de agua",
-      description: "DOP 40.00",
-      image: "https://picsum.photos/id/1/200",
-    },
-    {
-      id: "2",
-      title: "Queso Blanco",
-      description: "DOP 230.00",
-      image: "https://picsum.photos/id/2/200",
-    },
-    {
-      id: "3",
-      title: "Queso Amarillo",
-      description: "DOP 250.00.",
-      image: "https://picsum.photos/id/3/200",
-    },
-    {
-      id: "1",
-      title: "Botellon de agua",
-      description: "DOP 40.00",
-      image: "https://picsum.photos/id/1/200",
-    },
-    {
-      id: "2",
-      title: "Queso Blanco",
-      description: "DOP 230.00",
-      image: "https://picsum.photos/id/2/200",
-    },
-    {
-      id: "3",
-      title: "Queso Amarillo",
-      description: "DOP 250.00.",
-      image: "https://picsum.photos/id/3/200",
-    },
-  ];
+  useEffect(() => {
+    Products.getAll(2)
+      .then((e: any) => {
+        const data = groupAndSumStock(e.data.data);
+        setProducts(data);
+        setChecking(false);
+      })
+      .catch((err: any) => {
+        console.error(err);
+      });
+  }, []);
+
+  const groupAndSumStock = (products: Product[]): Product[] => {
+    const groupedProducts = products.reduce((acc, product) => {
+      const key = `${product.code}-${product.name}`;
+  
+      acc[key] = acc[key]
+        ? { ...acc[key], stock: acc[key].stock! + product.stock! }
+        : { ...product };
+  
+      return acc;
+    }, {} as { [key: string]: Product });
+  
+    return Object.values(groupedProducts);
+  };
+
+  const SearchHandle = (text: string) => {
+    setsearch(text);
+    console.log(text);
+    const filteredProduct = products.filter((p: Product) =>
+      p.name!.includes(text.toUpperCase())
+    );
+    setProductsFiltered(filteredProduct);
+  };
+
+  const addProducts = (id: number, product: Product, cantidad: number) => {
+    setSelectedProducts((prevProducts: any) => {
+      const existingProductIndex = prevProducts.findIndex(
+        (p: any) => p.id === id
+      );
+      if (existingProductIndex !== -1) {
+        if (cantidad === 0) {
+          return prevProducts.filter((p: any) => p.id !== id);
+        }
+        return prevProducts.map((p: any) =>
+          p.id === id ? { ...p, cantidad } : p
+        );
+      } else {
+        return cantidad > 0
+          ? [{ id, product, cantidad }, ...prevProducts]
+          : prevProducts;
+      }
+    });
+  };
+
+  const getTotalPrice = () => {
+    return selectedProducts.reduce((total: number, item: any) => {
+      return total + item.cantidad * item.product.price;
+    }, 0);
+  };
 
   return (
     <Provider>
-      <View style={{ flex: 1, padding: 10, backgroundColor: "#fff" }}>
-        <Searchbar
-          onChangeText={setsearch}
-          value={search}
-          style={{
-            borderColor: "#3F75EA",
-            borderWidth: 1,
-            backgroundColor: "white",
-            marginBottom: 10,
-          }}
-        />
-        <Surface
-          style={{
-            padding: 10,
-            borderRadius: 10,
-            elevation: 4,
-            backgroundColor: "#fff",
-          }}
+      {checking ? (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >
-          <FlatList
-            data={itemsList}
-            style={{ maxHeight: 450, marginBottom: 10 }}
-            renderItem={({ item, index }) => (
-              <List.Item
-                key={`${item.id}-${index}`}
-                title={item.title}
-                description={item.description}
-                left={(props) => (
-                  <Avatar.Image {...props} source={{ uri: item.image }} />
-                )}
-                right={() => (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: "#3F75EA",
-                        padding: 8,
-                        borderRadius: 5,
-                        marginHorizontal: 5,
-                      }}
-                    >
-                      <Text style={{ color: "white", fontSize: 16 }}>-</Text>
-                    </TouchableOpacity>
-                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>1</Text>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: "#3F75EA",
-                        padding: 8,
-                        borderRadius: 5,
-                        marginHorizontal: 5,
-                      }}
-                    >
-                      <Text style={{ color: "white", fontSize: 16 }}>+</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              />
-            )}
-            keyExtractor={(item, index) => index.toString()}
-          />
-          <View
-            style={{
-              display: "flex",
-              padding: 10,
-              borderTopWidth: 1,
-              borderColor: "gray",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                backgroundColor: "#fff",
-              }}
-            >
-              <Text style={{ fontSize: 16, color: "#333", fontWeight: "bold" }}>
-                Descuento
-              </Text>
-              <Text style={{ fontSize: 16, color: "#333" }}>RD$ 140.00</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                backgroundColor: "#fff",
-              }}
-            >
-              <Text style={{ fontSize: 16, color: "#333", fontWeight: "bold" }}>
-                Itebis
-              </Text>
-              <Text style={{ fontSize: 16, color: "#333" }}>RD$ 140.00</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                backgroundColor: "#fff",
-              }}
-            >
-              <Text style={{ fontSize: 16, color: "#333", fontWeight: "bold" }}>
-                Total
-              </Text>
-              <Text style={{ fontSize: 16, color: "#333" }}>RD$ 140.00</Text>
-            </View>
-          </View>
-        </Surface>
-
+          <ChargingApp />
+        </View>
+      ) : (
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 20,
+            flex: 1,
+            padding: 10,
+            backgroundColor:
+              theme === "light"
+                ? Colors.light.colors.background
+                : Colors.dark.colors.background,
           }}
         >
-          <Button
-            icon="trash-can-outline"
-            mode="contained"
-            onPress={() => console.log("Cancelado")}
-            style={{ backgroundColor: "red" }}
+          <Searchbar
+            onChangeText={SearchHandle}
+            value={search}
+            style={{
+              borderColor: "#3F75EA",
+              borderWidth: 1,
+              backgroundColor:
+                theme === "light"
+                  ? Colors.light.colors.background
+                  : Colors.dark.colors.background,
+              marginBottom: 10,
+            }}
+          />
+          <Surface
+            style={{
+              padding: 10,
+              borderRadius: 10,
+              elevation: 4,
+              backgroundColor:
+                theme === "light"
+                  ? Colors.light.colors.background
+                  : Colors.dark.colors.background,
+            }}
           >
-            Limpiar
-          </Button>
+            <FlatList
+              data={!search ? products : productsFiltered}
+              style={{ height: 450, marginBottom: 10 }}
+              renderItem={({ item, index }) => (
+                <ItemProduct key={index} product={item} add={addProducts} />
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
+            <View
+              style={{
+                display: "flex",
+                padding: 10,
+                borderTopWidth: 1,
+                borderColor: "gray",
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor:
+                    theme === "light"
+                      ? Colors.light.colors.background
+                      : Colors.dark.colors.background,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: "#333",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Cantidad de productos:
+                </Text>
+                <Text style={{ fontSize: 16, color: "#333" }}>
+                  {selectedProducts.length}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor:
+                    theme === "light"
+                      ? Colors.light.colors.background
+                      : Colors.dark.colors.background,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: "#333",
+                    fontWeight: "bold",
+                    marginLeft: 93,
+                  }}
+                >
+                  Descuento:
+                </Text>
+                <Text style={{ fontSize: 16, color: "#333" }}>
+                  RD$ {descuentos}.00
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor:
+                    theme === "light"
+                      ? Colors.light.colors.background
+                      : Colors.dark.colors.background,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: "#333",
+                    fontWeight: "bold",
+                    marginLeft: 133,
+                  }}
+                >
+                  Itebis:
+                </Text>
+                <Text style={{ fontSize: 16, color: "#333" }}>
+                  RD$ {itebis}.00
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor:
+                    theme === "light"
+                      ? Colors.light.colors.background
+                      : Colors.dark.colors.background,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: "#333",
+                    fontWeight: "bold",
+                    marginLeft: 138,
+                  }}
+                >
+                  Total:
+                </Text>
+                <Text style={{ fontSize: 16, color: "#333" }}>
+                  RD$ {getTotalPrice()}.00
+                </Text>
+              </View>
+            </View>
+          </Surface>
 
-          <Button
-            icon="check"
-            mode="contained"
-            onPress={() => navigation.navigate("ProcessOrderView" as never)}
-            style={{ backgroundColor: "#3F75EA" }}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: 20,
+            }}
           >
-            Procesar
-          </Button>
+            <Button
+              icon="trash-can-outline"
+              mode="contained"
+              onPress={() => console.log("Cancelado")}
+              style={{ backgroundColor: "red" }}
+            >
+              Limpiar
+            </Button>
+
+            <Button
+              icon="check"
+              mode="contained"
+              onPress={() => navigation.navigate("ProcessOrderView" as never)}
+              style={{ backgroundColor: "#3F75EA" }}
+            >
+              Procesar
+            </Button>
+          </View>
         </View>
-      </View>
+      )}
     </Provider>
   );
 };

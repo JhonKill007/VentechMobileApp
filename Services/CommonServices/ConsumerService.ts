@@ -1,0 +1,20 @@
+import { IConsumerService } from "@/Interface/Common/IConsumerService";
+import Http from "../Http/HttpClient";
+
+export class ConsumerService implements IConsumerService {
+  async getAll(UserID: number): Promise<any> {
+    let result = await new Promise<any>((resolve, reject) => {
+      Http.get(`/api/branch?userID=${UserID}`)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+    return result;
+  }
+}
+
+const consumer = new ConsumerService();
+export default consumer;

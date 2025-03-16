@@ -4,16 +4,12 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet
-} from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
 import OrdenesView from "@/Views/OrdenesView";
 import PosView from "@/Views/HomeView";
 import ProcessOrderView from "@/Views/ProcessOrderView";
 import HomeView from "@/Views/HomeView";
+import { useUserContext } from "@/context/UserContext/UserContext";
 
 export const Sidebar = ({ children }: any) => {
   const Drawer = createDrawerNavigator();
@@ -24,25 +20,17 @@ export const Sidebar = ({ children }: any) => {
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={screenOptions}
     >
-      <Drawer.Screen
-        name="Venta"
-        component={HomeView}
-      />
-      
-      <Drawer.Screen
-        name="Ordenes"
-        component={OrdenesView}
-      />
-      <Drawer.Screen
-        name="Inventario"
-        component={ProcessOrderView}
-      />
+      <Drawer.Screen name="Venta" component={HomeView} />
+
+      <Drawer.Screen name="Ordenes" component={OrdenesView} />
+      <Drawer.Screen name="Inventario" component={ProcessOrderView} />
       <Drawer.Screen name="Cerrar Sesión" component={PosView} />
     </Drawer.Navigator>
   );
 };
 
 const CustomDrawerContent = (props: any) => {
+  const { userData } = useUserContext();
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.header}>
@@ -52,7 +40,7 @@ const CustomDrawerContent = (props: any) => {
           }}
           style={styles.image}
         />
-        <Text style={styles.title}>Juan Rene Guzman</Text>
+        <Text style={styles.title}>{userData?.username}</Text>
       </View>
       <DrawerItemList {...props} />
     </DrawerContentScrollView>

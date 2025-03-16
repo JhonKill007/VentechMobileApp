@@ -1,0 +1,25 @@
+export const MessageType = Object.freeze({
+  TEXT: "TEXT",
+  AUDIO: "AUDIO",
+  IMAGE: "IMAGE",
+  VIDEO: "VIDEO",
+  PUBLICATION: "PUBLICATION",
+});
+
+export const NotifyType = Object.freeze({
+  PUBLICATION_LIKE: "PUBLICATION_LIKE",
+  HISTORY_LIKE: "HISTORY_LIKE",
+  COMENT_LIKE: "COMENT_LIKE",
+  FOLLOW: "FOLLOW",
+  COMENT: "COMENT",
+  PUBLICATION_MENTION: "PUBLICATION_MENTION",
+  HISTORY_MENTION: "HISTORY_MENTION",
+  COMENT_MENTION: "COMENT_MENTION",
+  MESSAGE: "MESSAGE",
+});
+
+export const MediaType = Object.freeze({
+  IMAGE: "IMAGE",
+  AUDIO: "AUDIO",
+  VIDEO: "VIDEO",
+});

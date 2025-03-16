@@ -7,117 +7,36 @@ import {
   Text,
   Alert,
 } from "react-native";
-import {
-  Avatar,
-  Button,
-  Title,
-  Paragraph,
-  List,
-  Surface,
-  Portal,
-  Modal,
-  Provider,
-  IconButton,
-  Searchbar,
-  Icon,
-} from "react-native-paper";
-import { PermissionsAndroid, Platform } from "react-native";
-import RNHTMLtoPDF from "react-native-html-to-pdf";
+import { Avatar, List, Surface, Provider, Icon } from "react-native-paper";
+
+
+import * as Print from "expo-print";
+
 
 const OrdenesView = () => {
-  const [value, setValue] = useState(null);
-  const [text, setText] = useState("");
-  const [isSwitchOn, setIsSwitchOn] = useState(false);
-
-  // Función para generar el PDF
-  const generatePDF = async () => {
-    console.log("Entra a generar PDF");
-
-    // Verificar si los permisos ya están concedidos
-    if (Platform.OS === "android") {
-      const hasPermission = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-      );
-
-      if (!hasPermission) {
-        console.log("No tiene el permiso WRITE_EXTERNAL_STORAGE");
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-        );
-
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert(
-            "Permiso denegado",
-            "No se puede generar el PDF sin permisos."
-          );
-          console.log("Permiso WRITE_EXTERNAL_STORAGE denegado");
-          return;
-        }
-        console.log("Permiso WRITE_EXTERNAL_STORAGE concedido");
-      } else {
-        console.log("Ya tiene el permiso WRITE_EXTERNAL_STORAGE");
-      }
-    }
-
-    // Verificar permisos de lectura para Android 11 o superior
-    if (Platform.OS === "android" && Platform.Version >= 30) {
-      const hasMediaPermission = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
-      );
-
-      if (!hasMediaPermission) {
-        console.log("No tiene el permiso READ_EXTERNAL_STORAGE");
-        const grantedMedia = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
-        );
-
-        if (grantedMedia !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert(
-            "Permiso denegado",
-            "No se puede generar el PDF sin permisos."
-          );
-          console.log("Permiso READ_EXTERNAL_STORAGE denegado");
-          return;
-        }
-        console.log("Permiso READ_EXTERNAL_STORAGE concedido");
-      } else {
-        console.log("Ya tiene el permiso READ_EXTERNAL_STORAGE");
-      }
-    }
-
-    console.log("Permisos concedidos, generando PDF");
-
-    // Crear el contenido HTML para el PDF
-    const htmlContent = `
-        <h1>Resumen de Compra</h1>
-        <p><strong>Cliente:</strong> ${value || "No seleccionado"}</p>
-        <p><strong>RNC o Cédula:</strong> ${text}</p>
-        <p><strong>Comprobante Fiscal:</strong> ${isSwitchOn ? "Sí" : "No"}</p>
-        <h2>Productos</h2>
-        <ul>
-          ${itemsList
-            .map(
-              (item) =>
-                `<li><strong>${item.title}:</strong> ${item.description}</li>`
-            )
-            .join("")}
-        </ul>
+  const printHTML = async () => {
+    try {
+      const htmlContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; text-align: center; }
+              h1 { color: #007bff; }
+              p { font-size: 18px; }
+            </style>
+          </head>
+          <body>
+            <h1>Documento HTML</h1>
+            <p>Este es un documento HTML que se puede imprimir o guardar como PDF.</p>
+          </body>
+        </html>
       `;
 
-    // Opciones para la generación del PDF
-    const options = {
-      html: htmlContent,
-      fileName: "resumen_compra",
-      directory: "Documents",
-    };
-
-    try {
-      const file = await RNHTMLtoPDF.convert(options);
-      Alert.alert("PDF generado", `Guardado en: ${file.filePath}`);
-      console.log("PDF generado en:", file.filePath);
+      await Print.printAsync({ html: htmlContent });
+      
     } catch (error) {
-      console.error("Error al generar el PDF:", error);
-      Alert.alert("Error", "No se pudo generar el PDF");
+      console.error("Error al imprimir:", error);
+      Alert.alert("Error", "No se pudo imprimir el documento");
     }
   };
 
@@ -213,10 +132,7 @@ const OrdenesView = () => {
                 )}
                 right={() => (
                   <View style={styles.counterContainer}>
-                    <TouchableOpacity
-                      style={styles.button}
-                      onPress={generatePDF}
-                    >
+                    <TouchableOpacity style={styles.button} onPress={printHTML}>
                       <Icon source="printer" size={20} color={"blank"} />
                     </TouchableOpacity>
                   </View>

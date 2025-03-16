@@ -2,9 +2,9 @@ import { IProductsService } from "../../Interface/Products/IProductsService";
 import Http from "../Http/HttpClient";
 
 export class ProductsService implements IProductsService {
-  async getAll(): Promise<any> {
+  async getAll(branchId: number): Promise<any> {
     let result = await new Promise<any>((resolve, reject) => {
-      Http.post(`/api/Product`)
+      Http.get(`/api/Product?BranchId=${branchId}`)
         .then((res) => {
           resolve(res);
         })

@@ -1,4 +1,4 @@
-import { useNavigation } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 import React, { useContext, useState } from "react";
 import {
   View,
@@ -9,16 +9,16 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   Keyboard,
+  useColorScheme,
 } from "react-native";
+import { Colors } from "@/constants/Colors";
+import { AuthenticateContext } from "@/context/AuthenticateContext/AuthenticateContext";
+import { useUserContext } from "@/context/UserContext/UserContext";
+import { UserAuthModel } from "@/Models/UserAuthModel";
+import User from "@/Services/User/UserService";
+import { AuthLogin } from "@/Models/AuthLogin";
+import ChargingApp from "@/components/CharginApp";
 import { Icon } from "react-native-paper";
-// import Icon from "react-native-vector-icons/FontAwesome";
-// import { AuthenticateContext } from "../../context/AuthenticateContext/AuthenticateContext";
-// import { ThemeContext } from "../../context/themeContext/ThemeContext";
-// import { useUserContext } from "../../context/UserContext/UserContext";
-// import { UserLoginModel } from "../../Models/User/UserLoginModel";
-// import User from "../../Services/User/UserService";
-// import { UserPerfilModel } from "../../Models/User/UserPerfilModel";
-// import ChargingApp from "../onLoad/ChargingApp";
 
 const LoginView = () => {
   const navigation = useNavigation();
@@ -28,90 +28,75 @@ const LoginView = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [checking, setChecking] = useState<boolean>(false);
 
+  const theme = useColorScheme();
 
-//   const _Authenticated = useContext(AuthenticateContext);
-//   if (!_Authenticated) {
-//     return null;
-//   }
-//   const { setAuthenticate } = _Authenticated;
+  const _Authenticated = useContext(AuthenticateContext);
+  if (!_Authenticated) {
+    return null;
+  }
+  const { setAuthenticate } = _Authenticated;
 
-//   const { updateUser } = useUserContext();
+  const { updateUser } = useUserContext();
 
   const handleLogin = () => {
-    // handlePressOutside();
-    // setChecking(true);
-    // let data: UserLoginModel = {
-    //   Key: key,
-    //   Password: password,
-    // };
+    handlePressOutside();
+    setChecking(true);
+    let data: UserAuthModel = {
+      value: key.toLowerCase(),
+      key: password,
+    };
 
-    // if (data.Key !== "" && data.Password !== "") {
-    //   User.LogIn(data)
-    //     .then((res: any) => {
-    //       if (res.data.code == 200) {
-    //         let user_result: UserPerfilModel = {
-    //           user: {
-    //             id: res.data.id,
-    //             name: res.data.name,
-    //             username: res.data.username,
-    //             email: res.data.email,
-    //             password: undefined,
-    //             phone: res.data.phone,
-    //             birthday: res.data.birthday,
-    //             gender: res.data.gender,
-    //             status: res.data.status,
-    //             verify: res.data.verify,
-    //             perfilData: {
-    //               presentation: res.data.perfilData.presentation,
-    //               idMediaDataProfile: res.data.perfilData.idMediaDataProfile,
-    //               // idMediaDataCover: res.data.perfilData.idMediaDataCover,
-    //             },
-    //             createDate: new Date(res.data.createDate),
-    //           },
-    //           isFollow: res.data.isFollow,
-    //           profilePhoto: res.data.profilePhoto,
-    //           // coverPhoto: res.data.coverPhoto,
-    //           seguidos: res.data.seguidos,
-    //           seguidores: res.data.seguidores,
-    //         };
+    if (data.value !== "" && data.key !== "") {
+      User.LogIn(data)
+        .then((res: any) => {
+          if (res.data.statusCode == 1) {
+            // console.log("Data en el log", res.data);
 
-    //         updateUser(user_result);
-    //         setAuthenticate(true);
-    //       }
-    //       if (res.data.code == 204) {
-    //         setChecking(false);
-    //         setError(res.data.message);
-    //       }
-    //     })
-    //     .catch((e: any) => {
-    //       console.log(e);
-    //       setError(e);
-    //     });
-    // } else {
-    //   if (data.Password === "") {
-    //     setError("Debes colocar tu contraseña");
-    //   }
+            const user_result: AuthLogin = {
+              id: res.data.data.id,
+              fullName: res.data.data.name,
+              username: res.data.data.username,
+              email: res.data.data.email,
+              roleName: res.data.data.email,
+              authCode: res.data.data.email,
+              token: res.data.data.token,
+            };
 
-    //   if (data.Key === "") {
-    //     setError("Colocar tu usuario, email o numero");
-    //   }
-    // }
+            // console.log("Data despues del log:", user_result);
+
+            updateUser(user_result);
+            setAuthenticate(true);
+          } else {
+            setError("Credenciales incorrecta");
+            setChecking(false);
+          }
+        })
+        .catch((e: any) => {
+          console.log(e);
+          setError(e);
+          setChecking(false);
+        });
+    } else {
+      if (data.key === "") {
+        setError("Debes colocar tu contraseña");
+        setChecking(false);
+      }
+
+      if (data.value === "") {
+        setError("Colocar tu usuario, email o numero");
+        setChecking(false);
+      }
+    }
   };
 
   const handlePressOutside = () => {
     Keyboard.dismiss();
   };
-
   return (
     <TouchableWithoutFeedback onPress={handlePressOutside}>
       <View style={styles.container}>
         {checking ? (
-          // <Image
-          //   source={require("../../../assets/adaptive-icon.png")}
-          //   style={{ margin: "auto", width: 70, height: 70 }}
-          // />
-        //   <ChargingApp />
-        <></>
+          <ChargingApp />
         ) : (
           <>
             <Image
@@ -119,7 +104,7 @@ const LoginView = () => {
               style={styles.branding}
             />
             <View style={styles.errorContainer}>
-              <Text style={{ color: 'black', fontStyle: "italic" }}>
+              <Text style={{ color: "black", fontStyle: "italic" }}>
                 {error}
               </Text>
             </View>
@@ -241,8 +226,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   errorContainer: {
-    height: 15,
+    height: 25,
     marginBottom: 8,
+    marginTop: 20,
   },
 });
 

@@ -1,3 +1,3 @@
 export interface IProductsService {
-    getAll(): Promise<any>
+  getAll(branchId: number): Promise<any>;
 }
