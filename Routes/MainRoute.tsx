@@ -9,7 +9,7 @@ import { Platform, useColorScheme, View } from "react-native";
 // import * as NavigationBar from "expo-navigation-bar";
 import { InsideRoute } from "./InsideRoute";
 import ChargingApp from "@/components/CharginApp";
-import getUserDataHook from "@/Hooks/getUserDataHook";
+import getUserDataHook from "@/hooks/getUserDataHook";
 
 export default function MainRoute() {
   const theme = useColorScheme();

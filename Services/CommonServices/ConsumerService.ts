@@ -2,9 +2,9 @@ import { IConsumerService } from "@/Interface/Common/IConsumerService";
 import Http from "../Http/HttpClient";
 
 export class ConsumerService implements IConsumerService {
-  async getAll(UserID: number): Promise<any> {
+  async getAll(companyId: number): Promise<any> {
     let result = await new Promise<any>((resolve, reject) => {
-      Http.get(`/api/branch?userID=${UserID}`)
+      Http.get(`/api/consumer/${companyId}`)
         .then((res) => {
           resolve(res);
         })

@@ -2,9 +2,9 @@ import { IDiscountService } from "@/Interface/Common/IDiscountService";
 import Http from "../Http/HttpClient";
 
 export class DiscountService implements IDiscountService {
-  async getAll(UserID: number): Promise<any> {
+  async getAll(companyId: number): Promise<any> {
     let result = await new Promise<any>((resolve, reject) => {
-      Http.get(`/api/branch?userID=${UserID}`)
+      Http.get(`/api/Discount?companyId=${companyId}`)
         .then((res) => {
           resolve(res);
         })

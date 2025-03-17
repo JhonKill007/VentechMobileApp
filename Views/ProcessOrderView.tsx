@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -24,29 +24,50 @@ import {
   Searchbar,
 } from "react-native-paper";
 import { useNavigation } from "expo-router";
-
+import ConsumerService from "@/Services/CommonServices/ConsumerService";
+import { Consumer } from "@/Models/Consumer";
+import ChargingApp from "@/components/CharginApp";
+import { Discount } from "@/Models/Discount";
+import DiscountService  from "@/Services/CommonServices/DiscountService";
 const ProcessOrderView = () => {
   const navigation = useNavigation();
   const [visible, setVisible] = useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [consumer, setConsumer] = useState<Consumer[]>([]);
+  const [discount, setDiscount] = useState<Discount[]>([]);
+  const [checking, setChecking] = useState<boolean>(true);
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
   const [value, setValue] = useState(null);
-  const [text, setText] = React.useState("");
-  const [isSwitchOn, setIsSwitchOn] = React.useState(false);
+  const [rncOrCedula, setRncOrCedula] = React.useState("");
+  const [hasRnc, setHasRnc] = React.useState(false);
+  const onToggleSwitch = () => setHasRnc(!hasRnc);
 
-  const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
-  const data = [
-    { label: "Item 1", value: "1" },
-    { label: "Item 2", value: "2" },
-    { label: "Item 3", value: "3" },
-    { label: "Item 4", value: "4" },
-    { label: "Item 5", value: "5" },
-    { label: "Item 6", value: "6" },
-    { label: "Item 7", value: "7" },
-    { label: "Item 8", value: "8" },
-  ];
+  useEffect(() => {
+    ConsumerService.getAll(2)
+      .then((e: any) => {
+        const data = e.data.data;
+
+        setConsumer(data);
+        setChecking(false);
+      })
+      .catch((err: any) => {
+        console.error(err);
+      });
+
+      DiscountService.getAll(2)
+      .then((e: any) => {
+        const data = e.data.data;
+        setDiscount(data.filter(x=>x.type==1));
+        console.log(discount);
+        
+      })
+      .catch((err: any) => {
+        console.error(err);
+      });
+  }, []);
+ 
   const itemsList = [
     {
       id: "1",
@@ -121,154 +142,170 @@ const ProcessOrderView = () => {
       image: "https://picsum.photos/id/3/200",
     },
   ];
+
+  const verifyClientInformation= (client:any)=>{
+    setHasRnc(client.hasRnc)
+    setRncOrCedula(client.rncOCedula)
+  }
+  
   return (
     <Provider>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
-          {/* Dropdown de Clientes */}
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={data}
-            search
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder="Clientes"
-            searchPlaceholder="Buscar..."
-            value={value}
-            onChange={(item) => setValue(item.value)}
-            renderLeftIcon={() => (
-              <AntDesign
-                style={styles.icon}
-                color="black"
-                name="user"
-                size={20}
-              />
-            )}
-          />
-
-          {/* Switch de Comprobante Fiscal */}
-          <View style={styles.switchContainer}>
-            <Text style={styles.label}>Comprobante Fiscal</Text>
-            <Switch value={isSwitchOn} onValueChange={onToggleSwitch} />
-          </View>
-
-          {/* Campo de RNC o Cédula */}
-          <TextInput
-            label="RNC o Cédula"
-            value={text}
-            style={styles.input}
-            onChangeText={(text) => setText(text)}
-          />
-
-          {/* Dropdown de Descuentos */}
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={data}
-            search
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder="Descuentos"
-            searchPlaceholder="Buscar..."
-            value={value}
-            onChange={(item) => setValue(item.value)}
-            renderLeftIcon={() => (
-              <AntDesign
-                style={styles.icon}
-                color="black"
-                name="tag"
-                size={20}
-              />
-            )}
-          />
-
-          {/* Título de Productos */}
-          <Text style={styles.sectionTitle}>Productos</Text>
-
-          {/* Lista de Productos */}
-          <Surface style={styles.surface}>
-            <ScrollView style={styles.scrollView}>
-              {itemsList.map((item, index) => (
-                <List.Item
-                  key={`${item.id}-${index}`}
-                  title={item.title}
-                  description={item.description}
-                  left={(props) => (
-                    <Avatar.Image {...props} source={{ uri: item.image }} />
-                  )}
-                  right={() => (
-                    <View style={styles.counterContainer}>
-                      <TouchableOpacity style={styles.button}>
-                        <Text style={styles.buttonText}>-</Text>
-                      </TouchableOpacity>
-                      <Text style={styles.quantity}>1</Text>
-                      <TouchableOpacity style={styles.button}>
-                        <Text style={styles.buttonText}>+</Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                />
-              ))}
-            </ScrollView>
-          </Surface>
-          {/* Switch de Comprobante Fiscal */}
-          <View style={styles.montosContainer}>
-            <View style={styles.montos}>
-              <Text style={styles.label}>Descuento</Text>
-              <Text style={styles.label}>140.00</Text>
-            </View>
-            <View style={styles.montos}>
-              <Text style={styles.label}>Itebis</Text>
-              <Text style={styles.label}>140.00</Text>
-            </View>
-            <View style={styles.montos}>
-              <Text style={styles.label}>Total</Text>
-              <Text style={styles.label}>140.00</Text>
-            </View>
-          </View>
-          {/* Botones de Acción */}
-          <View style={styles.buttonContainer}>
-            <Button
-              icon="cancel"
-              mode="contained"
-              onPress={() => navigation.goBack()}
-              style={{ backgroundColor: "red" }}
-            >
-              Cancelar
-            </Button>
-            <Button
-              icon="check"
-              mode="contained"
-              onPress={showModal}
-              style={{ backgroundColor: "#3F75EA" }}
-            >
-              Procesar
-            </Button>
-          </View>
-
-          {/* Modal */}
-          <Portal>
-            <Modal
-              visible={visible}
-              onDismiss={hideModal}
-              contentContainerStyle={styles.modalContainer}
-            >
-              <Button mode="contained" onPress={hideModal}>
-                Cerrar
-              </Button>
-            </Modal>
-          </Portal>
+      {checking ? (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <ChargingApp />
         </View>
-      </ScrollView>
+      ) : (
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.container}>
+            {/* Dropdown de Clientes */}
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={consumer}
+              search
+              maxHeight={300}
+              labelField="name"
+              valueField="id"
+              placeholder="Clientes"
+              searchPlaceholder="Buscar..."
+              value={value}
+              onChange={(item) => verifyClientInformation(item)}
+              renderLeftIcon={() => (
+                <AntDesign
+                  style={styles.icon}
+                  color="black"
+                  name="user"
+                  size={20}
+                />
+              )}
+            />
+
+            {/* Switch de Comprobante Fiscal */}
+            <View style={styles.switchContainer}>
+              <Text style={styles.label}>Comprobante Fiscal</Text>
+              <Switch value={hasRnc} onValueChange={onToggleSwitch} />
+            </View>
+
+            {/* Campo de RNC o Cédula */}
+            {hasRnc ? (
+            <TextInput
+            
+              label="RNC o Cédula"
+              value={rncOrCedula}
+              style={styles.input}
+              onChangeText={(text) => setRncOrCedula(text)}
+            />): <View></View> }
+
+            {/* Dropdown de Descuentos */}
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={discount}
+              search
+              maxHeight={300}
+              labelField="name"
+              valueField="valor"
+              placeholder="Descuentos"
+              searchPlaceholder="Buscar..."
+              value={value}
+              onChange={(item) => setValue(item.value)}
+              renderLeftIcon={() => (
+                <AntDesign
+                  style={styles.icon}
+                  color="black"
+                  name="tag"
+                  size={20}
+                />
+              )}
+            />
+
+            {/* Título de Productos */}
+            <Text style={styles.sectionTitle}>Productos</Text>
+
+            {/* Lista de Productos */}
+            <Surface style={styles.surface}>
+              <ScrollView style={styles.scrollView}>
+                {itemsList.map((item, index) => (
+                  <List.Item
+                    key={`${item.id}-${index}`}
+                    title={item.title}
+                    description={item.description}
+                    left={(props) => (
+                      <Avatar.Image {...props} source={{ uri: item.image }} />
+                    )}
+                    right={() => (
+                      <View style={styles.counterContainer}>
+                        <TouchableOpacity style={styles.button}>
+                          <Text style={styles.buttonText}>-</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.quantity}>1</Text>
+                        <TouchableOpacity style={styles.button}>
+                          <Text style={styles.buttonText}>+</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  />
+                ))}
+              </ScrollView>
+            </Surface>
+            {/* Switch de Comprobante Fiscal */}
+            <View style={styles.montosContainer}>
+              <View style={styles.montos}>
+                <Text style={styles.label}>Descuento</Text>
+                <Text style={styles.label}>140.00</Text>
+              </View>
+              <View style={styles.montos}>
+                <Text style={styles.label}>Itebis</Text>
+                <Text style={styles.label}>140.00</Text>
+              </View>
+              <View style={styles.montos}>
+                <Text style={styles.label}>Total</Text>
+                <Text style={styles.label}>140.00</Text>
+              </View>
+            </View>
+            {/* Botones de Acción */}
+            <View style={styles.buttonContainer}>
+              <Button
+                icon="cancel"
+                mode="contained"
+                onPress={() => navigation.goBack()}
+                style={{ backgroundColor: "red" }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                icon="check"
+                mode="contained"
+                onPress={showModal}
+                style={{ backgroundColor: "#3F75EA" }}
+              >
+                Procesar
+              </Button>
+            </View>
+
+            {/* Modal */}
+            <Portal>
+              <Modal
+                visible={visible}
+                onDismiss={hideModal}
+                contentContainerStyle={styles.modalContainer}
+              >
+                <Button mode="contained" onPress={hideModal}>
+                  Cerrar
+                </Button>
+              </Modal>
+            </Portal>
+          </View>
+        </ScrollView>
+      )}
     </Provider>
   );
 };
