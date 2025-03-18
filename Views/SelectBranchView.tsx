@@ -1,20 +1,33 @@
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, TouchableOpacity, Text } from "react-native";
-
+import  CompanyService  from "@/Services/Company/CompanyService";
+import { Company } from "@/Models/Company";
+import { Branch } from "@/Models/Branch";
 const SelectBranchView = () => {
+
+    const [branches, setBranches] = useState<Branch[]>([]);
+
+    
+  useEffect(() => {
+    CompanyService.getAllBranches(2)
+      .then((e: any) => {
+        const data = e.data.data;
+        console.log(data);
+        
+        setBranches(data);
+        // setChecking(false);
+      })
+      .catch((err: any) => {
+        console.error(err);
+      });
+  }, []);
   const navigation = useNavigation();
-  const sucursales = [
-    { id: 1, nombre: "Sucursal 1" },
-    { id: 2, nombre: "Sucursal 2" },
-    { id: 3, nombre: "Sucursal 3" },
-    { id: 4, nombre: "Sucursal 4" },
-    { id: 5, nombre: "Sucursal 5" },
-    { id: 6, nombre: "Sucursal 6" },
-  ];
+
   return (
+    
     <FlatList
-      data={sucursales}
+      data={branches}
       renderItem={({ item, index }) => (
         <TouchableOpacity
           key={index}
@@ -37,12 +50,12 @@ const SelectBranchView = () => {
             style={{
               textAlign: "center",
               marginTop: 20,
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: "bold",
               color: "black",
             }}
           >
-            {item.nombre}
+            {item.name}
           </Text>
         </TouchableOpacity>
       )}

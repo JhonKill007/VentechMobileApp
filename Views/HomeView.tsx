@@ -8,11 +8,12 @@ import { Product } from "@/Models/Product";
 import ItemProduct from "@/components/ItemProduct";
 import ChargingApp from "@/components/CharginApp";
 import { Colors } from "@/constants/Colors";
-import useGroupedProducts from "@/Hooks/useGroupedProducts";
+import { Order } from "@/Models/Order";
 
 const HomeView = () => {
   const theme = useColorScheme();
   const [products, setProducts] = useState<Product[]>([]);
+  const [newOrder, setNewOrder] = useState<Order>({});
   const [productsFiltered, setProductsFiltered] = useState<Product[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
   const [search, setsearch] = useState<string>("");
@@ -80,7 +81,11 @@ const HomeView = () => {
 
   const getTotalPrice = () => {
     return selectedProducts.reduce((total: number, item: any) => {
-      return total + item.cantidad * item.product.price;
+
+      newOrder.total= total + item.cantidad * item.product.price;
+
+      
+      return newOrder.total;
     }, 0);
   };
 
@@ -129,7 +134,7 @@ const HomeView = () => {
           >
             <FlatList
               data={!search ? products : productsFiltered}
-              style={{ height: 450, marginBottom: 10 }}
+              style={{ height: 350, marginBottom: 10 }}
               renderItem={({ item, index }) => (
                 <ItemProduct key={index} product={item} add={addProducts} />
               )}
