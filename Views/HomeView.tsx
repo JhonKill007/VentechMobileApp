@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { StyleSheet, View, Text, FlatList, useColorScheme } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  FlatList,
+  useColorScheme,
+  Dimensions,
+} from "react-native";
 import { useNavigation } from "expo-router";
 
 import { Button, Surface, Provider, Searchbar } from "react-native-paper";
@@ -9,19 +16,18 @@ import ItemProduct from "@/components/ItemProduct";
 import ChargingApp from "@/components/CharginApp";
 import { Colors } from "@/constants/Colors";
 import { Order } from "@/Models/Order";
+const ScreenHeight = Dimensions.get("window").height;
 
 const HomeView = () => {
   const theme = useColorScheme();
   const [products, setProducts] = useState<Product[]>([]);
-  const [newOrder, setNewOrder] = useState<Order>({});
+  // const [newOrder, setNewOrder] = useState<Order>({});
   const [productsFiltered, setProductsFiltered] = useState<Product[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
   const [search, setsearch] = useState<string>("");
   const [checking, setChecking] = useState<boolean>(true);
-  const [cantOfProducts, setcantOfProducts] = useState<number>(0);
   const [descuentos, setDescuentos] = useState<number>(0);
   const [itebis, setItebis] = useState<number>(0);
-  const [total, setTotal] = useState<number>(0);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -39,14 +45,14 @@ const HomeView = () => {
   const groupAndSumStock = (products: Product[]): Product[] => {
     const groupedProducts = products.reduce((acc, product) => {
       const key = `${product.code}-${product.name}`;
-  
+
       acc[key] = acc[key]
         ? { ...acc[key], stock: acc[key].stock! + product.stock! }
         : { ...product };
-  
+
       return acc;
     }, {} as { [key: string]: Product });
-  
+
     return Object.values(groupedProducts);
   };
 
@@ -81,12 +87,17 @@ const HomeView = () => {
 
   const getTotalPrice = () => {
     return selectedProducts.reduce((total: number, item: any) => {
-
-      newOrder.total= total + item.cantidad * item.product.price;
-
-      
-      return newOrder.total;
+      return total + item.cantidad * item.product.price;;
     }, 0);
+  };
+
+  const procesarOrden = () => {
+    navigation.navigate(
+      "ProcessOrderView" as never,
+      {
+        selectedProducts: selectedProducts,
+      } as never
+    );
   };
 
   return (
@@ -134,7 +145,7 @@ const HomeView = () => {
           >
             <FlatList
               data={!search ? products : productsFiltered}
-              style={{ height: 350, marginBottom: 10 }}
+              style={{ height: ScreenHeight - 400, marginBottom: 10 }}
               renderItem={({ item, index }) => (
                 <ItemProduct key={index} product={item} add={addProducts} />
               )}
@@ -260,7 +271,7 @@ const HomeView = () => {
             <Button
               icon="trash-can-outline"
               mode="contained"
-              onPress={() => console.log("Cancelado")}
+              onPress={() => setSelectedProducts([])}
               style={{ backgroundColor: "red" }}
             >
               Limpiar
@@ -269,7 +280,9 @@ const HomeView = () => {
             <Button
               icon="check"
               mode="contained"
-              onPress={() => navigation.navigate("ProcessOrderView" as never)}
+              onPress={() =>
+                selectedProducts.length > 0 ? procesarOrden() : null
+              }
               style={{ backgroundColor: "#3F75EA" }}
             >
               Procesar

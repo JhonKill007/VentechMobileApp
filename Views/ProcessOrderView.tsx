@@ -3,39 +3,39 @@ import {
   ScrollView,
   StyleSheet,
   View,
-  TouchableOpacity,
   Text,
+  FlatList,
+  Dimensions,
+  useColorScheme,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Switch, TextInput } from "react-native-paper";
 
-import {
-  Avatar,
-  Button,
-  Title,
-  Paragraph,
-  List,
-  Surface,
-  Portal,
-  Modal,
-  Provider,
-  IconButton,
-  Searchbar,
-} from "react-native-paper";
+import { Button, Surface, Portal, Modal, Provider } from "react-native-paper";
 import { useNavigation } from "expo-router";
 import ConsumerService from "@/Services/CommonServices/ConsumerService";
 import { Consumer } from "@/Models/Consumer";
 import ChargingApp from "@/components/CharginApp";
 import { Discount } from "@/Models/Discount";
-import DiscountService  from "@/Services/CommonServices/DiscountService";
+import DiscountService from "@/Services/CommonServices/DiscountService";
+import { useRoute } from "@react-navigation/native";
+import ItemProduct from "@/components/ItemProduct";
+import { Colors } from "@/constants/Colors";
+const ScreenHeight = Dimensions.get("window").height;
+
 const ProcessOrderView = () => {
+  const theme = useColorScheme();
+  const route = useRoute();
   const navigation = useNavigation();
+  const { selectedProducts }: any = route.params;
   const [visible, setVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = React.useState("");
   const [consumer, setConsumer] = useState<Consumer[]>([]);
   const [discount, setDiscount] = useState<Discount[]>([]);
   const [checking, setChecking] = useState<boolean>(true);
+
+  const [descuentos, setDescuentos] = useState<number>(0);
+  const [itebis, setItebis] = useState<number>(0);
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
@@ -56,98 +56,28 @@ const ProcessOrderView = () => {
         console.error(err);
       });
 
-      DiscountService.getAll(2)
+    DiscountService.getAll(2)
       .then((e: any) => {
         const data = e.data.data;
-        setDiscount(data.filter(x=>x.type==1));
+        setDiscount(data.filter((x) => x.type == 1));
         console.log(discount);
-        
       })
       .catch((err: any) => {
         console.error(err);
       });
   }, []);
- 
-  const itemsList = [
-    {
-      id: "1",
-      title: "Botellon de agua",
-      description: "DOP 40.00",
-      image: "https://picsum.photos/id/1/200",
-    },
-    {
-      id: "2",
-      title: "Queso Blanco",
-      description: "DOP 230.00",
-      image: "https://picsum.photos/id/2/200",
-    },
-    {
-      id: "3",
-      title: "Queso Amarillo",
-      description: "DOP 250.00.",
-      image: "https://picsum.photos/id/3/200",
-    },
-    {
-      id: "1",
-      title: "Botellon de agua",
-      description: "DOP 40.00",
-      image: "https://picsum.photos/id/1/200",
-    },
-    {
-      id: "2",
-      title: "Queso Blanco",
-      description: "DOP 230.00",
-      image: "https://picsum.photos/id/2/200",
-    },
-    {
-      id: "3",
-      title: "Queso Amarillo",
-      description: "DOP 250.00.",
-      image: "https://picsum.photos/id/3/200",
-    },
-    {
-      id: "1",
-      title: "Botellon de agua",
-      description: "DOP 40.00",
-      image: "https://picsum.photos/id/1/200",
-    },
-    {
-      id: "2",
-      title: "Queso Blanco",
-      description: "DOP 230.00",
-      image: "https://picsum.photos/id/2/200",
-    },
-    {
-      id: "3",
-      title: "Queso Amarillo",
-      description: "DOP 250.00.",
-      image: "https://picsum.photos/id/3/200",
-    },
-    {
-      id: "1",
-      title: "Botellon de agua",
-      description: "DOP 40.00",
-      image: "https://picsum.photos/id/1/200",
-    },
-    {
-      id: "2",
-      title: "Queso Blanco",
-      description: "DOP 230.00",
-      image: "https://picsum.photos/id/2/200",
-    },
-    {
-      id: "3",
-      title: "Queso Amarillo",
-      description: "DOP 250.00.",
-      image: "https://picsum.photos/id/3/200",
-    },
-  ];
 
-  const verifyClientInformation= (client:any)=>{
-    setHasRnc(client.hasRnc)
-    setRncOrCedula(client.rncOCedula)
-  }
-  
+  const verifyClientInformation = (client: any) => {
+    setHasRnc(client.hasRnc);
+    setRncOrCedula(client.rncOCedula);
+  };
+
+  const getTotalPrice = () => {
+    return selectedProducts.reduce((total: number, item: any) => {
+      return total + item.cantidad * item.product.price;
+    }, 0);
+  };
+
   return (
     <Provider>
       {checking ? (
@@ -157,8 +87,28 @@ const ProcessOrderView = () => {
           <ChargingApp />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.container}>
+        <View
+          style={[
+            styles.scrollContainer,
+            {
+              backgroundColor:
+                theme === "light"
+                  ? Colors.light.colors.background
+                  : Colors.dark.colors.background,
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.container,
+              {
+                backgroundColor:
+                  theme === "light"
+                    ? Colors.light.colors.background
+                    : Colors.dark.colors.background,
+              },
+            ]}
+          >
             {/* Dropdown de Clientes */}
             <Dropdown
               style={styles.dropdown}
@@ -193,13 +143,15 @@ const ProcessOrderView = () => {
 
             {/* Campo de RNC o Cédula */}
             {hasRnc ? (
-            <TextInput
-            
-              label="RNC o Cédula"
-              value={rncOrCedula}
-              style={styles.input}
-              onChangeText={(text) => setRncOrCedula(text)}
-            />): <View></View> }
+              <TextInput
+                label="RNC o Cédula"
+                value={rncOrCedula}
+                style={styles.input}
+                onChangeText={(text) => setRncOrCedula(text)}
+              />
+            ) : (
+              <View></View>
+            )}
 
             {/* Dropdown de Descuentos */}
             <Dropdown
@@ -231,44 +183,139 @@ const ProcessOrderView = () => {
             <Text style={styles.sectionTitle}>Productos</Text>
 
             {/* Lista de Productos */}
-            <Surface style={styles.surface}>
-              <ScrollView style={styles.scrollView}>
-                {itemsList.map((item, index) => (
-                  <List.Item
-                    key={`${item.id}-${index}`}
-                    title={item.title}
-                    description={item.description}
-                    left={(props) => (
-                      <Avatar.Image {...props} source={{ uri: item.image }} />
-                    )}
-                    right={() => (
-                      <View style={styles.counterContainer}>
-                        <TouchableOpacity style={styles.button}>
-                          <Text style={styles.buttonText}>-</Text>
-                        </TouchableOpacity>
-                        <Text style={styles.quantity}>1</Text>
-                        <TouchableOpacity style={styles.button}>
-                          <Text style={styles.buttonText}>+</Text>
-                        </TouchableOpacity>
-                      </View>
-                    )}
+            <Surface
+              style={[
+                styles.surface,
+                {
+                  backgroundColor:
+                    theme === "light"
+                      ? Colors.light.colors.background
+                      : Colors.dark.colors.background,
+                },
+              ]}
+            >
+              <FlatList
+                data={selectedProducts}
+                style={{ height: ScreenHeight - 600, marginBottom: 10 }}
+                renderItem={({ item, index }) => (
+                  <ItemProduct
+                    key={index}
+                    product={item.product}
+                    add={() => {}}
                   />
-                ))}
-              </ScrollView>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+              />
             </Surface>
             {/* Switch de Comprobante Fiscal */}
             <View style={styles.montosContainer}>
-              <View style={styles.montos}>
-                <Text style={styles.label}>Descuento</Text>
-                <Text style={styles.label}>140.00</Text>
-              </View>
-              <View style={styles.montos}>
-                <Text style={styles.label}>Itebis</Text>
-                <Text style={styles.label}>140.00</Text>
-              </View>
-              <View style={styles.montos}>
-                <Text style={styles.label}>Total</Text>
-                <Text style={styles.label}>140.00</Text>
+              <View
+                style={{
+                  display: "flex",
+                  padding: 10,
+                  borderTopWidth: 1,
+                  borderColor: "gray",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    backgroundColor:
+                      theme === "light"
+                        ? Colors.light.colors.background
+                        : Colors.dark.colors.background,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: "#333",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Cantidad de productos:
+                  </Text>
+                  <Text style={{ fontSize: 16, color: "#333" }}>
+                    {selectedProducts.length}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    backgroundColor:
+                      theme === "light"
+                        ? Colors.light.colors.background
+                        : Colors.dark.colors.background,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: "#333",
+                      fontWeight: "bold",
+                      marginLeft: 93,
+                    }}
+                  >
+                    Descuento:
+                  </Text>
+                  <Text style={{ fontSize: 16, color: "#333" }}>
+                    RD$ {descuentos}.00
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    backgroundColor:
+                      theme === "light"
+                        ? Colors.light.colors.background
+                        : Colors.dark.colors.background,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: "#333",
+                      fontWeight: "bold",
+                      marginLeft: 133,
+                    }}
+                  >
+                    Itebis:
+                  </Text>
+                  <Text style={{ fontSize: 16, color: "#333" }}>
+                    RD$ {itebis}.00
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    backgroundColor:
+                      theme === "light"
+                        ? Colors.light.colors.background
+                        : Colors.dark.colors.background,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: "#333",
+                      fontWeight: "bold",
+                      marginLeft: 138,
+                    }}
+                  >
+                    Total:
+                  </Text>
+                  <Text style={{ fontSize: 16, color: "#333" }}>
+                    RD$ {getTotalPrice()}.00
+                  </Text>
+                </View>
               </View>
             </View>
             {/* Botones de Acción */}
@@ -304,7 +351,7 @@ const ProcessOrderView = () => {
               </Modal>
             </Portal>
           </View>
-        </ScrollView>
+        </View>
       )}
     </Provider>
   );
@@ -356,8 +403,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   montosContainer: {
-    display: "flex",
-    backgroundColor: "#fff",
+    // display: "flex",
+    // backgroundColor: "#fff",
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
