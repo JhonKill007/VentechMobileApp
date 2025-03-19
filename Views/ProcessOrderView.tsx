@@ -85,8 +85,7 @@ const ProcessOrderView = () => {
 
   const CrearOrden = () => {
 
-    ConsumerService.GetContribuyente(company?.id!)
-
+    ConsumerService.GetContribuyente(rncOrCedula!)
     .then((e: any) => {
       const data = e.data.data;
       setRazonSocial(data.razonSocial);
