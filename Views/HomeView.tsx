@@ -61,7 +61,7 @@ const HomeView = () => {
   const SearchHandle = (text: string) => {
     setsearch(text);
     const filteredProduct = products.filter((p: Product) =>
-      p.name!.includes(text.toUpperCase())
+      p.name!.toLowerCase().includes(text.toLowerCase())
     );
     setProductsFiltered(filteredProduct);
   };

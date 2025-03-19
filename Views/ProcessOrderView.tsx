@@ -44,6 +44,7 @@ const ProcessOrderView = () => {
 
   const [descuentos, setDescuentos] = useState<number>(0);
   const [itebis, setItebis] = useState<number>(0);
+  const [razonSocial, setRazonSocial] = useState<string>("");
   const { company, userData, branch } = useUserContext();
 
   const [descuento, setDescuento] = useState(null);
@@ -83,6 +84,16 @@ const ProcessOrderView = () => {
 
 
   const CrearOrden = () => {
+
+    ConsumerService.GetContribuyente(company?.id!)
+
+    .then((e: any) => {
+      const data = e.data.data;
+      setRazonSocial(data.razonSocial);
+    })
+    .catch((err: any) => {
+      console.error(err);
+    });
     setChecking(true);
     const newOrdenProducts = selectedProducts.map((p) => ({
       productId: p.id,
@@ -114,7 +125,7 @@ const ProcessOrderView = () => {
       },
       rncOCedula: rncOrCedula,
       branchId: branch?.id!,
-      razonSocial: "",
+      razonSocial: razonSocial,
       companyId: company?.id!,
       payMethod: "Efectivo",
       discountPercent: 0,
@@ -128,7 +139,7 @@ const ProcessOrderView = () => {
       products: newOrdenProducts,
     };
 
-    console.log(newOrden);
+  
     OrderS.create(newOrden)
       .then((e: any) => {
 
@@ -429,6 +440,7 @@ Cliente:${ordenAImprimir.consumer.name}
 
             {/* Switch de Comprobante Fiscal */}
             <View style={styles.switchContainer}>
+            
               <Text style={styles.label}>Comprobante Fiscal</Text>
               <Switch value={hasRnc} onValueChange={onToggleSwitch} />
             </View>
@@ -446,7 +458,7 @@ Cliente:${ordenAImprimir.consumer.name}
             )}
 
             {/* Dropdown de Descuentos */}
-            <Dropdown
+            {/* <Dropdown
               style={styles.dropdown}
               placeholderStyle={styles.placeholderStyle}
               selectedTextStyle={styles.selectedTextStyle}
@@ -469,7 +481,7 @@ Cliente:${ordenAImprimir.consumer.name}
                   size={20}
                 />
               )}
-            />
+            /> */}
 
             {/* Título de Productos */}
             <Text style={styles.sectionTitle}>Productos</Text>
@@ -486,18 +498,11 @@ Cliente:${ordenAImprimir.consumer.name}
                 },
               ]}
             >
-
               <FlatList
                 data={selectedProducts}
-                style={{ height: ScreenHeight - 700, marginBottom: 10 }}
+                style={{ height: ScreenHeight - 500, marginBottom: 5 }}
                 renderItem={({ item, index }) => (
-                  // <ItemProduct
-                  //   key={index}
-                  //   product={item.product}
-                  //   add={() => {}}
-                  // />
-
-
+                
                   <List.Item
                       title={item.product.name!}
                       description={`RD$${item.product.price}`}
@@ -561,14 +566,6 @@ Cliente:${ordenAImprimir.consumer.name}
                 keyExtractor={(item, index) => index.toString()}
               />
 
-                    
-
-
-
-
-
-
-
             </Surface>
             {/* Switch de Comprobante Fiscal */}
             <View style={styles.montosContainer}>
@@ -604,31 +601,7 @@ Cliente:${ordenAImprimir.consumer.name}
                     {getTotalCantidadProducto()}
                   </Text>
                 </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    backgroundColor:
-                      theme === "light"
-                        ? Colors.light.colors.background
-                        : Colors.dark.colors.background,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color: "#333",
-                      fontWeight: "bold",
-                      marginLeft: 93,
-                    }}
-                  >
-                    Descuento:
-                  </Text>
-                  <Text style={{ fontSize: 16, color: "#333" }}>
-                    RD$ {descuentos}.00
-                  </Text>
-                </View>
+                
                 <View
                   style={{
                     flexDirection: "row",
@@ -686,7 +659,12 @@ Cliente:${ordenAImprimir.consumer.name}
               <Button
                 icon="cancel"
                 mode="contained"
-                onPress={() => navigation.goBack()}
+                onPress={() => navigation.navigate(
+                  "initalApp" as never,
+                  {
+                    selectedProducts: selectedProducts,
+                  } as never
+                )}
                 style={{ backgroundColor: "red" }}
               >
                 Cancelar
@@ -723,7 +701,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: "#ccc",
-    marginBottom: 15,
+    marginBottom: 5,
   },
   placeholderStyle: {
     fontSize: 16,
@@ -746,11 +724,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#fff",
-    padding: 10,
+    
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#ccc",
-    marginBottom: 15,
+    marginBottom: 5,
   },
   montosContainer: {
     // display: "flex",
@@ -770,6 +748,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     fontWeight: "bold",
+    marginLeft:7
   },
   input: {
     width: "100%",
@@ -778,12 +757,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: "#ccc",
-    marginBottom: 15,
+    marginBottom: 5,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 5,
     color: "#333",
   },
   surface: {
@@ -791,7 +770,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     elevation: 4,
-    marginBottom: 20,
+    marginBottom: 5,
   },
   scrollView: {
     maxHeight: 300,

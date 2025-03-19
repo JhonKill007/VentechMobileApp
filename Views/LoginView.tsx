@@ -100,7 +100,7 @@ const LoginView = () => {
         ) : (
           <>
             <Image
-              source={require("../assets/images/adaptive-icon.png")}
+              source={require("../assets/images/ventech.png")}
               style={styles.branding}
             />
             <View style={styles.errorContainer}>
@@ -177,9 +177,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor:"white"
   },
   branding: {
-    width: 100,
+    width: 300,
     height: 100,
   },
   logo: {

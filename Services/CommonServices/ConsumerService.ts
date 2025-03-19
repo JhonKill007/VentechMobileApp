@@ -14,6 +14,19 @@ export class ConsumerService implements IConsumerService {
     });
     return result;
   }
+
+  async GetContribuyente(rnc: string): Promise<any> {
+    let result = await new Promise<any>((resolve, reject) => {
+      Http.get(`/api/Contribuyente?rnc=${rnc}`)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+    return result;
+  }
 }
 
 const consumer = new ConsumerService();
