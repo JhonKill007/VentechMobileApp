@@ -60,7 +60,6 @@ const HomeView = () => {
 
   const SearchHandle = (text: string) => {
     setsearch(text);
-    console.log(text);
     const filteredProduct = products.filter((p: Product) =>
       p.name!.includes(text.toUpperCase())
     );
@@ -87,9 +86,21 @@ const HomeView = () => {
     });
   };
 
+  const getTotalItbis = () => {
+    return selectedProducts.reduce((total: number, item: any) => {
+      
+      return total + ((item.product.price * item.product.itbis)/100)* item.cantidad;;
+    }, 0);
+  };
+
   const getTotalPrice = () => {
     return selectedProducts.reduce((total: number, item: any) => {
       return total + item.cantidad * item.product.price;;
+    }, 0);
+  };
+  const getTotalCantidadProducto = () => {
+    return selectedProducts.reduce((total: number, item: any) => {
+      return total + item.cantidad ;
     }, 0);
   };
 
@@ -182,7 +193,7 @@ const HomeView = () => {
                   Cantidad de productos:
                 </Text>
                 <Text style={{ fontSize: 16, color: "#333" }}>
-                  {selectedProducts.length}
+                  {getTotalCantidadProducto()}
                 </Text>
               </View>
               <View
@@ -232,7 +243,7 @@ const HomeView = () => {
                   Itebis:
                 </Text>
                 <Text style={{ fontSize: 16, color: "#333" }}>
-                  RD$ {itebis}.00
+                  RD$ {getTotalItbis().toLocaleString("en-US", { style: "currency", currency: "USD" })}
                 </Text>
               </View>
               <View
@@ -257,7 +268,7 @@ const HomeView = () => {
                   Total:
                 </Text>
                 <Text style={{ fontSize: 16, color: "#333" }}>
-                  RD$ {getTotalPrice()}.00
+                  RD$ {getTotalPrice().toLocaleString("en-US", { style: "currency", currency: "USD" })}
                 </Text>
               </View>
             </View>

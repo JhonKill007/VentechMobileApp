@@ -101,7 +101,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   }, []);
 
   const removeUser = async () => {
-    console.log("entrando al cerrar");
     try {
       await AsyncStorage.removeItem("Vt-tk");
       setUserData(undefined);

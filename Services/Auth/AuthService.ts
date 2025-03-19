@@ -60,7 +60,6 @@ class AuthService {
     // localStorage.setItem("Us-Ac", JSON.stringify(u.Id));
 
     try {
-      console.log('el token', tk);
       
       await AsyncStorage.setItem("TK", tk);
 

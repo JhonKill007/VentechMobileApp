@@ -37,7 +37,6 @@ const OrdenesView = () => {
     OrderService.getAll(branch?.id!)
       .then((e: any) => {
         const data = e.data.data;
-        console.log(data);
 
         setOrders(data);
         setChecking(false);
@@ -55,7 +54,6 @@ const OrdenesView = () => {
       var razonSocial = "";
       var tipoDeFactura = "";
       var montoDescuento = 0;
-      console.log(ordenAImprimir);
 
       ordenAImprimir.products!.forEach((o) => {
         totalOrden +=
@@ -247,7 +245,6 @@ Cliente:${ordenAImprimir.consumer.name}
   };
 
   const PedidoItem = ({ orden }) => {
-    console.log(orden);
 
     return (
       <Provider>

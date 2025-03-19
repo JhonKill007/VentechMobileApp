@@ -67,7 +67,6 @@ const ProcessOrderView = () => {
         const data = e.data.data;
 
         setDiscount(data.filter((x) => x.type == 1));
-        console.log(discount);
       })
       .catch((err: any) => {
         console.error(err);
@@ -80,11 +79,7 @@ const ProcessOrderView = () => {
     setCliente(client);
   };
 
-  const getTotalPrice = () => {
-    return selectedProducts.reduce((total: number, item: any) => {
-      return total + item.cantidad * item.product.price;
-    }, 0);
-  };
+
   const CrearOrden = () => {
     setChecking(true);
     const newOrdenProducts = selectedProducts.map((p) => ({
@@ -93,7 +88,7 @@ const ProcessOrderView = () => {
       productAmount: p.cantidad,
       productPrice: p.product.price,
       productCode: p.product.code,
-      itbis: p.product.itbis,
+      itbis: gerPercent(p.product.price,p.product.itbis),
       totalDiscount: 0,
       discountPorcent: 0,
     }));
@@ -107,7 +102,6 @@ const ProcessOrderView = () => {
 
     const currentDate = new Date(); // Obtener la fecha y hora actual
     const formattedDate = currentDate.toLocaleString(); // Formatear la fecha y hora
-    console.log('la hora', formattedDate);
     
     const newOrden: Order = {
       consumer: {
@@ -160,7 +154,6 @@ const ProcessOrderView = () => {
     var tipoDeFactura = "";
     var montoDescuento = 0;
 
-    console.log('usuario', userData);
 
     
 
@@ -169,9 +162,8 @@ const ProcessOrderView = () => {
         totalOrden +=
           o.productPrice * o.productAmount -
           gerPercent(o.productPrice * o.productAmount, o.discountPorcent);
-        totalItbis +=
-          o.itbis * o.productAmount -
-          gerPercent(o.itbis * o.productAmount, o.discountPorcent);
+          totalItbis += o.itbis * o.productAmount ;
+
         montoDescuento += o.totalDiscount;
       });
 
@@ -357,6 +349,25 @@ Cliente:${ordenAImprimir.consumer.name}
   const gerPercent = (amount, percent) => {
     return (amount * percent) / 100;
   };
+
+
+  const getTotalItbis = () => {
+    return selectedProducts.reduce((total: number, item: any) => {
+      
+      return total + ((item.product.price * item.product.itbis)/100)* item.cantidad;;
+    }, 0);
+  };
+
+  const getTotalPrice = () => {
+    return selectedProducts.reduce((total: number, item: any) => {
+      return total + item.cantidad * item.product.price;;
+    }, 0);
+  };
+  const getTotalCantidadProducto = () => {
+    return selectedProducts.reduce((total: number, item: any) => {
+      return total + item.cantidad ;
+    }, 0);
+  };
   return (
     <Provider>
       {checking ? (
@@ -517,7 +528,7 @@ Cliente:${ordenAImprimir.consumer.name}
                     Cantidad de productos:
                   </Text>
                   <Text style={{ fontSize: 16, color: "#333" }}>
-                    {selectedProducts.length}
+                    {getTotalCantidadProducto()}
                   </Text>
                 </View>
                 <View
@@ -567,7 +578,7 @@ Cliente:${ordenAImprimir.consumer.name}
                     Itebis:
                   </Text>
                   <Text style={{ fontSize: 16, color: "#333" }}>
-                    RD$ {itebis}.00
+                    RD$ {getTotalItbis().toLocaleString("en-US", { style: "currency", currency: "USD" })}
                   </Text>
                 </View>
                 <View
@@ -592,7 +603,7 @@ Cliente:${ordenAImprimir.consumer.name}
                     Total:
                   </Text>
                   <Text style={{ fontSize: 16, color: "#333" }}>
-                    RD$ {getTotalPrice()}.00
+                    RD$ {getTotalPrice().toLocaleString("en-US", { style: "currency", currency: "USD" })}
                   </Text>
                 </View>
               </View>

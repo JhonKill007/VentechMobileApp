@@ -63,7 +63,6 @@ const LoginView = () => {
             };
 
             // console.log("Data despues del log:", user_result);
-            console.log('result', user_result);
             
             updateUser(user_result);
             setAuthenticate(true);
