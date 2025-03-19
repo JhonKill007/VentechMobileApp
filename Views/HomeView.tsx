@@ -33,7 +33,7 @@ const HomeView = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    Products.getAll(branch!, userData?.token!)
+    Products.getAll(branch!)
       .then((e: any) => {
         const data = groupAndSumStock(e.data.data);
         setProducts(data);

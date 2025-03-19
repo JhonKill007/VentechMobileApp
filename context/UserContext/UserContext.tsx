@@ -91,7 +91,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const updateUser = useCallback(async (newData: AuthLogin) => {
     try {
       setUserData(newData);
-      
+      await AsyncStorage.setItem("TK", newData.token!);
+
       setAuthenticate?.(true);
     } catch (err) {
       console.error("Error saving user:", err);

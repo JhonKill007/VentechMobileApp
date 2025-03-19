@@ -51,7 +51,7 @@ const ProcessOrderView = () => {
 
     console.log(company);
     
-    ConsumerService.getAll(company?.id!,userData?.token!)
+    ConsumerService.getAll(company?.id!)
     
       .then((e: any) => {
         const data = e.data.data;
@@ -63,7 +63,7 @@ const ProcessOrderView = () => {
         console.error(err);
       });
 
-    DiscountService.getAll(company?.id!,userData?.token!)
+    DiscountService.getAll(company?.id!)
       .then((e: any) => {
         const data = e.data.data;
         console.log('data del dis', data);

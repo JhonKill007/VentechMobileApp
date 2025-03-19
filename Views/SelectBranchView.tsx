@@ -13,7 +13,7 @@ const SelectBranchView = () => {
   const [company, setCompany] = useState<Company>({});
 
   useEffect(() => {
-    CompanyService.get(userData?.id!, userData?.token!)
+    CompanyService.get(userData?.id!)
       .then((e: any) => {
         setCompany(e.data.data[0]);        
         updateCompany(e.data.data[0])
@@ -21,7 +21,7 @@ const SelectBranchView = () => {
       .catch((err: any) => {
         console.error(err);
       });
-    CompanyService.getAllBranches(userData?.id!, userData?.token!)
+    CompanyService.getAllBranches(userData?.id!)
       .then((e: any) => {
         setBranches(e.data.data);
       })

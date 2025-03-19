@@ -2,9 +2,7 @@ import { ICompanyService } from "@/Interface/Company/ICompanyService";
 import Http from "../Http/HttpClient";
 
 export class CompanyService implements ICompanyService {
-  async getAllBranches(UserID: number, token:string): Promise<any> {
-    Http.defaults.headers["Authorization"] = `Bearer ${token}`;
-    console.log(token);
+  async getAllBranches(UserID: number): Promise<any> {
     
     let result = await new Promise<any>((resolve, reject) => {
       Http.get(`/api/branch?userID=${UserID}`)
@@ -17,9 +15,8 @@ export class CompanyService implements ICompanyService {
     });
     return result;
   }
-  async get(UserID: number, token:string): Promise<any> {
-    Http.defaults.headers["Authorization"] = `Bearer ${token}`;
-    console.log(token);
+  async get(UserID: number): Promise<any> {
+
     
     let result = await new Promise<any>((resolve, reject) => {
       Http.get(`/api/company?userID=${UserID}`)

@@ -7,7 +7,16 @@ import {
   Image,
   FlatList,
 } from "react-native";
-import { Avatar, List, Surface, Provider, Icon, Portal, Modal, Button } from "react-native-paper";
+import {
+  Avatar,
+  List,
+  Surface,
+  Provider,
+  Icon,
+  Portal,
+  Modal,
+  Button,
+} from "react-native-paper";
 import OrderService from "@/Services/Order/OrderService";
 
 import * as Print from "expo-print";
@@ -20,12 +29,12 @@ const OrdenesView = () => {
   const { branch, userData } = useUserContext();
   const [orders, setOrders] = useState<Order[]>([]);
   const [checking, setChecking] = useState<boolean>(true);
-    const [visible, setVisible] = useState(false);
-  
+  const [visible, setVisible] = useState(false);
+
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
   useEffect(() => {
-    OrderService.getAll(branch!, userData?.token!)
+    OrderService.getAll(branch!)
       .then((e: any) => {
         const data = e.data.data;
         console.log(data);
@@ -242,63 +251,61 @@ Cliente:${ordenAImprimir.consumer.name}
 
     return (
       <Provider>
-        
-      <View  style={styles.card}>
-      <TouchableOpacity onPress={showModal} activeOpacity={0.8}>
-        <View style={styles.row}>
-          <Image style={styles.logo} />
-          <View style={styles.info}>
-            <Text style={styles.estado}>{orden.payMethod}</Text>
-            <Text style={styles.restaurante}>{orden.consumer.name}</Text>
-            <Text style={styles.detalles}>
-              RD${" "}
-              {orden.products
-                .reduce((total, item) => total + item.productTotal, 0) // Sumar los precios
-                .toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                })}{" "}
-              • {orden.products.length} producto(s)
-            </Text>
-            <Text style={styles.fecha}>{formatDate(orden.dateHour)}</Text>
+        <View style={styles.card}>
+          <TouchableOpacity onPress={showModal} activeOpacity={0.8}>
+            <View style={styles.row}>
+              <Image style={styles.logo} />
+              <View style={styles.info}>
+                <Text style={styles.estado}>{orden.payMethod}</Text>
+                <Text style={styles.restaurante}>{orden.consumer.name}</Text>
+                <Text style={styles.detalles}>
+                  RD${" "}
+                  {orden.products
+                    .reduce((total, item) => total + item.productTotal, 0) // Sumar los precios
+                    .toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    })}{" "}
+                  • {orden.products.length} producto(s)
+                </Text>
+                <Text style={styles.fecha}>{formatDate(orden.dateHour)}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+          {/* Modal */}
+          <Portal>
+            <Modal
+              visible={visible}
+              onDismiss={hideModal}
+              contentContainerStyle={styles.modalContainer}
+            >
+              <Button mode="contained" onPress={hideModal}>
+                Cerrar
+              </Button>
+            </Modal>
+          </Portal>
+
+          <View style={styles.botones}>
+            <TouchableOpacity style={styles.button}>
+              <Icon source="trash-can-outline" size={20} color={"blank"} />
+              <Text>Cancelar</Text>
+            </TouchableOpacity>
+            <Text
+              style={{
+                borderEndWidth: 1,
+                borderStartWidth: 1,
+                borderColor: "gray",
+              }}
+            ></Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => rePrintOrder(orden)}
+            >
+              <Icon source="printer" size={20} color={"blank"} />
+              <Text>Imprimir</Text>
+            </TouchableOpacity>
           </View>
         </View>
-        </TouchableOpacity>
-        {/* Modal */}
-        <Portal>
-              <Modal
-                visible={visible}
-                onDismiss={hideModal}
-                contentContainerStyle={styles.modalContainer}
-              >
-                <Button mode="contained" onPress={hideModal}>
-                  Cerrar
-                </Button>
-              </Modal>
-            </Portal>
-
-        <View style={styles.botones}>
-          <TouchableOpacity style={styles.button}>
-            <Icon source="trash-can-outline" size={20} color={"blank"} />
-            <Text>Cancelar</Text>
-          </TouchableOpacity>
-          <Text
-            style={{
-              borderEndWidth: 1,
-              borderStartWidth: 1,
-              borderColor: "gray",
-            }}
-          ></Text>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => rePrintOrder(orden)}
-          >
-            <Icon source="printer" size={20} color={"blank"} />
-            <Text>Imprimir</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      
       </Provider>
     );
   };
@@ -311,7 +318,6 @@ Cliente:${ordenAImprimir.consumer.name}
         renderItem={({ item }) => <PedidoItem orden={item} />}
       />
     </View>
-    
   );
 };
 
@@ -360,6 +366,5 @@ const styles = {
     width: "80%",
   },
 };
-
 
 export default OrdenesView;
