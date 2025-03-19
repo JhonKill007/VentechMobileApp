@@ -26,7 +26,7 @@ import { Company } from "@/Models/Company";
 import { useUserContext } from "@/context/UserContext/UserContext";
 
 const OrdenesView = () => {
-  const { branch, userData } = useUserContext();
+  const { branch, userData , company} = useUserContext();
   const [orders, setOrders] = useState<Order[]>([]);
   const [checking, setChecking] = useState<boolean>(true);
   const [visible, setVisible] = useState(false);
@@ -34,7 +34,7 @@ const OrdenesView = () => {
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
   useEffect(() => {
-    OrderService.getAll(branch!)
+    OrderService.getAll(branch?.id!)
       .then((e: any) => {
         const data = e.data.data;
         console.log(data);
@@ -74,12 +74,12 @@ const OrdenesView = () => {
         tipoDeFactura = "PARA CONSUMIDOR FINAL";
       }
       const companySelected: Company = {
-        name: "Countech Solutions",
-        rnc: "133-12764-4",
+        name: company?.name,
+        rnc: company?.rnc,
       };
       const branchSelected: Branch = {
-        address: "calle el sol",
-        cellPhone: "829-751-8951",
+        address: branch?.address,
+        cellPhone: branch?.cellPhone,
       };
 
       var invoice = `<!DOCTYPE html>

@@ -54,11 +54,11 @@ const LoginView = () => {
 
             const user_result: AuthLogin = {
               id: res.data.data.id,
-              fullName: res.data.data.name,
+              fullName: res.data.data.fullName,
               username: res.data.data.username,
               email: res.data.data.email,
               roleName: res.data.data.email,
-              authCode: res.data.data.email,
+              authCode: res.data.data.authCode,
               token: res.data.data.token,
             };
 

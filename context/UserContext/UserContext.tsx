@@ -12,15 +12,16 @@ import { AuthenticateContext } from "../AuthenticateContext/AuthenticateContext"
 import { AuthLogin } from "@/Models/AuthLogin";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { Company } from "@/Models/Company";
+import { Branch } from "@/Models/Branch";
 
 interface UserContextProps {
   userData: AuthLogin | undefined;
   token: string | undefined;
-  branch: number | undefined;
+  branch: Branch | undefined;
   company: Company | undefined;
   updateUser: (newData: AuthLogin) => void;
   updateCompany: (newData: Company) => void;
-  updateBranch: (b: number) => void;
+  updateBranch: (b: Branch) => void;
   removeUser: () => void;
 }
 
@@ -32,7 +33,7 @@ interface UserProviderProps {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | undefined>(undefined);
-  const [branch, setBranch] = useState<number | undefined>(undefined);
+  const [branch, setBranch] = useState<Branch | undefined>({});
   const [company, setCompany] = useState<Company | undefined>({});
   const [userData, setUserData] = useState<AuthLogin | undefined>(undefined);
   const { setAuthenticate } = useContext(AuthenticateContext) || {};
@@ -41,7 +42,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     getUser();
   }, []);
 
-  const updateBranch = (b: number) => {
+  const updateBranch = (b: Branch) => {
     setBranch(b);
   };
   const updateCompany= (c: Company) => {

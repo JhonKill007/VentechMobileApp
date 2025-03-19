@@ -97,6 +97,18 @@ const ProcessOrderView = () => {
       totalDiscount: 0,
       discountPorcent: 0,
     }));
+
+    let totalOrden = 0;
+    newOrdenProducts.forEach((o) => {
+      totalOrden +=
+        o.productPrice * o.productAmount -
+        gerPercent(o.productPrice * o.productAmount, o.discountPorcent);
+    });
+
+    const currentDate = new Date(); // Obtener la fecha y hora actual
+    const formattedDate = currentDate.toLocaleString(); // Formatear la fecha y hora
+    console.log('la hora', formattedDate);
+    
     const newOrden: Order = {
       consumer: {
         id: cliente?.id ?? 0, // Valor por defecto si es null/undefined
@@ -105,7 +117,7 @@ const ProcessOrderView = () => {
         cellPhone: cliente?.cellPhone ?? "",
       },
       rncOCedula: rncOrCedula,
-      branchId: branch!,
+      branchId: branch?.id!,
       razonSocial: "",
       companyId: company?.id!,
       payMethod: "Efectivo",
@@ -114,7 +126,8 @@ const ProcessOrderView = () => {
       toCaja: false,
       deliveryId: 0,
       total: 0,
-      payWith: 0,
+      dateHour: formattedDate,
+      payWith: totalOrden,
       hasComprobante: hasRnc,
       products: newOrdenProducts,
     };
@@ -122,8 +135,11 @@ const ProcessOrderView = () => {
     console.log(newOrden);
     OrderS.create(newOrden)
       .then((e: any) => {
+
+        newOrden.ncf=e.data.data;
+
         setChecking(false);
-        printOrder(newOrden)
+        printOrder(newOrden);
         navigation.navigate(
           "initalApp" as never,
           {
@@ -136,7 +152,7 @@ const ProcessOrderView = () => {
       });
   };
 
-  const printOrder = async(orden: Order) => {
+  const printOrder = async (orden: Order) => {
     var ordenAImprimir = { ...orden };
     var totalOrden = 0;
     var totalItbis = 0;
@@ -144,38 +160,42 @@ const ProcessOrderView = () => {
     var tipoDeFactura = "";
     var montoDescuento = 0;
 
-    try{
-    ordenAImprimir.products.forEach((o) => {
-      totalOrden +=
-        o.productPrice * o.productAmount -
-        gerPercent(o.productPrice * o.productAmount, o.discountPorcent);
-      totalItbis +=
-        o.itbis * o.productAmount -
-        gerPercent(o.itbis * o.productAmount, o.discountPorcent);
-      montoDescuento += o.totalDiscount;
-    });
+    console.log('usuario', userData);
 
-    const companySelected: Company = {
-      name: company?.name,
-      rnc: company?.rnc,
-    };
-    const branchSelected: Branch = {
-      address: "calle el sol",
-      cellPhone: "829-751-8951",
-    };
+    
 
-    totalOrden -= gerPercent(totalOrden, orden.discountPercent);
+    try {
+      ordenAImprimir.products.forEach((o) => {
+        totalOrden +=
+          o.productPrice * o.productAmount -
+          gerPercent(o.productPrice * o.productAmount, o.discountPorcent);
+        totalItbis +=
+          o.itbis * o.productAmount -
+          gerPercent(o.itbis * o.productAmount, o.discountPorcent);
+        montoDescuento += o.totalDiscount;
+      });
 
-    totalItbis -= gerPercent(totalItbis, orden.discountPercent);
+      const companySelected: Company = {
+        name: company?.name,
+        rnc: company?.rnc,
+      };
+      const branchSelected: Branch = {
+        address: branch?.address!,
+        cellPhone: branch?.cellPhone!,
+      };
 
-    if (ordenAImprimir.rncOCedula.length >= 9) {
-      tipoDeFactura = "CON CRÉDITO FISCAL";
-      razonSocial = `Razon Social: ${ordenAImprimir.razonSocial}<br />`;
-    } else {
-      tipoDeFactura = "PARA CONSUMIDOR FINAL";
-    }
+      totalOrden -= gerPercent(totalOrden, orden.discountPercent);
 
-    var invoice = `<!DOCTYPE html>
+      totalItbis -= gerPercent(totalItbis, orden.discountPercent);
+
+      if (ordenAImprimir.rncOCedula.length >= 9) {
+        tipoDeFactura = "CON CRÉDITO FISCAL";
+        razonSocial = `Razon Social: ${ordenAImprimir.razonSocial}<br />`;
+      } else {
+        tipoDeFactura = "PARA CONSUMIDOR FINAL";
+      }
+
+      var invoice = `<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
@@ -218,10 +238,10 @@ text-align: right;
 </div>
 <div class="section">
 <p>
-${branchSelected.address}
-<br />TEL:${branchSelected.cellPhone} <br />RNC: ${companySelected.rnc} 
-<br />NCF: ${ordenAImprimir.ncf} 
-<br />Fecha: ${formatDate(ordenAImprimir.dateHour)}
+${branchSelected?.address??''}
+<br />TEL:${branchSelected?.cellPhone??''} <br />RNC: ${companySelected.rnc} 
+<br />NCF: ${ordenAImprimir?.ncf ?? ""} 
+<br />Fecha: ${ordenAImprimir.dateHour}
 </p>
 <hr />
 <div style="text-align: center">
@@ -261,21 +281,21 @@ ${ordenAImprimir.products
 <hr />
 <div class="section totals">
 <p>subtotal: ${(totalOrden - totalItbis).toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    })}</p>
+        style: "currency",
+        currency: "USD",
+      })}</p>
 <p>itbis: ${totalItbis.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    })}</p>
+        style: "currency",
+        currency: "USD",
+      })}</p>
 <p>Descuento: -${montoDescuento.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    })}</p>
+        style: "currency",
+        currency: "USD",
+      })}</p>
 <p>Total: ${totalOrden.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    })}</p>
+        style: "currency",
+        currency: "USD",
+      })}</p>
 
 </div>
 <hr />
@@ -283,15 +303,15 @@ ${ordenAImprimir.products
 
 <p>Forma de Pago: ${ordenAImprimir.payMethod}
 <br />Pagó con: ${(ordenAImprimir.payWith <= 0
-      ? 0
-      : ordenAImprimir.payWith
-    ).toLocaleString("en-US", { style: "currency", currency: "USD" })}
+        ? 0
+        : ordenAImprimir.payWith
+      ).toLocaleString("en-US", { style: "currency", currency: "USD" })}
 <br />Cambio: ${(ordenAImprimir.payWith <= 0
-      ? 0
-      : ordenAImprimir.payWith - totalOrden
-    ).toLocaleString("en-US", { style: "currency", currency: "USD" })}
+        ? 0
+        : ordenAImprimir.payWith - totalOrden
+      ).toLocaleString("en-US", { style: "currency", currency: "USD" })}
 
-<br />Vendedor(a): ${ordenAImprimir.cajero}
+<br />Vendedor(a): ${userData?.fullName}
 </p>
 </div>
 <hr />
@@ -313,7 +333,7 @@ Cliente:${ordenAImprimir.consumer.name}
 <div class="corte"></div>
 </body>
 </html>`;
-  await Print.printAsync({ html: invoice });
+      await Print.printAsync({ html: invoice });
     } catch (error) {
       console.error("Error al imprimir:", error);
       Alert.alert("Error", "No se pudo imprimir el documento");

@@ -45,7 +45,7 @@ const SelectBranchView = () => {
             backgroundColor: "#E3EFFD",
           }}
           onPress={() => {
-            updateBranch(item.id!);
+            updateBranch(item);
             navigation.reset({
               index: 0,
               routes: [{ name: "initalApp" as never }],
