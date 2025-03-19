@@ -10,11 +10,14 @@ import React, {
 } from "react";
 import { AuthenticateContext } from "../AuthenticateContext/AuthenticateContext";
 import { AuthLogin } from "@/Models/AuthLogin";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 
 interface UserContextProps {
   userData: AuthLogin | undefined;
-  userID: string | undefined;
+  token: string | undefined;
+  branch: number | undefined;
   updateUser: (newData: AuthLogin) => void;
+  updateBranch: (b: number) => void;
   removeUser: () => void;
 }
 
@@ -25,19 +28,44 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [userID, setUserID] = useState<string | undefined>(undefined);
+  const [token, setToken] = useState<string | undefined>(undefined);
+  const [branch, setBranch] = useState<number | undefined>(undefined);
   const [userData, setUserData] = useState<AuthLogin | undefined>(undefined);
   const { setAuthenticate } = useContext(AuthenticateContext) || {};
 
   useEffect(() => {
-    getUserID();
+    getUser();
   }, []);
 
-  const getUserID = () => {
+  const updateBranch = (b: number) => {
+    setBranch(b);
+  };
+
+  const getUser = () => {
     try {
-      AsyncStorage.getItem("Us-Ac").then((id) => {
-        if (id !== null) {
-          setUserID(id);
+      AsyncStorage.getItem("Vt-tk").then((token) => {
+        if (token !== null) {
+          const decoded = jwtDecode(token);
+
+          if (isTokenExpired(decoded)) {
+            removeUser();
+          } else {
+            const decodedString = JSON.stringify(decoded);
+            const user = JSON.parse(decodedString);
+            const { id, username, email, fullname, authCode, Role } = user;
+
+            const dta: AuthLogin = {
+              id: id!,
+              fullName: fullname,
+              username: username,
+              email: email,
+              roleName: Role,
+              authCode: authCode,
+              token: token,
+            };
+            updateUser(dta);
+          }
+          setToken(token);
         }
       });
     } catch (err: any) {
@@ -45,11 +73,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   };
 
+  const isTokenExpired = (decoded: JwtPayload) => {
+    return decoded.exp! * 1000 < Date.now();
+  };
+
   const updateUser = useCallback(async (newData: AuthLogin) => {
     try {
-      // await AsyncStorage.setItem("Us-Ac", newData.id?.toString()!);
-      // console.log("Data en context: ", newData);
-
       setUserData(newData);
       setAuthenticate?.(true);
     } catch (err) {
@@ -58,17 +87,21 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   }, []);
 
   const removeUser = async () => {
+    console.log("entrando al cerrar");
     try {
-      await AsyncStorage.removeItem("Us-Ac");
+      await AsyncStorage.removeItem("Vt-tk");
       setUserData(undefined);
-      setUserID(undefined);
+      setToken(undefined);
+      setAuthenticate?.(false);
     } catch (err) {
       console.error("Error removing user:", err);
     }
   };
 
   return (
-    <UserContext.Provider value={{ userData, updateUser, removeUser, userID }}>
+    <UserContext.Provider
+      value={{ userData, updateUser, removeUser, token, branch, updateBranch }}
+    >
       {children}
     </UserContext.Provider>
   );

@@ -2,7 +2,8 @@ import { ICompanyService } from "@/Interface/Company/ICompanyService";
 import Http from "../Http/HttpClient";
 
 export class CompanyService implements ICompanyService {
-  async getAllBranches(UserID: number): Promise<any> {
+  async getAllBranches(UserID: number, token:string): Promise<any> {
+    Http.defaults.headers["Authorization"] = `Bearer ${token}`;
     let result = await new Promise<any>((resolve, reject) => {
       Http.get(`/api/branch?userID=${UserID}`)
         .then((res) => {

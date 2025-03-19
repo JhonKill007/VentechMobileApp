@@ -13,6 +13,7 @@ import { useUserContext } from "@/context/UserContext/UserContext";
 
 export const Sidebar = ({ children }: any) => {
   const Drawer = createDrawerNavigator();
+  const { removeUser } = useUserContext();
 
   return (
     <Drawer.Navigator
@@ -24,7 +25,16 @@ export const Sidebar = ({ children }: any) => {
 
       <Drawer.Screen name="Ordenes" component={OrdenesView} />
       <Drawer.Screen name="Inventario" component={ProcessOrderView} />
-      <Drawer.Screen name="Cerrar Sesión" component={PosView} />
+      <Drawer.Screen
+        name="Cerrar Sesión"
+        component={() => null}
+        listeners={({ navigation }) => ({
+          focus: () => {
+            removeUser();
+            navigation.closeDrawer();
+          },
+        })}
+      />
     </Drawer.Navigator>
   );
 };

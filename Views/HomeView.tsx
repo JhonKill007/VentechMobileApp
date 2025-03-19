@@ -16,9 +16,11 @@ import ItemProduct from "@/components/ItemProduct";
 import ChargingApp from "@/components/CharginApp";
 import { Colors } from "@/constants/Colors";
 import { Order } from "@/Models/Order";
+import { useUserContext } from "@/context/UserContext/UserContext";
 const ScreenHeight = Dimensions.get("window").height;
 
 const HomeView = () => {
+  const { branch, token } = useUserContext();
   const theme = useColorScheme();
   const [products, setProducts] = useState<Product[]>([]);
   // const [newOrder, setNewOrder] = useState<Order>({});
@@ -31,7 +33,7 @@ const HomeView = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    Products.getAll(2)
+    Products.getAll(branch!, token!)
       .then((e: any) => {
         const data = groupAndSumStock(e.data.data);
         setProducts(data);
@@ -40,7 +42,7 @@ const HomeView = () => {
       .catch((err: any) => {
         console.error(err);
       });
-  }, []);
+  }, [branch]);
 
   const groupAndSumStock = (products: Product[]): Product[] => {
     const groupedProducts = products.reduce((acc, product) => {

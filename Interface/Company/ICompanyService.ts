@@ -1,4 +1,4 @@
 export interface ICompanyService {
-    getAllBranches(branchId: number): Promise<any>;
+    getAllBranches(branchId: number, token:string): Promise<any>;
   }
   
