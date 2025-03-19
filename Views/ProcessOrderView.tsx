@@ -29,7 +29,7 @@ import OrderS from "@/Services/Order/OrderService";
 import { Order } from "@/Models/Order";
 import { Company } from "@/Models/Company";
 import { Branch } from "@/Models/Branch";
-import { Badge } from 'react-native-paper';
+import { Badge } from "react-native-paper";
 
 const ScreenHeight = Dimensions.get("window").height;
 
@@ -82,25 +82,26 @@ const ProcessOrderView = () => {
     setCliente(client);
   };
 
-
   const CrearOrden = () => {
-
-    ConsumerService.GetContribuyente(rncOrCedula!)
-    .then((e: any) => {
-      const data = e.data.data;
-      setRazonSocial(data.razonSocial);
-    })
-    .catch((err: any) => {
-      console.error(err);
-    });
     setChecking(true);
+
+    if (hasRnc) {
+      ConsumerService.GetContribuyente(rncOrCedula!)
+        .then((e: any) => {
+          const data = e.data.data;
+          setRazonSocial(data.razonSocial);
+        })
+        .catch((err: any) => {
+          console.error(err);
+        });
+    }
     const newOrdenProducts = selectedProducts.map((p) => ({
       productId: p.id,
       productName: p.product.name,
       productAmount: p.cantidad,
       productPrice: p.product.price,
       productCode: p.product.code,
-      itbis: gerPercent(p.product.price,p.product.itbis),
+      itbis: gerPercent(p.product.price, p.product.itbis),
       totalDiscount: 0,
       discountPorcent: 0,
     }));
@@ -114,7 +115,7 @@ const ProcessOrderView = () => {
 
     const currentDate = new Date(); // Obtener la fecha y hora actual
     const formattedDate = currentDate.toLocaleString(); // Formatear la fecha y hora
-    
+
     const newOrden: Order = {
       consumer: {
         id: cliente?.id ?? 0, // Valor por defecto si es null/undefined
@@ -138,11 +139,9 @@ const ProcessOrderView = () => {
       products: newOrdenProducts,
     };
 
-  
     OrderS.create(newOrden)
       .then((e: any) => {
-
-        newOrden.ncf=e.data.data;
+        newOrden.ncf = e.data.data;
 
         setChecking(false);
         printOrder(newOrden);
@@ -166,15 +165,12 @@ const ProcessOrderView = () => {
     var tipoDeFactura = "";
     var montoDescuento = 0;
 
-
-    
-
     try {
       ordenAImprimir.products.forEach((o) => {
         totalOrden +=
           o.productPrice * o.productAmount -
           gerPercent(o.productPrice * o.productAmount, o.discountPorcent);
-          totalItbis += o.itbis * o.productAmount ;
+        totalItbis += o.itbis * o.productAmount;
 
         montoDescuento += o.totalDiscount;
       });
@@ -242,8 +238,8 @@ text-align: right;
 </div>
 <div class="section">
 <p>
-${branchSelected?.address??''}
-<br />TEL:${branchSelected?.cellPhone??''} <br />RNC: ${companySelected.rnc} 
+${branchSelected?.address ?? ""}
+<br />TEL:${branchSelected?.cellPhone ?? ""} <br />RNC: ${companySelected.rnc} 
 <br />NCF: ${ordenAImprimir?.ncf ?? ""} 
 <br />Fecha: ${ordenAImprimir.dateHour}
 </p>
@@ -362,22 +358,23 @@ Cliente:${ordenAImprimir.consumer.name}
     return (amount * percent) / 100;
   };
 
-
   const getTotalItbis = () => {
     return selectedProducts.reduce((total: number, item: any) => {
-      
-      return total + ((item.product.price * item.product.itbis)/100)* item.cantidad;;
+      return (
+        total +
+        ((item.product.price * item.product.itbis) / 100) * item.cantidad
+      );
     }, 0);
   };
 
   const getTotalPrice = () => {
     return selectedProducts.reduce((total: number, item: any) => {
-      return total + item.cantidad * item.product.price;;
+      return total + item.cantidad * item.product.price;
     }, 0);
   };
   const getTotalCantidadProducto = () => {
     return selectedProducts.reduce((total: number, item: any) => {
-      return total + item.cantidad ;
+      return total + item.cantidad;
     }, 0);
   };
   return (
@@ -439,7 +436,6 @@ Cliente:${ordenAImprimir.consumer.name}
 
             {/* Switch de Comprobante Fiscal */}
             <View style={styles.switchContainer}>
-            
               <Text style={styles.label}>Comprobante Fiscal</Text>
               <Switch value={hasRnc} onValueChange={onToggleSwitch} />
             </View>
@@ -501,50 +497,49 @@ Cliente:${ordenAImprimir.consumer.name}
                 data={selectedProducts}
                 style={{ height: ScreenHeight - 500, marginBottom: 5 }}
                 renderItem={({ item, index }) => (
-                
                   <List.Item
-                      title={item.product.name!}
-                      description={`RD$${item.product.price}`}
-                      left={(props) =>
-                        item.product.photo ? (
-                          <Avatar.Image
-                            {...props}
-                            style={{
-                              backgroundColor:
-                                theme === "light"
-                                  ? Colors.light.colors.background
-                                  : Colors.dark.colors.background,
-                            }}
-                            source={{ uri: "data:image/png;base64," + item.product.photo }}
-                          />
-                        ) : (
-                          <Avatar.Text
-                            {...props}
-                            style={{
-                              backgroundColor:
-                                theme === "light"
-                                  ? Colors.light.colors.background
-                                  : Colors.dark.colors.background,
-                            }}
-                            color={
-                              theme === "light"
-                                ? Colors.light.colors.primary
-                                : Colors.dark.colors.primary
-                            }
-                            label={item.product.name!.charAt(0)}
-                          />
-                        )
-                      }
-                      right={() => (
-                        <View
+                    title={item.product.name!}
+                    description={`RD$${item.product.price}`}
+                    left={(props) =>
+                      item.product.photo ? (
+                        <Avatar.Image
+                          {...props}
                           style={{
-                            
-                           
-                            marginRight: -23,
+                            backgroundColor:
+                              theme === "light"
+                                ? Colors.light.colors.background
+                                : Colors.dark.colors.background,
                           }}
-                        >
-                           <Badge>{item.cantidad}</Badge>
-                           {/* <Text
+                          source={{
+                            uri: "data:image/png;base64," + item.product.photo,
+                          }}
+                        />
+                      ) : (
+                        <Avatar.Text
+                          {...props}
+                          style={{
+                            backgroundColor:
+                              theme === "light"
+                                ? Colors.light.colors.background
+                                : Colors.dark.colors.background,
+                          }}
+                          color={
+                            theme === "light"
+                              ? Colors.light.colors.primary
+                              : Colors.dark.colors.primary
+                          }
+                          label={item.product.name!.charAt(0)}
+                        />
+                      )
+                    }
+                    right={() => (
+                      <View
+                        style={{
+                          marginRight: -23,
+                        }}
+                      >
+                        <Badge>{item.cantidad}</Badge>
+                        {/* <Text
                                         style={{
                                           fontSize: 16,
                                           fontWeight: "bold",
@@ -557,14 +552,12 @@ Cliente:${ordenAImprimir.consumer.name}
                                       >
                                       Cant. : {item.cantidad}
                                       </Text> */}
-                          
-                        </View>
-                      )}
-                    />
+                      </View>
+                    )}
+                  />
                 )}
                 keyExtractor={(item, index) => index.toString()}
               />
-
             </Surface>
             {/* Switch de Comprobante Fiscal */}
             <View style={styles.montosContainer}>
@@ -600,7 +593,7 @@ Cliente:${ordenAImprimir.consumer.name}
                     {getTotalCantidadProducto()}
                   </Text>
                 </View>
-                
+
                 <View
                   style={{
                     flexDirection: "row",
@@ -623,7 +616,11 @@ Cliente:${ordenAImprimir.consumer.name}
                     Itebis:
                   </Text>
                   <Text style={{ fontSize: 16, color: "#333" }}>
-                    RD$ {getTotalItbis().toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    RD${" "}
+                    {getTotalItbis().toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    })}
                   </Text>
                 </View>
                 <View
@@ -648,7 +645,11 @@ Cliente:${ordenAImprimir.consumer.name}
                     Total:
                   </Text>
                   <Text style={{ fontSize: 16, color: "#333" }}>
-                    RD$ {getTotalPrice().toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    RD${" "}
+                    {getTotalPrice().toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    })}
                   </Text>
                 </View>
               </View>
@@ -658,12 +659,14 @@ Cliente:${ordenAImprimir.consumer.name}
               <Button
                 icon="cancel"
                 mode="contained"
-                onPress={() => navigation.navigate(
-                  "initalApp" as never,
-                  {
-                    selectedProducts: selectedProducts,
-                  } as never
-                )}
+                onPress={() =>
+                  navigation.navigate(
+                    "initalApp" as never,
+                    {
+                      selectedProducts: selectedProducts,
+                    } as never
+                  )
+                }
                 style={{ backgroundColor: "red" }}
               >
                 Cancelar
@@ -723,7 +726,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#fff",
-    
+
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#ccc",
@@ -747,7 +750,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     fontWeight: "bold",
-    marginLeft:7
+    marginLeft: 7,
   },
   input: {
     width: "100%",

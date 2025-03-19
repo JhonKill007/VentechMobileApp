@@ -48,7 +48,27 @@ const OrdenesView = () => {
     setVisible(false);
   };
   useEffect(() => {
-    OrderService.getAll(branch?.id!)
+
+
+    let hoy = new Date();
+    console.log("hoy", hoy);
+    
+    // Crear nuevas fechas ajustadas
+    let desdeDate = new Date(hoy);
+    desdeDate.setDate(hoy.getDate() - 2);
+    
+    let hastaDate = new Date(hoy);
+    hastaDate.setDate(hoy.getDate() + 1);
+    
+    // Formatear correctamente en dd/mm/yyyy
+    let opciones = { day: "2-digit", month: "2-digit", year: "numeric" };
+    let desde = desdeDate.toLocaleDateString("es-ES", opciones);
+    let hasta = hastaDate.toLocaleDateString("es-ES", opciones);
+    
+    console.log("desde", desde);
+    console.log("hasta", hasta);
+    
+    OrderService.getAll(branch?.id!, desde,hasta)
       .then((e: any) => {
         const data = e.data.data;
         console.log(data);

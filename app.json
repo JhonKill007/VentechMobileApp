@@ -17,7 +17,7 @@
         "WRITE_EXTERNAL_STORAGE"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/iconlogo.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.jrguzman.ventech"
