@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Switch, TextInput } from "react-native-paper";
+import { Avatar, List, Switch, TextInput } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import * as Print from "expo-print";
 import { Button, Surface, Portal, Modal, Provider } from "react-native-paper";
@@ -29,6 +29,8 @@ import OrderS from "@/Services/Order/OrderService";
 import { Order } from "@/Models/Order";
 import { Company } from "@/Models/Company";
 import { Branch } from "@/Models/Branch";
+import { Badge } from 'react-native-paper';
+
 const ScreenHeight = Dimensions.get("window").height;
 
 const ProcessOrderView = () => {
@@ -484,18 +486,89 @@ Cliente:${ordenAImprimir.consumer.name}
                 },
               ]}
             >
+
               <FlatList
                 data={selectedProducts}
-                style={{ height: ScreenHeight - 600, marginBottom: 10 }}
+                style={{ height: ScreenHeight - 700, marginBottom: 10 }}
                 renderItem={({ item, index }) => (
-                  <ItemProduct
-                    key={index}
-                    product={item.product}
-                    add={() => {}}
-                  />
+                  // <ItemProduct
+                  //   key={index}
+                  //   product={item.product}
+                  //   add={() => {}}
+                  // />
+
+
+                  <List.Item
+                      title={item.product.name!}
+                      description={`RD$${item.product.price}`}
+                      left={(props) =>
+                        item.product.photo ? (
+                          <Avatar.Image
+                            {...props}
+                            style={{
+                              backgroundColor:
+                                theme === "light"
+                                  ? Colors.light.colors.background
+                                  : Colors.dark.colors.background,
+                            }}
+                            source={{ uri: "data:image/png;base64," + item.product.photo }}
+                          />
+                        ) : (
+                          <Avatar.Text
+                            {...props}
+                            style={{
+                              backgroundColor:
+                                theme === "light"
+                                  ? Colors.light.colors.background
+                                  : Colors.dark.colors.background,
+                            }}
+                            color={
+                              theme === "light"
+                                ? Colors.light.colors.primary
+                                : Colors.dark.colors.primary
+                            }
+                            label={item.product.name!.charAt(0)}
+                          />
+                        )
+                      }
+                      right={() => (
+                        <View
+                          style={{
+                            
+                           
+                            marginRight: -23,
+                          }}
+                        >
+                           <Badge>{item.cantidad}</Badge>
+                           {/* <Text
+                                        style={{
+                                          fontSize: 16,
+                                          fontWeight: "bold",
+                                          textAlign: "center",
+                                          color:
+                                            theme === "light"
+                                              ? Colors.light.colors.primary
+                                              : Colors.dark.colors.primary,
+                                        }}
+                                      >
+                                      Cant. : {item.cantidad}
+                                      </Text> */}
+                          
+                        </View>
+                      )}
+                    />
                 )}
                 keyExtractor={(item, index) => index.toString()}
               />
+
+                    
+
+
+
+
+
+
+
             </Surface>
             {/* Switch de Comprobante Fiscal */}
             <View style={styles.montosContainer}>
