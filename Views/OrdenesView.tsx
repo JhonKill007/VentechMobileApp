@@ -17,7 +17,7 @@ import { Company } from "@/Models/Company";
 import { useUserContext } from "@/context/UserContext/UserContext";
 
 const OrdenesView = () => {
-  const { branch, token } = useUserContext();
+  const { branch, userData } = useUserContext();
   const [orders, setOrders] = useState<Order[]>([]);
   const [checking, setChecking] = useState<boolean>(true);
     const [visible, setVisible] = useState(false);
@@ -25,7 +25,7 @@ const OrdenesView = () => {
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
   useEffect(() => {
-    OrderService.getAll(2, token!)
+    OrderService.getAll(branch!, userData?.token!)
       .then((e: any) => {
         const data = e.data.data;
         console.log(data);

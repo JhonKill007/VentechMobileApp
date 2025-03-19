@@ -11,12 +11,15 @@ import React, {
 import { AuthenticateContext } from "../AuthenticateContext/AuthenticateContext";
 import { AuthLogin } from "@/Models/AuthLogin";
 import { jwtDecode, JwtPayload } from "jwt-decode";
+import { Company } from "@/Models/Company";
 
 interface UserContextProps {
   userData: AuthLogin | undefined;
   token: string | undefined;
   branch: number | undefined;
+  company: Company | undefined;
   updateUser: (newData: AuthLogin) => void;
+  updateCompany: (newData: Company) => void;
   updateBranch: (b: number) => void;
   removeUser: () => void;
 }
@@ -30,6 +33,7 @@ interface UserProviderProps {
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | undefined>(undefined);
   const [branch, setBranch] = useState<number | undefined>(undefined);
+  const [company, setCompany] = useState<Company | undefined>({});
   const [userData, setUserData] = useState<AuthLogin | undefined>(undefined);
   const { setAuthenticate } = useContext(AuthenticateContext) || {};
 
@@ -40,6 +44,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const updateBranch = (b: number) => {
     setBranch(b);
   };
+  const updateCompany= (c: Company) => {
+    setCompany(c);
+  };
+
 
   const getUser = () => {
     try {
@@ -64,7 +72,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
               token: token,
             };
             updateUser(dta);
+
+
           }
+
           setToken(token);
         }
       });
@@ -80,6 +91,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const updateUser = useCallback(async (newData: AuthLogin) => {
     try {
       setUserData(newData);
+      
       setAuthenticate?.(true);
     } catch (err) {
       console.error("Error saving user:", err);
@@ -100,7 +112,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{ userData, updateUser, removeUser, token, branch, updateBranch }}
+      value={{ userData, updateUser, removeUser, token, branch, updateBranch ,company, updateCompany}}
     >
       {children}
     </UserContext.Provider>

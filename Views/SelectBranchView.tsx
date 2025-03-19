@@ -4,15 +4,24 @@ import { FlatList, TouchableOpacity, Text } from "react-native";
 import CompanyService from "@/Services/Company/CompanyService";
 import { Branch } from "@/Models/Branch";
 import { useUserContext } from "@/context/UserContext/UserContext";
+import { Company } from "@/Models/Company";
 
 const SelectBranchView = () => {
-  const { token } = useUserContext();
   const navigation = useNavigation();
-  const { updateBranch, userData } = useUserContext();
+  const { updateBranch, userData, updateCompany } = useUserContext();
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [company, setCompany] = useState<Company>({});
 
   useEffect(() => {
-    CompanyService.getAllBranches(userData?.id!, token!)
+    CompanyService.get(userData?.id!, userData?.token!)
+      .then((e: any) => {
+        setCompany(e.data.data[0]);        
+        updateCompany(e.data.data[0])
+      })
+      .catch((err: any) => {
+        console.error(err);
+      });
+    CompanyService.getAllBranches(userData?.id!, userData?.token!)
       .then((e: any) => {
         setBranches(e.data.data);
       })

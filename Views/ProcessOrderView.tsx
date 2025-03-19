@@ -22,6 +22,7 @@ import DiscountService from "@/Services/CommonServices/DiscountService";
 import { useRoute } from "@react-navigation/native";
 import ItemProduct from "@/components/ItemProduct";
 import { Colors } from "@/constants/Colors";
+import { useUserContext } from "@/context/UserContext/UserContext";
 const ScreenHeight = Dimensions.get("window").height;
 
 const ProcessOrderView = () => {
@@ -36,6 +37,7 @@ const ProcessOrderView = () => {
 
   const [descuentos, setDescuentos] = useState<number>(0);
   const [itebis, setItebis] = useState<number>(0);
+  const { company, userData } = useUserContext();
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
@@ -45,10 +47,15 @@ const ProcessOrderView = () => {
   const onToggleSwitch = () => setHasRnc(!hasRnc);
 
   useEffect(() => {
-    ConsumerService.getAll(2)
+
+
+    console.log(company);
+    
+    ConsumerService.getAll(company?.id!,userData?.token!)
+    
       .then((e: any) => {
         const data = e.data.data;
-
+        console.log('data del cons', data);
         setConsumer(data);
         setChecking(false);
       })
@@ -56,9 +63,11 @@ const ProcessOrderView = () => {
         console.error(err);
       });
 
-    DiscountService.getAll(2)
+    DiscountService.getAll(company?.id!,userData?.token!)
       .then((e: any) => {
         const data = e.data.data;
+        console.log('data del dis', data);
+        
         setDiscount(data.filter((x) => x.type == 1));
         console.log(discount);
       })

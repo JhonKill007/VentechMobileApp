@@ -1,5 +1,5 @@
 export interface IDiscountService {
-    getAll(branchId: number): Promise<any>;
+    getAll(branchId: number, token:string): Promise<any>;
 
   }
   

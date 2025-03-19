@@ -60,7 +60,10 @@ class AuthService {
     // localStorage.setItem("Us-Ac", JSON.stringify(u.Id));
 
     try {
+      console.log('el token', tk);
+      
       await AsyncStorage.setItem("TK", tk);
+
       await AsyncStorage.setItem("Us-Ac", u.user?.id!);
     } catch (error) {
       console.error("Error al guardar el token y el iD:", error);

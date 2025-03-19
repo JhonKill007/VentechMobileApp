@@ -1,5 +1,5 @@
 export interface IConsumerService {
-    getAll(branchId: number): Promise<any>;
+    getAll(branchId: number, token:string): Promise<any>;
 
   }
   

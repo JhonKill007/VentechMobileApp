@@ -20,7 +20,7 @@ import { useUserContext } from "@/context/UserContext/UserContext";
 const ScreenHeight = Dimensions.get("window").height;
 
 const HomeView = () => {
-  const { branch, token } = useUserContext();
+  const { branch, userData } = useUserContext();
   const theme = useColorScheme();
   const [products, setProducts] = useState<Product[]>([]);
   // const [newOrder, setNewOrder] = useState<Order>({});
@@ -33,7 +33,7 @@ const HomeView = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    Products.getAll(branch!, token!)
+    Products.getAll(branch!, userData?.token!)
       .then((e: any) => {
         const data = groupAndSumStock(e.data.data);
         setProducts(data);
