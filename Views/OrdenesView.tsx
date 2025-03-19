@@ -6,9 +6,22 @@ import {
   Alert,
   Image,
   FlatList,
+  Dimensions,
+  useColorScheme,
 } from "react-native";
-import { Avatar, List, Surface, Provider, Icon, Portal, Modal, Button } from "react-native-paper";
+import {
+  Avatar,
+  List,
+  Surface,
+  Provider,
+  Icon,
+  Portal,
+  Modal,
+  Button,
+  Badge,
+} from "react-native-paper";
 import OrderService from "@/Services/Order/OrderService";
+import { Colors } from "@/constants/Colors";
 
 import * as Print from "expo-print";
 import { Order } from "@/Models/Order";
@@ -17,15 +30,45 @@ import { Company } from "@/Models/Company";
 import { useUserContext } from "@/context/UserContext/UserContext";
 
 const OrdenesView = () => {
-  const { branch, token } = useUserContext();
+  const { branch, userData, company } = useUserContext();
   const [orders, setOrders] = useState<Order[]>([]);
   const [checking, setChecking] = useState<boolean>(true);
-    const [visible, setVisible] = useState(false);
-  
-  const showModal = () => setVisible(true);
-  const hideModal = () => setVisible(false);
+  const [visible, setVisible] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const ScreenHeight = Dimensions.get("window").height;
+  const theme = useColorScheme();
+
+  const showModal = (order: Order) => {
+    setSelectedOrder(order);
+    setVisible(true);
+  };
+
+  const hideModal = () => {
+    setSelectedOrder(null);
+    setVisible(false);
+  };
   useEffect(() => {
-    OrderService.getAll(2, token!)
+
+
+    let hoy = new Date();
+    console.log("hoy", hoy);
+    
+    // Crear nuevas fechas ajustadas
+    let desdeDate = new Date(hoy);
+    desdeDate.setDate(hoy.getDate() - 2);
+    
+    let hastaDate = new Date(hoy);
+    hastaDate.setDate(hoy.getDate() + 1);
+    
+    // Formatear correctamente en dd/mm/yyyy
+    let opciones = { day: "2-digit", month: "2-digit", year: "numeric" };
+    let desde = desdeDate.toLocaleDateString("es-ES", opciones);
+    let hasta = hastaDate.toLocaleDateString("es-ES", opciones);
+    
+    console.log("desde", desde);
+    console.log("hasta", hasta);
+    
+    OrderService.getAll(branch?.id!, desde,hasta)
       .then((e: any) => {
         const data = e.data.data;
         console.log(data);
@@ -46,7 +89,6 @@ const OrdenesView = () => {
       var razonSocial = "";
       var tipoDeFactura = "";
       var montoDescuento = 0;
-      console.log(ordenAImprimir);
 
       ordenAImprimir.products!.forEach((o) => {
         totalOrden +=
@@ -65,12 +107,12 @@ const OrdenesView = () => {
         tipoDeFactura = "PARA CONSUMIDOR FINAL";
       }
       const companySelected: Company = {
-        name: "Countech Solutions",
-        rnc: "133-12764-4",
+        name: company?.name,
+        rnc: company?.rnc,
       };
       const branchSelected: Branch = {
-        address: "calle el sol",
-        cellPhone: "829-751-8951",
+        address: branch?.address,
+        cellPhone: branch?.cellPhone,
       };
 
       var invoice = `<!DOCTYPE html>
@@ -237,81 +279,129 @@ Cliente:${ordenAImprimir.consumer.name}
     return (amount * percent) / 100;
   };
 
-  const PedidoItem = ({ orden }) => {
-    console.log(orden);
-
+  const PedidoItem = ({
+    orden,
+    showModal,
+  }: {
+    orden: Order;
+    showModal: () => void;
+  }) => {
     return (
-      <Provider>
-        
-      <View  style={styles.card}>
-      <TouchableOpacity onPress={showModal} activeOpacity={0.8}>
-        <View style={styles.row}>
-          <Image style={styles.logo} />
-          <View style={styles.info}>
-            <Text style={styles.estado}>{orden.payMethod}</Text>
-            <Text style={styles.restaurante}>{orden.consumer.name}</Text>
-            <Text style={styles.detalles}>
-              RD${" "}
-              {orden.products
-                .reduce((total, item) => total + item.productTotal, 0) // Sumar los precios
-                .toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                })}{" "}
-              • {orden.products.length} producto(s)
-            </Text>
-            <Text style={styles.fecha}>{formatDate(orden.dateHour)}</Text>
+      <View style={styles.card}>
+        <TouchableOpacity onPress={showModal} activeOpacity={0.8}>
+          <View style={styles.row}>
+            <Image style={styles.logo} />
+            <View style={styles.info}>
+              <Text style={styles.estado}>{orden.payMethod}</Text>
+              <Text style={styles.restaurante}>{orden.consumer.name}</Text>
+              <Text style={styles.detalles}>
+                RD${" "}
+                {orden.products
+                  .reduce((total, item) => total + item.productTotal, 0)
+                  .toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  })}{" "}
+                • {orden.products.length} producto(s)
+              </Text>
+              <Text style={styles.fecha}>{formatDate(orden.dateHour)}</Text>
+            </View>
           </View>
-        </View>
+          <View style={styles.botones}>
+            <TouchableOpacity style={styles.button}>
+              <Icon source="trash-can-outline" size={20} color={"blank"} />
+              <Text>Cancelar</Text>
+            </TouchableOpacity>
+            <Text
+              style={{
+                borderEndWidth: 1,
+                borderStartWidth: 1,
+                borderColor: "gray",
+              }}
+            ></Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => rePrintOrder(orden)}
+            >
+              <Icon source="printer" size={20} color={"blank"} />
+              <Text>Imprimir</Text>
+            </TouchableOpacity>
+          </View>
         </TouchableOpacity>
-        {/* Modal */}
-        <Portal>
-              <Modal
-                visible={visible}
-                onDismiss={hideModal}
-                contentContainerStyle={styles.modalContainer}
-              >
-                <Button mode="contained" onPress={hideModal}>
-                  Cerrar
-                </Button>
-              </Modal>
-            </Portal>
-
-        <View style={styles.botones}>
-          <TouchableOpacity style={styles.button}>
-            <Icon source="trash-can-outline" size={20} color={"blank"} />
-            <Text>Cancelar</Text>
-          </TouchableOpacity>
-          <Text
-            style={{
-              borderEndWidth: 1,
-              borderStartWidth: 1,
-              borderColor: "gray",
-            }}
-          ></Text>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => rePrintOrder(orden)}
-          >
-            <Icon source="printer" size={20} color={"blank"} />
-            <Text>Imprimir</Text>
-          </TouchableOpacity>
-        </View>
       </View>
-      
-      </Provider>
     );
   };
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={orders}
-        keyExtractor={(item) => item.id?.toString()!}
-        renderItem={({ item }) => <PedidoItem orden={item} />}
-      />
-    </View>
-    
+    <Provider>
+      <View style={styles.container}>
+        <FlatList
+          data={orders}
+          keyExtractor={(item) => item.id?.toString()!}
+          renderItem={({ item }) => (
+            <PedidoItem orden={item} showModal={() => showModal(item)} />
+          )}
+        />
+
+        {/* Modal Global */}
+        <Portal>
+          <Modal
+            visible={visible}
+            onDismiss={hideModal}
+            contentContainerStyle={styles.modalContainer}
+          >
+            <Text style={{ fontSize: 18, fontWeight: "bold"}}>
+              Detalles del pedido 
+            </Text>
+            {selectedOrder && (
+              <View style={{ height: ScreenHeight - 400, marginBottom: 15 }}>
+                <FlatList
+                  data={selectedOrder.products}
+                  style={{ height: ScreenHeight - 500, marginBottom: 15 }}
+                  renderItem={({ item, index }) => (
+                    <List.Item
+                      title={item.productName!}
+                      description={`RD$${item.productPrice}`}
+                      left={(props) => (
+                        <Avatar.Text
+                          {...props}
+                          style={{
+                            backgroundColor:
+                              theme === "light"
+                                ? Colors.light.colors.background
+                                : Colors.dark.colors.background,
+                          }}
+                          color={
+                            theme === "light"
+                              ? Colors.light.colors.primary
+                              : Colors.dark.colors.primary
+                          }
+                          label={item.productName!.charAt(0)}
+                        />
+                      )}
+                      right={() => (
+                        <View
+                          style={{
+                            marginRight: -23,
+                          }}
+                        >
+                          <Badge>{item.productAmount}</Badge>
+                         
+                        </View>
+                      )}
+                    />
+                  )}
+                  keyExtractor={(item, index) => index.toString()}
+                />
+              </View>
+            )}
+            <Button mode="contained" onPress={hideModal}>
+              Cerrar
+            </Button>
+          </Modal>
+        </Portal>
+      </View>
+    </Provider>
   );
 };
 
@@ -360,6 +450,5 @@ const styles = {
     width: "80%",
   },
 };
-
 
 export default OrdenesView;

@@ -54,16 +54,16 @@ const LoginView = () => {
 
             const user_result: AuthLogin = {
               id: res.data.data.id,
-              fullName: res.data.data.name,
+              fullName: res.data.data.fullName,
               username: res.data.data.username,
               email: res.data.data.email,
               roleName: res.data.data.email,
-              authCode: res.data.data.email,
+              authCode: res.data.data.authCode,
               token: res.data.data.token,
             };
 
             // console.log("Data despues del log:", user_result);
-
+            
             updateUser(user_result);
             setAuthenticate(true);
           } else {
@@ -100,7 +100,7 @@ const LoginView = () => {
         ) : (
           <>
             <Image
-              source={require("../assets/images/adaptive-icon.png")}
+              source={require("../assets/images/ventech.png")}
               style={styles.branding}
             />
             <View style={styles.errorContainer}>
@@ -177,9 +177,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor:"white"
   },
   branding: {
-    width: 100,
+    width: 300,
     height: 100,
   },
   logo: {

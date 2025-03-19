@@ -11,13 +11,17 @@ import React, {
 import { AuthenticateContext } from "../AuthenticateContext/AuthenticateContext";
 import { AuthLogin } from "@/Models/AuthLogin";
 import { jwtDecode, JwtPayload } from "jwt-decode";
+import { Company } from "@/Models/Company";
+import { Branch } from "@/Models/Branch";
 
 interface UserContextProps {
   userData: AuthLogin | undefined;
   token: string | undefined;
-  branch: number | undefined;
+  branch: Branch | undefined;
+  company: Company | undefined;
   updateUser: (newData: AuthLogin) => void;
-  updateBranch: (b: number) => void;
+  updateCompany: (newData: Company) => void;
+  updateBranch: (b: Branch) => void;
   removeUser: () => void;
 }
 
@@ -29,7 +33,8 @@ interface UserProviderProps {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | undefined>(undefined);
-  const [branch, setBranch] = useState<number | undefined>(undefined);
+  const [branch, setBranch] = useState<Branch | undefined>({});
+  const [company, setCompany] = useState<Company | undefined>({});
   const [userData, setUserData] = useState<AuthLogin | undefined>(undefined);
   const { setAuthenticate } = useContext(AuthenticateContext) || {};
 
@@ -37,9 +42,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     getUser();
   }, []);
 
-  const updateBranch = (b: number) => {
+  const updateBranch = (b: Branch) => {
     setBranch(b);
   };
+  const updateCompany= (c: Company) => {
+    setCompany(c);
+  };
+
 
   const getUser = () => {
     try {
@@ -64,7 +73,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
               token: token,
             };
             updateUser(dta);
+
+
           }
+
           setToken(token);
         }
       });
@@ -80,6 +92,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const updateUser = useCallback(async (newData: AuthLogin) => {
     try {
       setUserData(newData);
+      await AsyncStorage.setItem("TK", newData.token!);
+
       setAuthenticate?.(true);
     } catch (err) {
       console.error("Error saving user:", err);
@@ -87,7 +101,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   }, []);
 
   const removeUser = async () => {
-    console.log("entrando al cerrar");
     try {
       await AsyncStorage.removeItem("Vt-tk");
       setUserData(undefined);
@@ -100,7 +113,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{ userData, updateUser, removeUser, token, branch, updateBranch }}
+      value={{ userData, updateUser, removeUser, token, branch, updateBranch ,company, updateCompany}}
     >
       {children}
     </UserContext.Provider>

@@ -24,7 +24,7 @@ export const Sidebar = ({ children }: any) => {
       <Drawer.Screen name="Venta" component={HomeView} />
 
       <Drawer.Screen name="Ordenes" component={OrdenesView} />
-      <Drawer.Screen name="Inventario" component={ProcessOrderView} />
+      {/* <Drawer.Screen name="Inventario" component={ProcessOrderView} /> */}
       <Drawer.Screen
         name="Cerrar Sesión"
         component={() => null}
@@ -50,7 +50,7 @@ const CustomDrawerContent = (props: any) => {
           }}
           style={styles.image}
         />
-        <Text style={styles.title}>{userData?.username}</Text>
+        <Text style={styles.title}>{userData?.fullName}</Text>
       </View>
       <DrawerItemList {...props} />
     </DrawerContentScrollView>
