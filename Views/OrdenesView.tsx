@@ -48,27 +48,24 @@ const OrdenesView = () => {
     setVisible(false);
   };
   useEffect(() => {
-
-
     let hoy = new Date();
-    console.log("hoy", hoy);
-    
+
     // Crear nuevas fechas ajustadas
     let desdeDate = new Date(hoy);
     desdeDate.setDate(hoy.getDate() - 2);
-    
+
     let hastaDate = new Date(hoy);
     hastaDate.setDate(hoy.getDate() + 1);
-    
+
     // Formatear correctamente en dd/mm/yyyy
     let opciones = { day: "2-digit", month: "2-digit", year: "numeric" };
     let desde = desdeDate.toLocaleDateString("es-ES", opciones);
     let hasta = hastaDate.toLocaleDateString("es-ES", opciones);
-    
-    console.log("desde", desde);
-    console.log("hasta", hasta);
-    
-    OrderService.getAll(branch?.id!, desde,hasta)
+
+    // console.log("desde", desde);
+    // console.log("hasta", hasta);
+
+    OrderService.getAll(branch?.id!, desde, hasta)
       .then((e: any) => {
         const data = e.data.data;
         console.log(data);
@@ -92,15 +89,15 @@ const OrdenesView = () => {
 
       ordenAImprimir.products!.forEach((o) => {
         totalOrden +=
-          o.productPrice * o.productAmount -
-          gerPercent(o.productPrice * o.productAmount, o.discountPorcent);
+          o.productPrice! * o.productAmount! -
+          gerPercent(o.productPrice! * o.productAmount!, o.discountPorcent);
         totalItbis +=
-          o.itbis * o.productAmount -
-          gerPercent(o.itbis * o.productAmount, o.discountPorcent);
-        montoDescuento += o.totalDiscount * o.productAmount;
+          o.itbis! * o.productAmount! -
+          gerPercent(o.itbis! * o.productAmount!, o.discountPorcent);
+        montoDescuento += o.totalDiscount! * o.productAmount!;
       });
 
-      if (ordenAImprimir.rncOCedula.length >= 9) {
+      if (ordenAImprimir.rncOCedula!.length >= 9) {
         tipoDeFactura = "CON CRÉDITO FISCAL";
         razonSocial = `Razon Social: ${ordenAImprimir.razonSocial}<br />`;
       } else {
@@ -177,12 +174,12 @@ ${branchSelected.address}
 <th style="border: none;">itbis</th>
 <th style="border: none;">valor</th>
 </tr>
-${ordenAImprimir.products
-  .map(
+${ordenAImprimir
+  .products!.map(
     (a) => `
   <tr>
     <td style="border: none;">${a.productName} * ${a.productAmount}</td>
-    <td style="border: none;">${(a.itbis * a.productAmount).toLocaleString(
+    <td style="border: none;">${(a.itbis! * a.productAmount!).toLocaleString(
       "en-US",
       {
         style: "currency",
@@ -190,7 +187,7 @@ ${ordenAImprimir.products
       }
     )}</td>
     <td style="border: none;">${(
-      a.productPrice * a.productAmount
+      a.productPrice! * a.productAmount!
     ).toLocaleString("en-US", { style: "currency", currency: "USD" })}</td>
     </tr>
 `
@@ -350,8 +347,8 @@ Cliente:${ordenAImprimir.consumer.name}
             onDismiss={hideModal}
             contentContainerStyle={styles.modalContainer}
           >
-            <Text style={{ fontSize: 18, fontWeight: "bold"}}>
-              Detalles del pedido 
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+              Detalles del pedido
             </Text>
             {selectedOrder && (
               <View style={{ height: ScreenHeight - 400, marginBottom: 15 }}>
@@ -386,7 +383,6 @@ Cliente:${ordenAImprimir.consumer.name}
                           }}
                         >
                           <Badge>{item.productAmount}</Badge>
-                         
                         </View>
                       )}
                     />
@@ -413,7 +409,7 @@ const styles = {
     marginHorizontal: 5,
     flexDirection: "row",
   },
-  container: { flex: 1, backgroundColor: "#f5f5f5", padding: 10 },
+  container: { flex: 1, padding: 10 },
   card: {
     backgroundColor: "#fff",
     padding: 15,

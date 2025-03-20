@@ -21,6 +21,7 @@ import ChargingApp from "@/components/CharginApp";
 import { Icon } from "react-native-paper";
 
 const LoginView = () => {
+  const theme = useColorScheme();
   const navigation = useNavigation();
   const [key, setKey] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -28,7 +29,6 @@ const LoginView = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [checking, setChecking] = useState<boolean>(false);
 
-  const theme = useColorScheme();
 
   const _Authenticated = useContext(AuthenticateContext);
   if (!_Authenticated) {
@@ -177,7 +177,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor:"white"
   },
   branding: {
     width: 300,

@@ -20,8 +20,8 @@ import { useUserContext } from "@/context/UserContext/UserContext";
 const ScreenHeight = Dimensions.get("window").height;
 
 const HomeView = () => {
-  const { branch, userData } = useUserContext();
   const theme = useColorScheme();
+  const { branch } = useUserContext();
   const [products, setProducts] = useState<Product[]>([]);
   // const [newOrder, setNewOrder] = useState<Order>({});
   const [productsFiltered, setProductsFiltered] = useState<Product[]>([]);
@@ -88,19 +88,21 @@ const HomeView = () => {
 
   const getTotalItbis = () => {
     return selectedProducts.reduce((total: number, item: any) => {
-      
-      return total + ((item.product.price * item.product.itbis)/100)* item.cantidad;;
+      return (
+        total +
+        ((item.product.price * item.product.itbis) / 100) * item.cantidad
+      );
     }, 0);
   };
 
   const getTotalPrice = () => {
     return selectedProducts.reduce((total: number, item: any) => {
-      return total + item.cantidad * item.product.price;;
+      return total + item.cantidad * item.product.price;
     }, 0);
   };
   const getTotalCantidadProducto = () => {
     return selectedProducts.reduce((total: number, item: any) => {
-      return total + item.cantidad ;
+      return total + item.cantidad;
     }, 0);
   };
 
@@ -186,7 +188,10 @@ const HomeView = () => {
                 <Text
                   style={{
                     fontSize: 16,
-                    color: "#333",
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
                     fontWeight: "bold",
                   }}
                 >
@@ -210,14 +215,25 @@ const HomeView = () => {
                 <Text
                   style={{
                     fontSize: 16,
-                    color: "#333",
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
                     fontWeight: "bold",
                     marginLeft: 93,
                   }}
                 >
                   Descuento:
                 </Text>
-                <Text style={{ fontSize: 16, color: "#333" }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
+                  }}
+                >
                   RD$ {descuentos}.00
                 </Text>
               </View>
@@ -235,15 +251,30 @@ const HomeView = () => {
                 <Text
                   style={{
                     fontSize: 16,
-                    color: "#333",
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
                     fontWeight: "bold",
                     marginLeft: 133,
                   }}
                 >
                   Itebis:
                 </Text>
-                <Text style={{ fontSize: 16, color: "#333" }}>
-                  RD$ {getTotalItbis().toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
+                  }}
+                >
+                  RD${" "}
+                  {getTotalItbis().toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  })}
                 </Text>
               </View>
               <View
@@ -260,15 +291,30 @@ const HomeView = () => {
                 <Text
                   style={{
                     fontSize: 16,
-                    color: "#333",
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
                     fontWeight: "bold",
                     marginLeft: 138,
                   }}
                 >
                   Total:
                 </Text>
-                <Text style={{ fontSize: 16, color: "#333" }}>
-                  RD$ {getTotalPrice().toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
+                  }}
+                >
+                  RD${" "}
+                  {getTotalPrice().toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  })}
                 </Text>
               </View>
             </View>
@@ -291,14 +337,14 @@ const HomeView = () => {
             </Button>
 
             <Button
-              icon="check"
+              icon="arrow-right"
               mode="contained"
               onPress={() =>
                 selectedProducts.length > 0 ? procesarOrden() : null
               }
               style={{ backgroundColor: "#3F75EA" }}
             >
-              Procesar
+              Siguiente
             </Button>
           </View>
         </View>

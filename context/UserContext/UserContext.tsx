@@ -45,14 +45,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const updateBranch = (b: Branch) => {
     setBranch(b);
   };
-  const updateCompany= (c: Company) => {
+  const updateCompany = (c: Company) => {
     setCompany(c);
   };
 
-
   const getUser = () => {
     try {
-      AsyncStorage.getItem("Vt-tk").then((token) => {
+      AsyncStorage.getItem("TK").then((token) => {
         if (token !== null) {
           const decoded = jwtDecode(token);
 
@@ -73,8 +72,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
               token: token,
             };
             updateUser(dta);
-
-
           }
 
           setToken(token);
@@ -113,7 +110,16 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{ userData, updateUser, removeUser, token, branch, updateBranch ,company, updateCompany}}
+      value={{
+        userData,
+        updateUser,
+        removeUser,
+        token,
+        branch,
+        updateBranch,
+        company,
+        updateCompany,
+      }}
     >
       {children}
     </UserContext.Provider>

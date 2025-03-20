@@ -9,10 +9,7 @@ interface IItemProduct {
   add: Function;
 }
 
-const ItemProduct = ({ product, add }: IItemProduct) => {
-
-  console.log('entro aquiiii',product);
-  
+const ItemProduct = ({ product, add }: IItemProduct) => {  
   const theme = useColorScheme();
   const [cantidad, setCantidad] = useState<number>(0);
 

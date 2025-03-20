@@ -4,12 +4,13 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, useColorScheme } from "react-native";
 import OrdenesView from "@/Views/OrdenesView";
 import PosView from "@/Views/HomeView";
 import ProcessOrderView from "@/Views/ProcessOrderView";
 import HomeView from "@/Views/HomeView";
 import { useUserContext } from "@/context/UserContext/UserContext";
+import { Colors } from "@/constants/Colors";
 
 export const Sidebar = ({ children }: any) => {
   const Drawer = createDrawerNavigator();
@@ -41,6 +42,7 @@ export const Sidebar = ({ children }: any) => {
 
 const CustomDrawerContent = (props: any) => {
   const { userData } = useUserContext();
+  const theme = useColorScheme();
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.header}>
@@ -50,7 +52,19 @@ const CustomDrawerContent = (props: any) => {
           }}
           style={styles.image}
         />
-        <Text style={styles.title}>{userData?.fullName}</Text>
+        <Text
+          style={[
+            styles.title,
+            {
+              color:
+                theme === "light"
+                  ? Colors.light.colors.primary
+                  : Colors.dark.colors.primary,
+            },
+          ]}
+        >
+          {userData?.fullName}
+        </Text>
       </View>
       <DrawerItemList {...props} />
     </DrawerContentScrollView>
