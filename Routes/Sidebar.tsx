@@ -4,28 +4,62 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import { View, Text, Image, StyleSheet, useColorScheme } from "react-native";
+import { View, Text, Image, useColorScheme } from "react-native";
 import OrdenesView from "@/Views/OrdenesView";
-import PosView from "@/Views/HomeView";
-import ProcessOrderView from "@/Views/ProcessOrderView";
 import HomeView from "@/Views/HomeView";
 import { useUserContext } from "@/context/UserContext/UserContext";
 import { Colors } from "@/constants/Colors";
 
-export const Sidebar = ({ children }: any) => {
+export const Sidebar = () => {
   const Drawer = createDrawerNavigator();
   const { removeUser } = useUserContext();
+  const theme = useColorScheme();
+
+  const screenOptions = React.useMemo(
+    () => ({
+      headerTitle: () => (
+        <View
+          style={{
+            flexDirection: "row",
+            backgroundColor:
+              theme === "light"
+                ? Colors.light.colors.background
+                : Colors.dark.colors.background,
+          }}
+        >
+          {/* <Text
+            style={{
+              fontSize: 30,
+              fontWeight: "bold",
+              color: "#3F75EA",
+            }}
+          >
+            Ventech
+          </Text> */}
+          <Image
+            source={require("../assets/images/title-logo.png")}
+            style={{
+              width: 150,
+              height: 30,
+              // borderRadius: 50,
+            }}
+          />
+        </View>
+      ),
+    }),
+    [theme]
+  );
 
   return (
     <Drawer.Navigator
       initialRouteName="Venta"
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      drawerContent={(props) => (
+        <CustomDrawerContent {...props} theme={theme} />
+      )}
       screenOptions={screenOptions}
     >
       <Drawer.Screen name="Venta" component={HomeView} />
-
       <Drawer.Screen name="Ordenes" component={OrdenesView} />
-      {/* <Drawer.Screen name="Inventario" component={ProcessOrderView} /> */}
       <Drawer.Screen
         name="Cerrar Sesión"
         component={() => null}
@@ -40,28 +74,37 @@ export const Sidebar = ({ children }: any) => {
   );
 };
 
-const CustomDrawerContent = (props: any) => {
+const CustomDrawerContent = React.memo(({ theme, ...props }: any) => {
   const { userData } = useUserContext();
-  const theme = useColorScheme();
+
   return (
     <DrawerContentScrollView {...props}>
-      <View style={styles.header}>
+      <View
+        style={{
+          alignItems: "center",
+          padding: 20,
+        }}
+      >
         <Image
           source={{
             uri: "https://as1.ftcdn.net/v2/jpg/03/46/83/96/1000_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg",
           }}
-          style={styles.image}
+          style={{
+            width: 100,
+            height: 100,
+            borderRadius: 50,
+          }}
         />
         <Text
-          style={[
-            styles.title,
-            {
-              color:
-                theme === "light"
-                  ? Colors.light.colors.primary
-                  : Colors.dark.colors.primary,
-            },
-          ]}
+          style={{
+            marginTop: 10,
+            fontSize: 18,
+            fontWeight: "bold",
+            color:
+              theme === "light"
+                ? Colors.light.colors.primary
+                : Colors.dark.colors.primary,
+          }}
         >
           {userData?.fullName}
         </Text>
@@ -69,67 +112,6 @@ const CustomDrawerContent = (props: any) => {
       <DrawerItemList {...props} />
     </DrawerContentScrollView>
   );
-};
-
-const screenOptions = {
-  headerTitle: () => (
-    <View style={styles.brandinglogobox}>
-      <Text style={{ fontSize: 30, fontWeight: "bold", color: "#3F75EA" }}>
-        Ventech
-      </Text>
-    </View>
-  ),
-};
-
-const styles = StyleSheet.create({
-  header: {
-    alignItems: "center",
-    padding: 20,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  title: {
-    marginTop: 10,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  brandinglogobox: {
-    flexDirection: "row",
-  },
-  branding: {
-    width: 50,
-    height: 50,
-    resizeMode: "contain",
-  },
-  logo: {
-    width: 170,
-    height: 50,
-    resizeMode: "contain",
-    marginLeft: -30,
-  },
-  AddButton: {
-    width: 160,
-    height: 50,
-    borderWidth: 1,
-    borderColor: "grey",
-    alignSelf: "flex-start",
-    marginStart: 20,
-    marginTop: 20,
-    borderRadius: 30,
-    flexDirection: "row",
-  },
-  ButtonCircleIcon: {
-    width: 40,
-    height: 40,
-    borderWidth: 1,
-    borderColor: "grey",
-    marginTop: 4,
-    marginStart: 5,
-    borderRadius: 30,
-    alignItems: "center",
-    backgroundColor: "#54aeff",
-  },
 });
+
+export default Sidebar;

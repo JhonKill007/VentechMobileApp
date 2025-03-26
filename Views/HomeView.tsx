@@ -15,8 +15,8 @@ import { Product } from "@/Models/Product";
 import ItemProduct from "@/components/ItemProduct";
 import ChargingApp from "@/components/CharginApp";
 import { Colors } from "@/constants/Colors";
-import { Order } from "@/Models/Order";
 import { useUserContext } from "@/context/UserContext/UserContext";
+import { SelectProduct } from "@/Models/SelectProduct";
 const ScreenHeight = Dimensions.get("window").height;
 
 const HomeView = () => {
@@ -25,7 +25,7 @@ const HomeView = () => {
   const [products, setProducts] = useState<Product[]>([]);
   // const [newOrder, setNewOrder] = useState<Order>({});
   const [productsFiltered, setProductsFiltered] = useState<Product[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<SelectProduct[]>([]);
   const [search, setsearch] = useState<string>("");
   const [checking, setChecking] = useState<boolean>(true);
   const [descuentos, setDescuentos] = useState<number>(0);
@@ -67,15 +67,15 @@ const HomeView = () => {
   };
 
   const addProducts = (id: number, product: Product, cantidad: number) => {
-    setSelectedProducts((prevProducts: any) => {
+    setSelectedProducts((prevProducts: SelectProduct[]) => {
       const existingProductIndex = prevProducts.findIndex(
-        (p: any) => p.id === id
+        (p: SelectProduct) => p.id === id
       );
       if (existingProductIndex !== -1) {
         if (cantidad === 0) {
-          return prevProducts.filter((p: any) => p.id !== id);
+          return prevProducts.filter((p: SelectProduct) => p.id !== id);
         }
-        return prevProducts.map((p: any) =>
+        return prevProducts.map((p: SelectProduct) =>
           p.id === id ? { ...p, cantidad } : p
         );
       } else {
@@ -197,7 +197,15 @@ const HomeView = () => {
                 >
                   Cantidad de productos:
                 </Text>
-                <Text style={{ fontSize: 16, color: "#333" }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
+                  }}
+                >
                   {getTotalCantidadProducto()}
                 </Text>
               </View>

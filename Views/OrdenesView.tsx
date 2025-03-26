@@ -331,7 +331,15 @@ Cliente:${ordenAImprimir.consumer.name}
 
   return (
     <Provider>
-      <View style={styles.container}>
+      <View
+        style={{
+          height: ScreenHeight - 110,
+          backgroundColor:
+            theme === "light"
+              ? Colors.light.colors.background
+              : Colors.dark.colors.background,
+        }}
+      >
         <FlatList
           data={orders}
           keyExtractor={(item) => item.id?.toString()!}
@@ -409,7 +417,6 @@ const styles = {
     marginHorizontal: 5,
     flexDirection: "row",
   },
-  container: { flex: 1, padding: 10 },
   card: {
     backgroundColor: "#fff",
     padding: 15,

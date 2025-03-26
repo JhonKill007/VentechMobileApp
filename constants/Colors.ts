@@ -27,7 +27,7 @@ export const Colors = {
     dividerColor: 'rgba(0,0,0,0.7)',
     colors: {
         primary: 'white',
-        background: 'black',
+        background: '#0c0f14',
         details:'#3F75EA',
         card: 'black',
         text: 'white',

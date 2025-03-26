@@ -14,7 +14,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { Avatar, List, Switch, TextInput } from "react-native-paper";
 // import Toast from "react-native-toast-message";
 import * as Print from "expo-print";
-import { Button, Surface, Portal, Modal, Provider } from "react-native-paper";
+import { Button, Surface, Provider } from "react-native-paper";
 import { useNavigation } from "expo-router";
 import ConsumerService from "@/Services/CommonServices/ConsumerService";
 import { Consumer } from "@/Models/Consumer";
@@ -22,7 +22,6 @@ import ChargingApp from "@/components/CharginApp";
 import { Discount } from "@/Models/Discount";
 import DiscountService from "@/Services/CommonServices/DiscountService";
 import { useRoute } from "@react-navigation/native";
-import ItemProduct from "@/components/ItemProduct";
 import { Colors } from "@/constants/Colors";
 import { useUserContext } from "@/context/UserContext/UserContext";
 import OrderS from "@/Services/Order/OrderService";
@@ -30,6 +29,7 @@ import { Order } from "@/Models/Order";
 import { Company } from "@/Models/Company";
 import { Branch } from "@/Models/Branch";
 import { Badge } from "react-native-paper";
+import ItemOrdenProduct from "@/components/ItemOrdenProduct";
 
 const ScreenHeight = Dimensions.get("window").height;
 
@@ -84,7 +84,6 @@ const ProcessOrderView = () => {
 
   const CrearOrden = () => {
     setChecking(true);
-
     if (hasRnc) {
       ConsumerService.GetContribuyente(rncOrCedula!)
         .then((e: any) => {
@@ -410,94 +409,90 @@ const ProcessOrderView = () => {
         </View>
       ) : (
         <View
-          style={[
-            styles.scrollContainer,
-            {
-              backgroundColor:
-                theme === "light"
-                  ? Colors.light.colors.background
-                  : Colors.dark.colors.background,
-            },
-          ]}
+          style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor:
+              theme === "light"
+                ? Colors.light.colors.background
+                : Colors.dark.colors.background,
+          }}
         >
-          <View
-            style={[
-              styles.container,
-              {
-                backgroundColor:
-                  theme === "light"
-                    ? Colors.light.colors.background
-                    : Colors.dark.colors.background,
-              },
-            ]}
-          >
-            {/* Dropdown de Clientes */}
-            <Dropdown
-              style={styles.dropdown}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={consumer}
-              search
-              maxHeight={300}
-              labelField="name"
-              valueField="id"
-              placeholder="Clientes"
-              searchPlaceholder="Buscar..."
-              value={descuento}
-              onChange={(item) => verifyClientInformation(item)}
-              renderLeftIcon={() => (
-                <AntDesign
-                  style={styles.icon}
-                  color="black"
-                  name="user"
-                  size={20}
-                />
-              )}
-            />
-
-            {/* Switch de Comprobante Fiscal */}
-            <View style={{ marginTop: 10 }}>
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  color:
-                    theme === "light"
-                      ? Colors.light.colors.primary
-                      : Colors.dark.colors.primary,
-                }}
-              >
-                Comprobante Fiscal
-              </Text>
-              <Switch value={hasRnc} onValueChange={onToggleSwitch} />
-            </View>
-
-            {/* Campo de RNC o Cédula */}
-            {hasRnc && (
-              <View style={{ marginTop: 10 }}>
-                <TextInput
-                  label="RNC o Cédula"
-                  value={rncOrCedula}
-                  style={{
-                    // width: "100%",
-                    backgroundColor:
-                      theme === "light"
-                        ? Colors.light.colors.background
-                        : Colors.dark.colors.background,
-                    borderRadius: 8,
-                    paddingHorizontal: 10,
-                    borderWidth: 1,
-                    borderColor: "#ccc",
-                    marginBottom: 5,
-                  }}
-                  onChangeText={(text) => setRncOrCedula(text)}
-                />
-              </View>
+          {/* Dropdown de Clientes */}
+          <Dropdown
+            style={{
+              width: "100%",
+              backgroundColor: "white",
+              borderRadius: 8,
+              padding: 10,
+              borderWidth: 1,
+              borderColor: "#ccc",
+              marginBottom: 5,
+            }}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={consumer}
+            search
+            maxHeight={300}
+            labelField="name"
+            valueField="id"
+            placeholder="Clientes"
+            searchPlaceholder="Buscar..."
+            value={descuento}
+            onChange={(item) => verifyClientInformation(item)}
+            renderLeftIcon={() => (
+              <AntDesign
+                style={styles.icon}
+                color="black"
+                name="user"
+                size={20}
+              />
             )}
+          />
 
-            {/* Dropdown de Descuentos */}
-            {/* <Dropdown
+          {/* Switch de Comprobante Fiscal */}
+          <View style={{ marginTop: 10 }}>
+            <Text
+              style={{
+                fontWeight: "bold",
+                color:
+                  theme === "light"
+                    ? Colors.light.colors.primary
+                    : Colors.dark.colors.primary,
+              }}
+            >
+              Comprobante Fiscal
+            </Text>
+            <Switch value={hasRnc} onValueChange={onToggleSwitch} />
+          </View>
+
+          {/* Campo de RNC o Cédula */}
+          {hasRnc && (
+            <View style={{ marginTop: 10 }}>
+              <TextInput
+                label="RNC o Cédula"
+                value={rncOrCedula}
+                style={{
+                  // width: "100%",
+                  backgroundColor:
+                    theme === "light"
+                      ? Colors.light.colors.background
+                      : Colors.dark.colors.background,
+                  borderRadius: 8,
+                  paddingHorizontal: 10,
+                  borderWidth: 1,
+                  borderColor: "#ccc",
+                  marginBottom: 5,
+                }}
+                onChangeText={(text) => setRncOrCedula(text)}
+              />
+            </View>
+          )}
+
+          {/* Dropdown de Descuentos */}
+          {/* <Dropdown
               style={styles.dropdown}
               placeholderStyle={styles.placeholderStyle}
               selectedTextStyle={styles.selectedTextStyle}
@@ -522,257 +517,191 @@ const ProcessOrderView = () => {
               )}
             /> */}
 
-            {/* Título de Productos */}
-            <View style={{ marginTop: 10 }}>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: "bold",
-                  marginBottom: 5,
-                  color:
+          {/* Título de Productos */}
+          <View style={{ marginTop: 10 }}>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "bold",
+                marginBottom: 5,
+                color:
+                  theme === "light"
+                    ? Colors.light.colors.primary
+                    : Colors.dark.colors.primary,
+              }}
+            >
+              Productos
+            </Text>
+
+            {/* Lista de Productos */}
+            <Surface
+              style={[
+                styles.surface,
+                {
+                  backgroundColor:
                     theme === "light"
-                      ? Colors.light.colors.primary
-                      : Colors.dark.colors.primary,
+                      ? Colors.light.colors.background
+                      : Colors.dark.colors.background,
+                },
+              ]}
+            >
+              <FlatList
+                data={selectedProducts}
+                style={{
+                  height: !hasRnc ? ScreenHeight - 462 : ScreenHeight - 535,
+                  marginBottom: 5,
+                }}
+                renderItem={({ item, index }) => (
+                  <ItemOrdenProduct OrdenItem={item} />
+                )}
+                keyExtractor={(item, index) => index.toString()}
+              />
+              <View
+                style={{
+                  display: "flex",
+                  padding: 10,
+                  borderTopWidth: 1,
+                  borderColor: "gray",
                 }}
               >
-                Productos
-              </Text>
-
-              {/* Lista de Productos */}
-              <Surface
-                style={[
-                  styles.surface,
-                  {
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                     backgroundColor:
                       theme === "light"
                         ? Colors.light.colors.background
                         : Colors.dark.colors.background,
-                  },
-                ]}
-              >
-                <FlatList
-                  data={selectedProducts}
-                  style={{
-                    height: !hasRnc ? ScreenHeight - 462 : ScreenHeight - 535,
-                    marginBottom: 5,
-                  }}
-                  renderItem={({ item, index }) => (
-                    <List.Item
-                      title={item.product.name!}
-                      description={`RD$${item.product.price}`}
-                      left={(props) =>
-                        item.product.photo ? (
-                          <Avatar.Image
-                            {...props}
-                            style={{
-                              backgroundColor:
-                                theme === "light"
-                                  ? Colors.light.colors.background
-                                  : Colors.dark.colors.background,
-                            }}
-                            source={{
-                              uri:
-                                "data:image/png;base64," + item.product.photo,
-                            }}
-                          />
-                        ) : (
-                          <Avatar.Text
-                            {...props}
-                            style={{
-                              backgroundColor:
-                                theme === "light"
-                                  ? Colors.light.colors.background
-                                  : Colors.dark.colors.background,
-                            }}
-                            color={
-                              theme === "light"
-                                ? Colors.light.colors.primary
-                                : Colors.dark.colors.primary
-                            }
-                            label={item.product.name!.charAt(0)}
-                          />
-                        )
-                      }
-                      right={() => (
-                        <View
-                          style={{
-                            marginRight: -20,
-                            marginTop: 20,
-                            borderRadius: 25,
-                            backgroundColor: "red",
-                            height: 30,
-                            padding: 5,
-                          }}
-                        >
-                          <Text style={{ fontWeight: "bold" }}>
-                            Cant: {item.cantidad}
-                          </Text>
-                          {/* <Text
-                            style={{
-                              fontSize: 16,
-                              fontWeight: "bold",
-                              textAlign: "center",
-                              color:
-                                theme === "light"
-                                  ? Colors.light.colors.primary
-                                  : Colors.dark.colors.primary,
-                            }}
-                          >
-                          Cant. : {item.cantidad}
-                          </Text> */}
-                        </View>
-                      )}
-                    />
-                  )}
-                  keyExtractor={(item, index) => index.toString()}
-                />
-                <View
-                  style={{
-                    display: "flex",
-                    padding: 10,
-                    borderTopWidth: 1,
-                    borderColor: "gray",
                   }}
                 >
-                  <View
+                  <Text
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      backgroundColor:
+                      fontSize: 16,
+                      color:
                         theme === "light"
-                          ? Colors.light.colors.background
-                          : Colors.dark.colors.background,
+                          ? Colors.light.colors.primary
+                          : Colors.dark.colors.primary,
+                      fontWeight: "bold",
                     }}
                   >
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color:
-                          theme === "light"
-                            ? Colors.light.colors.primary
-                            : Colors.dark.colors.primary,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Cantidad de productos:
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color:
-                          theme === "light"
-                            ? Colors.light.colors.primary
-                            : Colors.dark.colors.primary,
-                      }}
-                    >
-                      {getTotalCantidadProducto()}
-                    </Text>
-                  </View>
-
-                  <View
+                    Cantidad de productos:
+                  </Text>
+                  <Text
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      backgroundColor:
+                      fontSize: 16,
+                      color:
                         theme === "light"
-                          ? Colors.light.colors.background
-                          : Colors.dark.colors.background,
+                          ? Colors.light.colors.primary
+                          : Colors.dark.colors.primary,
                     }}
                   >
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color:
-                          theme === "light"
-                            ? Colors.light.colors.primary
-                            : Colors.dark.colors.primary,
-                        fontWeight: "bold",
-                        marginLeft: 133,
-                      }}
-                    >
-                      Itebis:
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color:
-                          theme === "light"
-                            ? Colors.light.colors.primary
-                            : Colors.dark.colors.primary,
-                      }}
-                    >
-                      RD${" "}
-                      {getTotalItbis().toLocaleString("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      })}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      backgroundColor:
-                        theme === "light"
-                          ? Colors.light.colors.background
-                          : Colors.dark.colors.background,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color:
-                          theme === "light"
-                            ? Colors.light.colors.primary
-                            : Colors.dark.colors.primary,
-                        fontWeight: "bold",
-                        marginLeft: 138,
-                      }}
-                    >
-                      Total:
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color:
-                          theme === "light"
-                            ? Colors.light.colors.primary
-                            : Colors.dark.colors.primary,
-                      }}
-                    >
-                      RD${" "}
-                      {getTotalPrice().toLocaleString("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      })}
-                    </Text>
-                  </View>
+                    {getTotalCantidadProducto()}
+                  </Text>
                 </View>
-              </Surface>
-            </View>
 
-            {/* Botones de Acción */}
-            <View style={styles.buttonContainer}>
-              <Button
-                icon="arrow-left"
-                mode="contained"
-                onPress={() => navigation.goBack()}
-                style={{ backgroundColor: "orange" }}
-              >
-                Atras
-              </Button>
-              <Button
-                icon="check"
-                mode="contained"
-                onPress={() => CrearOrden()}
-                style={{ backgroundColor: "#3F75EA" }}
-              >
-                Procesar
-              </Button>
-            </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    backgroundColor:
+                      theme === "light"
+                        ? Colors.light.colors.background
+                        : Colors.dark.colors.background,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color:
+                        theme === "light"
+                          ? Colors.light.colors.primary
+                          : Colors.dark.colors.primary,
+                      fontWeight: "bold",
+                      marginLeft: 133,
+                    }}
+                  >
+                    Itebis:
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color:
+                        theme === "light"
+                          ? Colors.light.colors.primary
+                          : Colors.dark.colors.primary,
+                    }}
+                  >
+                    RD${" "}
+                    {getTotalItbis().toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    })}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    backgroundColor:
+                      theme === "light"
+                        ? Colors.light.colors.background
+                        : Colors.dark.colors.background,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color:
+                        theme === "light"
+                          ? Colors.light.colors.primary
+                          : Colors.dark.colors.primary,
+                      fontWeight: "bold",
+                      marginLeft: 138,
+                    }}
+                  >
+                    Total:
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color:
+                        theme === "light"
+                          ? Colors.light.colors.primary
+                          : Colors.dark.colors.primary,
+                    }}
+                  >
+                    RD${" "}
+                    {getTotalPrice().toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    })}
+                  </Text>
+                </View>
+              </View>
+            </Surface>
+          </View>
+
+          {/* Botones de Acción */}
+          <View style={styles.buttonContainer}>
+            <Button
+              icon="arrow-left"
+              mode="contained"
+              onPress={() => navigation.goBack()}
+              style={{ backgroundColor: "orange" }}
+            >
+              Atras
+            </Button>
+            <Button
+              icon="check"
+              mode="contained"
+              onPress={() => CrearOrden()}
+              style={{ backgroundColor: "#3F75EA" }}
+            >
+              Procesar
+            </Button>
           </View>
         </View>
       )}
@@ -780,24 +709,6 @@ const ProcessOrderView = () => {
   );
 };
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    paddingBottom: 20,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#f4f4f4",
-    padding: 20,
-  },
-  dropdown: {
-    width: "100%",
-    backgroundColor: "white",
-    borderRadius: 8,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginBottom: 5,
-  },
   placeholderStyle: {
     fontSize: 16,
     color: "#aaa",

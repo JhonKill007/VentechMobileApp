@@ -6,131 +6,126 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  StyleSheet,
   TouchableWithoutFeedback,
   Keyboard,
   useColorScheme,
 } from "react-native";
-import { Colors } from "@/constants/Colors";
 import { AuthenticateContext } from "@/context/AuthenticateContext/AuthenticateContext";
 import { useUserContext } from "@/context/UserContext/UserContext";
-import { UserAuthModel } from "@/Models/UserAuthModel";
 import User from "@/Services/User/UserService";
-import { AuthLogin } from "@/Models/AuthLogin";
 import ChargingApp from "@/components/CharginApp";
 import { Icon } from "react-native-paper";
 
 const LoginView = () => {
-  const theme = useColorScheme();
   const navigation = useNavigation();
   const [key, setKey] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<any>();
-  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [checking, setChecking] = useState<boolean>(false);
-
-
   const _Authenticated = useContext(AuthenticateContext);
-  if (!_Authenticated) {
-    return null;
-  }
+  if (!_Authenticated) return null;
   const { setAuthenticate } = _Authenticated;
-
   const { updateUser } = useUserContext();
 
   const handleLogin = () => {
-    handlePressOutside();
-    setChecking(true);
-    let data: UserAuthModel = {
-      value: key.toLowerCase(),
-      key: password,
-    };
-
-    if (data.value !== "" && data.key !== "") {
-      User.LogIn(data)
-        .then((res: any) => {
-          if (res.data.statusCode == 1) {
-            // console.log("Data en el log", res.data);
-
-            const user_result: AuthLogin = {
-              id: res.data.data.id,
-              fullName: res.data.data.fullName,
-              username: res.data.data.username,
-              email: res.data.data.email,
-              roleName: res.data.data.email,
-              authCode: res.data.data.authCode,
-              token: res.data.data.token,
-            };
-
-            // console.log("Data despues del log:", user_result);
-            
-            updateUser(user_result);
-            setAuthenticate(true);
-          } else {
-            setError("Credenciales incorrecta");
-            setChecking(false);
-          }
-        })
-        .catch((e: any) => {
-          console.log(e);
-          setError(e);
-          setChecking(false);
-        });
-    } else {
-      if (data.key === "") {
-        setError("Debes colocar tu contraseña");
-        setChecking(false);
-      }
-
-      if (data.value === "") {
-        setError("Colocar tu usuario, email o numero");
-        setChecking(false);
-      }
-    }
-  };
-
-  const handlePressOutside = () => {
     Keyboard.dismiss();
+    setChecking(true);
+    if (!key || !password) {
+      setError(
+        !key
+          ? "Coloca tu usuario, email o número"
+          : "Debes colocar tu contraseña"
+      );
+      setChecking(false);
+      return;
+    }
+
+    User.LogIn({ value: key.toLowerCase(), key: password })
+      .then((res) => {
+        if (res.data.statusCode === 1) {
+          updateUser({
+            id: res.data.data.id,
+            fullName: res.data.data.fullName,
+            username: res.data.data.username,
+            email: res.data.data.email,
+            roleName: res.data.data.roleName,
+            authCode: res.data.data.authCode,
+            token: res.data.data.token,
+          });
+          setAuthenticate(true);
+        } else {
+          setError("Credenciales incorrectas");
+          setChecking(false);
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+        setError("Error al iniciar sesión");
+        setChecking(false);
+      });
   };
+
   return (
-    <TouchableWithoutFeedback onPress={handlePressOutside}>
-      <View style={styles.container}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         {checking ? (
           <ChargingApp />
         ) : (
           <>
             <Image
-              source={require("../assets/images/ventech.png")}
-              style={styles.branding}
+              source={require("../assets/images/adaptive-icon.png")}
+              style={{ width: 300, height: 100 }}
             />
-            <View style={styles.errorContainer}>
-              <Text style={{ color: "black", fontStyle: "italic" }}>
+            {error && (
+              <Text
+                style={{ color: "red", fontStyle: "italic", marginVertical: 8 }}
+              >
                 {error}
               </Text>
-            </View>
-            <View style={styles.form}>
-              <View style={styles.inputContainer}>
+            )}
+            <View style={{ width: "80%" }}>
+              <TextInput
+                style={{
+                  height: 40,
+                  borderWidth: 1,
+                  borderColor: "gray",
+                  borderRadius: 10,
+                  paddingHorizontal: 10,
+                  marginBottom: 10,
+                  color: "gray",
+                }}
+                placeholder="Teléfono, usuario o correo electrónico"
+                placeholderTextColor="gray"
+                onChangeText={setKey}
+                value={key}
+              />
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  borderWidth: 1,
+                  borderColor: "gray",
+                  borderRadius: 10,
+                  marginBottom: 10,
+                }}
+              >
                 <TextInput
-                  style={styles.input}
-                  placeholder="Teléfono, usuario o correo electrónico"
-                  placeholderTextColor="gray"
-                  onChangeText={(text) => setKey(text)}
-                  value={key}
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
+                  style={{
+                    flex: 1,
+                    height: 40,
+                    paddingHorizontal: 10,
+                    color: "gray",
+                  }}
                   placeholder="Contraseña"
                   placeholderTextColor="gray"
                   secureTextEntry={!showPassword}
-                  onChangeText={(text) => setPassword(text)}
+                  onChangeText={setPassword}
                   value={password}
                 />
                 <TouchableOpacity
-                  style={styles.iconContainer}
                   onPress={() => setShowPassword(!showPassword)}
+                  style={{ padding: 10 }}
                 >
                   <Icon
                     source={showPassword ? "eye-off" : "eye"}
@@ -141,29 +136,19 @@ const LoginView = () => {
               </View>
               <TouchableOpacity
                 disabled={checking}
-                style={styles.loginButton}
+                style={{
+                  backgroundColor: "#007AFF",
+                  borderRadius: 10,
+                  paddingVertical: 15,
+                  alignItems: "center",
+                  marginTop: 10,
+                }}
                 onPress={handleLogin}
               >
-                <Text style={styles.buttonText}>Iniciar Sesion</Text>
+                <Text style={{ color: "white", fontSize: 16 }}>
+                  Iniciar Sesión
+                </Text>
               </TouchableOpacity>
-              {/* <TouchableOpacity style={styles.forgotPassword}>
-                <Text style={{ color: 'black' }}>
-                  ¿Olvidaste tu contraseña?
-                </Text>
-              </TouchableOpacity> */}
-              {/* <View style={styles.registerContainer}>
-                <Text style={{ color: 'black' }}>
-                  ¿Aún no tienes cuenta?{" "}
-                  <TouchableOpacity
-                    style={{ alignItems: "center", marginTop: -3 }}
-                    onPress={() => {
-                      navigation.navigate("Register" as never);
-                    }}
-                  >
-                    <Text style={{ color: 'black' }}>Regístrate</Text>
-                  </TouchableOpacity>
-                </Text>
-              </View> */}
             </View>
           </>
         )}
@@ -171,65 +156,5 @@ const LoginView = () => {
     </TouchableWithoutFeedback>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  branding: {
-    width: 300,
-    height: 100,
-  },
-  logo: {
-    width: 150,
-    height: 35,
-    marginTop: -10,
-  },
-  form: {
-    width: "80%",
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 10,
-  },
-  input: {
-    height: 40,
-    flex: 1,
-    paddingHorizontal: 10,
-    color: "gray",
-  },
-  iconContainer: {
-    padding: 10,
-  },
-  loginButton: {
-    backgroundColor: "#007AFF",
-    borderRadius: 10,
-    paddingVertical: 15,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-  },
-  forgotPassword: {
-    marginTop: 10,
-  },
-  registerContainer: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  errorContainer: {
-    height: 25,
-    marginBottom: 8,
-    marginTop: 20,
-  },
-});
 
 export default LoginView;

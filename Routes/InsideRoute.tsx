@@ -4,10 +4,19 @@ import { useNavigation } from "expo-router";
 import { Sidebar } from "./Sidebar";
 import ProcessOrderView from "@/Views/ProcessOrderView";
 import SelectBranchView from "@/Views/SelectBranchView";
+import { useColorScheme } from "react-native";
+import { Colors } from "@/constants/Colors";
 
 const Stack = createStackNavigator();
 
 export const InsideRoute = () => {
+
+  const theme = useColorScheme();
+  const headerTitleColor =
+    theme === "light"
+      ? Colors.light.colors.details
+      : Colors.dark.colors.details;
+      
   return (
     <Stack.Navigator initialRouteName="SelectBranchView">
       <Stack.Screen
@@ -15,6 +24,7 @@ export const InsideRoute = () => {
         component={SelectBranchView}
         options={{
           headerTitle: "Sucursales",
+          headerTitleStyle: { color: headerTitleColor, fontSize: 20 },
         }}
       />
       <Stack.Screen
