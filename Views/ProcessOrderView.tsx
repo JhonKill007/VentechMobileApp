@@ -8,6 +8,8 @@ import {
   Dimensions,
   useColorScheme,
   Alert,
+  TouchableOpacity,
+  Keyboard,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -16,11 +18,11 @@ import { Avatar, List, Switch, TextInput } from "react-native-paper";
 import * as Print from "expo-print";
 import { Button, Surface, Provider } from "react-native-paper";
 import { useNavigation } from "expo-router";
-import ConsumerService from "@/Services/CommonServices/ConsumerService";
+import ConsumerService from "@/Services/Common/ConsumerService";
 import { Consumer } from "@/Models/Consumer";
 import ChargingApp from "@/components/CharginApp";
 import { Discount } from "@/Models/Discount";
-import DiscountService from "@/Services/CommonServices/DiscountService";
+import DiscountService from "@/Services/Common/DiscountService";
 import { useRoute } from "@react-navigation/native";
 import { Colors } from "@/constants/Colors";
 import { useUserContext } from "@/context/UserContext/UserContext";
@@ -30,14 +32,22 @@ import { Company } from "@/Models/Company";
 import { Branch } from "@/Models/Branch";
 import { Badge } from "react-native-paper";
 import ItemOrdenProduct from "@/components/ItemOrdenProduct";
+import { Icon } from "react-native-paper";
+import { SelectProduct } from "@/Models/SelectProduct";
+import { InfoOrder } from "@/Models/InfoOrder";
 
 const ScreenHeight = Dimensions.get("window").height;
+
+// interface IProcessOrderRouteParams {}
 
 const ProcessOrderView = () => {
   const theme = useColorScheme();
   const route = useRoute();
   const navigation = useNavigation();
-  const { selectedProducts }: any = route.params;
+  const {
+    selectedProducts,
+    infoOrder,
+  }: { selectedProducts: SelectProduct[]; infoOrder: InfoOrder } = route.params;
   const [consumer, setConsumer] = useState<Consumer[]>([]);
   const [discount, setDiscount] = useState<Discount[]>([]);
   const [checking, setChecking] = useState<boolean>(true);
@@ -82,18 +92,23 @@ const ProcessOrderView = () => {
     setCliente(client);
   };
 
+  const getRNC = (rncOrCedula: string) => {
+    ConsumerService.GetContribuyente(rncOrCedula!)
+      .then((e: any) => {
+        const data = e.data.data;
+        setRazonSocial(data.razonSocial);
+      })
+      .catch((err: any) => {
+        console.error(err);
+      });
+  };
+
+  const handlePressOutside = () => {
+    Keyboard.dismiss();
+  };
+
   const CrearOrden = () => {
     setChecking(true);
-    if (hasRnc) {
-      ConsumerService.GetContribuyente(rncOrCedula!)
-        .then((e: any) => {
-          const data = e.data.data;
-          setRazonSocial(data.razonSocial);
-        })
-        .catch((err: any) => {
-          console.error(err);
-        });
-    }
     const newOrdenProducts = selectedProducts.map((p: any) => ({
       productId: p.id,
       productName: p.product.name,
@@ -117,24 +132,24 @@ const ProcessOrderView = () => {
 
     const newOrden: Order = {
       consumer: {
-        id: cliente?.id ?? 0, // Valor por defecto si es null/undefined
-        name: cliente?.name ?? "", // Valor por defecto si es null/undefined
+        id: infoOrder.clientId ?? 0, // Valor por defecto si es null/undefined
+        name: infoOrder.clientName ?? "", // Valor por defecto si es null/undefined
         address: cliente?.address ?? "",
         cellPhone: cliente?.cellPhone ?? "",
       },
-      rncOCedula: rncOrCedula,
+      rncOCedula: infoOrder.rnc,
       branchId: branch?.id!,
-      razonSocial: razonSocial,
+      razonSocial: infoOrder.razonSocial,
       companyId: company?.id!,
-      payMethod: "Efectivo",
-      discountPercent: 0,
+      payMethod: infoOrder.metodoPago,
+      discountPercent: infoOrder.descuento ?? 0,
       byDelivery: false,
       toCaja: false,
       deliveryId: 0,
       total: 0,
       dateHour: formattedDate,
       payWith: totalOrden,
-      hasComprobante: hasRnc,
+      hasComprobante: infoOrder.rnc ? true : false,
       products: newOrdenProducts,
     };
 
@@ -144,12 +159,10 @@ const ProcessOrderView = () => {
 
         setChecking(false);
         printOrder(newOrden);
-        navigation.navigate(
-          "initalApp" as never,
-          {
-            selectedProducts: selectedProducts,
-          } as never
-        );
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "initalApp" as never }],
+        });
       })
       .catch((err: any) => {
         console.error(err);
@@ -418,105 +431,126 @@ const ProcessOrderView = () => {
                 : Colors.dark.colors.background,
           }}
         >
-          {/* Dropdown de Clientes */}
-          <Dropdown
-            style={{
-              width: "100%",
-              backgroundColor: "white",
-              borderRadius: 8,
-              padding: 10,
-              borderWidth: 1,
-              borderColor: "#ccc",
-              marginBottom: 5,
-            }}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={consumer}
-            search
-            maxHeight={300}
-            labelField="name"
-            valueField="id"
-            placeholder="Clientes"
-            searchPlaceholder="Buscar..."
-            value={descuento}
-            onChange={(item) => verifyClientInformation(item)}
-            renderLeftIcon={() => (
-              <AntDesign
-                style={styles.icon}
-                color="black"
-                name="user"
-                size={20}
-              />
-            )}
-          />
-
-          {/* Switch de Comprobante Fiscal */}
-          <View style={{ marginTop: 10 }}>
-            <Text
-              style={{
-                fontWeight: "bold",
-                color:
-                  theme === "light"
-                    ? Colors.light.colors.primary
-                    : Colors.dark.colors.primary,
-              }}
-            >
-              Comprobante Fiscal
-            </Text>
-            <Switch value={hasRnc} onValueChange={onToggleSwitch} />
-          </View>
-
-          {/* Campo de RNC o Cédula */}
-          {hasRnc && (
-            <View style={{ marginTop: 10 }}>
-              <TextInput
-                label="RNC o Cédula"
-                value={rncOrCedula}
+          <View style={{ padding: 20 }}>
+            <View style={{ flexDirection: "row", marginBottom: 20 }}>
+              <Text
                 style={{
-                  // width: "100%",
-                  backgroundColor:
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  marginBottom: 2,
+                  color:
                     theme === "light"
-                      ? Colors.light.colors.background
-                      : Colors.dark.colors.background,
-                  borderRadius: 8,
-                  paddingHorizontal: 10,
-                  borderWidth: 1,
-                  borderColor: "#ccc",
-                  marginBottom: 5,
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
                 }}
-                onChangeText={(text) => setRncOrCedula(text)}
-              />
+              >
+                Cliente:
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  marginBottom: 2,
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
+                }}
+              >
+                {infoOrder.clientName}
+              </Text>
             </View>
-          )}
 
-          {/* Dropdown de Descuentos */}
-          {/* <Dropdown
-              style={styles.dropdown}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={discount}
-              search
-              maxHeight={300}
-              labelField="name"
-              valueField="valor"
-              placeholder="Descuentos"
-              searchPlaceholder="Buscar..."
-              value={descuento}
-              onChange={(item) => setDescuento(item.value)}
-              renderLeftIcon={() => (
-                <AntDesign
-                  style={styles.icon}
-                  color="black"
-                  name="tag"
-                  size={20}
-                />
-              )}
-            /> */}
+            <View style={{ flexDirection: "row", marginBottom: 20 }}>
+              <Text
+                style={{
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
+                }}
+              >
+                Comprobante fiscal:
+              </Text>
 
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: "#888",
+                  marginTop: 1,
+                  marginLeft: 5,
+                }}
+              >
+                {infoOrder.rnc}
+              </Text>
+            </View>
+
+            <View style={{ marginBottom: 20 }}>
+              <Text style={{ fontSize: 14, color: "#555" }}>
+                <Text
+                  style={{
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
+                  }}
+                >
+                  Descuento:
+                </Text>{" "}
+                {infoOrder.descuento + "%"}
+              </Text>
+            </View>
+
+            <View style={{ flexDirection: "row", marginBottom: 20 }}>
+              <Text
+                style={{
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
+                }}
+              >
+                Metodo de pago:
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: "#27ae60",
+                  fontWeight: "bold",
+                  marginTop: 2,
+                  marginLeft: 5,
+                }}
+              >
+                {infoOrder.metodoPago}
+              </Text>
+            </View>
+
+            {/* <View style={{ flexDirection: "row" }}>
+              <Text
+                style={{
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
+                }}
+              >
+                Total de la orden:
+              </Text>
+              <Text style={{ fontSize: 14, color: "#555", marginLeft: 5 }}>
+                RD${" "}
+                {order
+                  .products!.reduce(
+                    (total, item) => total + item.productTotal!,
+                    0
+                  )
+                  .toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  })}
+              </Text>
+            </View> */}
+          </View>
           {/* Título de Productos */}
           <View style={{ marginTop: 10 }}>
             <Text
@@ -548,7 +582,7 @@ const ProcessOrderView = () => {
               <FlatList
                 data={selectedProducts}
                 style={{
-                  height: !hasRnc ? ScreenHeight - 462 : ScreenHeight - 535,
+                  height: ScreenHeight - 510,
                   marginBottom: 5,
                 }}
                 renderItem={({ item, index }) => (
@@ -685,7 +719,18 @@ const ProcessOrderView = () => {
           </View>
 
           {/* Botones de Acción */}
-          <View style={styles.buttonContainer}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              position: "absolute",
+              bottom: 10,
+              left: 0,
+              right: 0,
+              padding: 16,
+              alignItems: "center",
+            }}
+          >
             <Button
               icon="arrow-left"
               mode="contained"
@@ -740,10 +785,6 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     maxHeight: 300,
-  },
-  counterContainer: {
-    flexDirection: "row",
-    alignItems: "center",
   },
   button: {
     backgroundColor: "#007bff",

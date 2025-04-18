@@ -21,7 +21,7 @@ const ScreenHeight = Dimensions.get("window").height;
 
 const HomeView = () => {
   const theme = useColorScheme();
-  const { branch } = useUserContext();
+  const { branch, company } = useUserContext();
   const [products, setProducts] = useState<Product[]>([]);
   // const [newOrder, setNewOrder] = useState<Order>({});
   const [productsFiltered, setProductsFiltered] = useState<Product[]>([]);
@@ -43,6 +43,8 @@ const HomeView = () => {
         console.error(err);
       });
   }, [branch]);
+
+
 
   const groupAndSumStock = (products: Product[]): Product[] => {
     const groupedProducts = products.reduce((acc, product) => {
@@ -106,9 +108,9 @@ const HomeView = () => {
     }, 0);
   };
 
-  const procesarOrden = () => {
+  const aggInfoOrder = () => {
     navigation.navigate(
-      "ProcessOrderView" as never,
+      "InfoOrderView" as never,
       {
         selectedProducts: selectedProducts,
       } as never
@@ -332,7 +334,12 @@ const HomeView = () => {
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              marginTop: 20,
+              position: 'absolute',
+              bottom: 10,
+              left: 0,
+              right: 0,
+              padding: 16,
+              alignItems: 'center',
             }}
           >
             <Button
@@ -348,7 +355,7 @@ const HomeView = () => {
               icon="arrow-right"
               mode="contained"
               onPress={() =>
-                selectedProducts.length > 0 ? procesarOrden() : null
+                selectedProducts.length > 0 ? aggInfoOrder() : null
               }
               style={{ backgroundColor: "#3F75EA" }}
             >

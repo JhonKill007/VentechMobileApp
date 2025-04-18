@@ -6,6 +6,8 @@ import ProcessOrderView from "@/Views/ProcessOrderView";
 import SelectBranchView from "@/Views/SelectBranchView";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
+import { DetailsOrderView } from "@/Views/DetailsOrderView";
+import { InfoOrderView } from "@/Views/InfoOrderView";
 
 const Stack = createStackNavigator();
 
@@ -28,10 +30,26 @@ export const InsideRoute = () => {
         }}
       />
       <Stack.Screen
+        name="InfoOrderView"
+        component={InfoOrderView}
+        options={{
+          headerTitle: "Informacion de Orden",
+          headerBackTitle: "",
+        }}
+      />
+      <Stack.Screen
         name="ProcessOrderView"
         component={ProcessOrderView}
         options={{
           headerTitle: "Detalle de Orden",
+          headerBackTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="DetailsOrderView"
+        component={DetailsOrderView}
+        options={{
+          headerTitle: "Detalles del pedido",
           headerBackTitle: "",
         }}
       />
