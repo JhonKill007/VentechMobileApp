@@ -37,10 +37,28 @@ export const ItemOrden = ({ orden }: { orden: Order }) => {
           <Text style={{ fontSize: 12, color: "#27ae60", fontWeight: "bold" }}>
             {orden.payMethod}
           </Text>
-          <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 2 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              color:
+                theme === "light"
+                  ? Colors.light.colors.primary
+                  : Colors.dark.colors.primary,
+              fontWeight: "bold",
+              marginBottom: 2,
+            }}
+          >
             {orden.consumer!.name}
           </Text>
-          <Text style={{ fontSize: 14, color: "#555" }}>
+          <Text
+            style={{
+              fontSize: 14,
+              color:
+                theme === "light"
+                  ? Colors.light.colors.primary
+                  : Colors.dark.colors.primary,
+            }}
+          >
             RD${" "}
             {orden
               .products!.reduce((total, item) => total + item.productTotal!, 0)
@@ -50,7 +68,16 @@ export const ItemOrden = ({ orden }: { orden: Order }) => {
               })}{" "}
             • {orden.products!.length} producto(s)
           </Text>
-          <Text style={{ fontSize: 12, color: "#888", marginTop: 5 }}>
+          <Text
+            style={{
+              fontSize: 12,
+              color:
+                theme === "light"
+                  ? Colors.light.colors.primary
+                  : Colors.dark.colors.primary,
+              marginTop: 5,
+            }}
+          >
             {new Date(orden.dateHour!).toLocaleDateString("es-DO")}
           </Text>
         </View>
@@ -76,7 +103,7 @@ export const ItemOrden = ({ orden }: { orden: Order }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: "#3F75EA",
             padding: 8,
             borderRadius: 5,
             marginHorizontal: 5,

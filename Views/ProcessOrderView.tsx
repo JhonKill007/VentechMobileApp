@@ -1,44 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-  ScrollView,
   StyleSheet,
   View,
   Text,
   FlatList,
   Dimensions,
   useColorScheme,
-  Alert,
-  TouchableOpacity,
-  Keyboard,
 } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import { Avatar, List, Switch, TextInput } from "react-native-paper";
-// import Toast from "react-native-toast-message";
-import * as Print from "expo-print";
 import { Button, Surface, Provider } from "react-native-paper";
 import { useNavigation } from "expo-router";
-import ConsumerService from "@/Services/Common/ConsumerService";
-import { Consumer } from "@/Models/Consumer";
 import ChargingApp from "@/components/CharginApp";
-import { Discount } from "@/Models/Discount";
-import DiscountService from "@/Services/Common/DiscountService";
 import { useRoute } from "@react-navigation/native";
 import { Colors } from "@/constants/Colors";
 import { useUserContext } from "@/context/UserContext/UserContext";
 import OrderS from "@/Services/Order/OrderService";
 import { Order } from "@/Models/Order";
-import { Company } from "@/Models/Company";
-import { Branch } from "@/Models/Branch";
-import { Badge } from "react-native-paper";
 import ItemOrdenProduct from "@/components/ItemOrdenProduct";
-import { Icon } from "react-native-paper";
 import { SelectProduct } from "@/Models/SelectProduct";
 import { InfoOrder } from "@/Models/InfoOrder";
+import { useCountHook } from "@/Hooks/useCountHook";
+import { usePrintHook } from "@/Hooks/usePrintHook";
 
 const ScreenHeight = Dimensions.get("window").height;
-
-// interface IProcessOrderRouteParams {}
 
 const ProcessOrderView = () => {
   const theme = useColorScheme();
@@ -48,83 +31,39 @@ const ProcessOrderView = () => {
     selectedProducts,
     infoOrder,
   }: { selectedProducts: SelectProduct[]; infoOrder: InfoOrder } = route.params;
-  const [consumer, setConsumer] = useState<Consumer[]>([]);
-  const [discount, setDiscount] = useState<Discount[]>([]);
-  const [checking, setChecking] = useState<boolean>(true);
 
-  const [descuentos, setDescuentos] = useState<number>(0);
-  const [itebis, setItebis] = useState<number>(0);
-  const [razonSocial, setRazonSocial] = useState<string>("");
-  const { company, userData, branch } = useUserContext();
+  const [checking, setChecking] = useState<boolean>(false);
 
-  const [descuento, setDescuento] = useState(null);
-  const [cliente, setCliente] = useState<Consumer>({});
-  const [rncOrCedula, setRncOrCedula] = React.useState("");
-  const [hasRnc, setHasRnc] = React.useState(false);
-  const onToggleSwitch = () => setHasRnc(!hasRnc);
+  const { company, branch } = useUserContext();
 
-  useEffect(() => {
-    ConsumerService.getAll(company?.id!)
-
-      .then((e: any) => {
-        const data = e.data.data;
-        setConsumer(data);
-        setChecking(false);
-      })
-      .catch((err: any) => {
-        console.error(err);
-      });
-
-    DiscountService.getAll(company?.id!)
-      .then((e: any) => {
-        const data = e.data.data;
-
-        setDiscount(data.filter((x: any) => x.type == 1));
-      })
-      .catch((err: any) => {
-        console.error(err);
-      });
-  }, []);
-
-  const verifyClientInformation = (client: any) => {
-    setHasRnc(client.hasRnc);
-    setRncOrCedula(client.rncOCedula);
-    setCliente(client);
-  };
-
-  const getRNC = (rncOrCedula: string) => {
-    ConsumerService.GetContribuyente(rncOrCedula!)
-      .then((e: any) => {
-        const data = e.data.data;
-        setRazonSocial(data.razonSocial);
-      })
-      .catch((err: any) => {
-        console.error(err);
-      });
-  };
-
-  const handlePressOutside = () => {
-    Keyboard.dismiss();
-  };
+  const {
+    getValuePercent,
+    getTotalItbis,
+    getTotalPrice,
+    getTotalCantidadProducto,
+  } = useCountHook();
+  const { printOrder } = usePrintHook();
 
   const CrearOrden = () => {
     setChecking(true);
-    const newOrdenProducts = selectedProducts.map((p: any) => ({
+    const newOrdenProducts = selectedProducts.map((p: SelectProduct) => ({
       productId: p.id,
-      productName: p.product.name,
+      productName: p.product!.name,
       productAmount: p.cantidad,
-      productPrice: p.product.price,
-      productCode: p.product.code,
-      itbis: gerPercent(p.product.price, p.product.itbis),
-      totalDiscount: 0,
-      discountPorcent: 0,
+      productPrice: p.product?.price,
+      //nota: se esta guardando el precio de los productos con el descuento agregado
+      //pero no se guarda el precio base ni el itebis con el descuento apicado
+      productCode: p.product!.code,
+      itbis: getValuePercent(p.product!.price!, p.product!.itbis!),
+      totalDiscount: getValuePercent(p.product!.price!, infoOrder.descuento!),
+      discountPorcent: infoOrder.descuento,
     }));
 
     let totalOrden = 0;
     newOrdenProducts.forEach((o: any) => {
       totalOrden +=
         o.productPrice * o.productAmount -
-        gerPercent(o.productPrice * o.productAmount, o.discountPorcent);
+        getValuePercent(o.productPrice * o.productAmount, o.discountPorcent);
     });
 
     const currentDate = new Date(); // Obtener la fecha y hora actual
@@ -134,8 +73,8 @@ const ProcessOrderView = () => {
       consumer: {
         id: infoOrder.clientId ?? 0, // Valor por defecto si es null/undefined
         name: infoOrder.clientName ?? "", // Valor por defecto si es null/undefined
-        address: cliente?.address ?? "",
-        cellPhone: cliente?.cellPhone ?? "",
+        address: "",
+        cellPhone: "",
       },
       rncOCedula: infoOrder.rnc,
       branchId: branch?.id!,
@@ -146,9 +85,15 @@ const ProcessOrderView = () => {
       byDelivery: false,
       toCaja: false,
       deliveryId: 0,
-      total: 0,
+      total: getTotalPrice(
+        infoOrder.descuento!,
+        selectedProducts
+      ),
       dateHour: formattedDate,
-      payWith: totalOrden,
+      payWith: getTotalPrice(
+        infoOrder.descuento!,
+        selectedProducts
+      ),
       hasComprobante: infoOrder.rnc ? true : false,
       products: newOrdenProducts,
     };
@@ -169,212 +114,6 @@ const ProcessOrderView = () => {
       });
   };
 
-  const printOrder = async (orden: Order) => {
-    var ordenAImprimir = { ...orden };
-    var totalOrden = 0;
-    var totalItbis = 0;
-    var razonSocial = "";
-    var tipoDeFactura = "";
-    var montoDescuento = 0;
-
-    try {
-      ordenAImprimir.products!.forEach((o) => {
-        totalOrden +=
-          o.productPrice! * o.productAmount! -
-          gerPercent(o.productPrice! * o.productAmount!, o.discountPorcent);
-        totalItbis += o.itbis! * o.productAmount!;
-
-        montoDescuento += o.totalDiscount!;
-      });
-
-      const companySelected: Company = {
-        name: company?.name,
-        rnc: company?.rnc,
-      };
-      const branchSelected: Branch = {
-        address: branch?.address!,
-        cellPhone: branch?.cellPhone!,
-      };
-
-      totalOrden -= gerPercent(totalOrden, orden.discountPercent);
-
-      totalItbis -= gerPercent(totalItbis, orden.discountPercent);
-
-      if (ordenAImprimir.rncOCedula!.length >= 9) {
-        tipoDeFactura = "CON CRÉDITO FISCAL";
-        razonSocial = `Razon Social: ${ordenAImprimir.razonSocial}<br />`;
-      } else {
-        tipoDeFactura = "PARA CONSUMIDOR FINAL";
-      }
-
-      var invoice = `<!DOCTYPE html>
-          <html lang="es">
-            <head>
-              <meta charset="UTF-8" />
-              <title>Factura</title>
-              <style>
-                body {
-                  padding: 0px 7px 0 8px;
-                  font-family: Arial, sans-serif;
-                }
-                .header {
-                  text-align: center;
-                }
-                .section {
-                  margin-top: 20px;
-                }
-                table {
-                  width: 100%;
-                  border-collapse: collapse;
-                }
-                th,
-                td {
-                  border: 1px solid black;
-                  padding: 8px;
-                  text-align: left;
-                }
-                .totals {
-                  text-align: right;
-                }
-                @media print {
-                  /* Indicar al navegador que divida las páginas cuando el contenido exceda el límite */
-                  .corte {
-                    page-break-inside: avoid;
-                  }
-                }
-              </style>
-            </head>
-            <body>
-              <div class="header">
-                <h2>${companySelected.name}</h2>
-              </div>
-              <div class="section">
-                <p>
-                  ${branchSelected?.address ?? ""}
-                  <br />TEL:${branchSelected?.cellPhone ?? ""} <br />RNC:
-                  ${companySelected.rnc} <br />NCF: ${ordenAImprimir?.ncf ?? ""}
-                  <br />Fecha: ${ordenAImprimir.dateHour}
-                </p>
-                <hr />
-                <div style="text-align: center">
-                  <span style="font-weight: bold">FACTURA ${tipoDeFactura}</span>
-                </div>
-                <hr />
-              </div>
-              <div class="section">
-                <table style="border: none; width: 100%">
-                  <tr>
-                    <th style="border: none">Descripción</th>
-                    <th style="border: none">itbis</th>
-                    <th style="border: none">valor</th>
-                  </tr>
-                  ${ordenAImprimir
-                    .products!.map(
-                      (a) => `
-                  <tr>
-                    <td style="border: none">${a.productName} * ${
-                        a.productAmount
-                      }</td>
-                    <td style="border: none">
-                      ${(a.itbis! * a.productAmount!).toLocaleString("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      })}
-                    </td>
-                    <td style="border: none">
-                      ${(a.productPrice! * a.productAmount!).toLocaleString(
-                        "en-US",
-                        {
-                          style: "currency",
-                          currency: "USD",
-                        }
-                      )}
-                    </td>
-                  </tr>
-                  `
-                    )
-                    .join("")}
-                </table>
-              </div>
-              <hr />
-              <div class="section totals">
-                <p>
-                  subtotal: ${(totalOrden - totalItbis).toLocaleString(
-                    "en-US",
-                    { style: "currency", currency: "USD" }
-                  )}
-                </p>
-                <p>
-                  itbis: ${totalItbis.toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  })}
-                </p>
-                <p>
-                  Descuento: -${montoDescuento.toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  })}
-                </p>
-                <p>
-                  Total: ${totalOrden.toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  })}
-                </p>
-              </div>
-              <hr />
-              <div class="section">
-                <p>
-                  Forma de Pago: ${ordenAImprimir.payMethod} <br />Pagó con:
-                  ${(ordenAImprimir.payWith! <= 0
-                    ? 0
-                    : ordenAImprimir.payWith!
-                  ).toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  })}
-                  <br />Cambio: ${(ordenAImprimir.payWith! <= 0
-                    ? 0
-                    : ordenAImprimir.payWith! - totalOrden
-                  ).toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  })}
-          
-                  <br />Vendedor(a): ${userData?.fullName}
-                </p>
-              </div>
-              <hr />
-              <div style="text-align: center">
-                <span>DATOS DEL CLIENTE</span>
-              </div>
-              <hr />
-          
-              <p>
-                ${
-                  orden.rncOCedula!.length > 0
-                    ? `RNC/Cedula: ${orden.rncOCedula} <br />
-                ${razonSocial} `
-                    : ""
-                } Cliente:${ordenAImprimir.consumer!.name}
-                <br />Tel: ${
-                  ordenAImprimir.consumer!.cellPhone
-                } <br />Dirección:
-                ${ordenAImprimir.consumer!.address}
-              </p>
-              <div class="corte"></div>
-            </body>
-          </html>
-
-      `;
-      await Print.printAsync({ html: invoice });
-    } catch (error) {
-      console.error("Error al imprimir:", error);
-      Alert.alert("Error", "No se pudo imprimir el documento");
-    }
-  };
-
   // const formatDate = (apiDate: any) => {
   //   const date = new Date(apiDate);
   //   const options = {
@@ -389,29 +128,6 @@ const ProcessOrderView = () => {
   //   return date.toLocaleString("es-ES", options);
   // };
 
-  const gerPercent = (amount: any, percent: any) => {
-    return (amount * percent) / 100;
-  };
-
-  const getTotalItbis = () => {
-    return selectedProducts.reduce((total: number, item: any) => {
-      return (
-        total +
-        ((item.product.price * item.product.itbis) / 100) * item.cantidad
-      );
-    }, 0);
-  };
-
-  const getTotalPrice = () => {
-    return selectedProducts.reduce((total: number, item: any) => {
-      return total + item.cantidad * item.product.price;
-    }, 0);
-  };
-  const getTotalCantidadProducto = () => {
-    return selectedProducts.reduce((total: number, item: any) => {
-      return total + item.cantidad;
-    }, 0);
-  };
   return (
     <Provider>
       {checking ? (
@@ -630,7 +346,7 @@ const ProcessOrderView = () => {
                           : Colors.dark.colors.primary,
                     }}
                   >
-                    {getTotalCantidadProducto()}
+                    {getTotalCantidadProducto(selectedProducts)}
                   </Text>
                 </View>
 
@@ -667,8 +383,11 @@ const ProcessOrderView = () => {
                           : Colors.dark.colors.primary,
                     }}
                   >
-                    RD${" "}
-                    {getTotalItbis().toLocaleString("en-US", {
+                    RD
+                    {getTotalItbis(
+                      infoOrder.descuento!,
+                      selectedProducts
+                    ).toLocaleString("en-US", {
                       style: "currency",
                       currency: "USD",
                     })}
@@ -708,7 +427,10 @@ const ProcessOrderView = () => {
                     }}
                   >
                     RD${" "}
-                    {getTotalPrice().toLocaleString("en-US", {
+                    {getTotalPrice(
+                      infoOrder.descuento!,
+                      selectedProducts
+                    ).toLocaleString("en-US", {
                       style: "currency",
                       currency: "USD",
                     })}

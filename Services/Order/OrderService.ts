@@ -1,8 +1,8 @@
 import { Order } from "@/Models/Order";
-import { IProductsService } from "../../Interface/Products/IProductsService";
 import Http from "../Http/HttpClient";
+import { IOrderService } from "@/Interface/Order/IOrderService";
 
-export class OrderService implements IProductsService {
+export class OrderService implements IOrderService {
   async getAll(branchId: number, desde:string, hasta:string): Promise<any> {
     let result = await new Promise<any>((resolve, reject) => {
       Http.get(`/api/Order/getAllOrder?branchId=${branchId}&desde=${desde}&hasta=${hasta}&userName=`)

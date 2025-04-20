@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -12,7 +12,7 @@ import { useNavigation } from "expo-router";
 import { Button, Surface, Provider, Searchbar } from "react-native-paper";
 import Products from "@/Services/Products/ProductsService";
 import { Product } from "@/Models/Product";
-import ItemProduct from "@/components/ItemProduct";
+import ItemProduct, { ItemProductRef } from "@/components/ItemProduct";
 import ChargingApp from "@/components/CharginApp";
 import { Colors } from "@/constants/Colors";
 import { useUserContext } from "@/context/UserContext/UserContext";
@@ -30,7 +30,16 @@ const HomeView = () => {
   const [checking, setChecking] = useState<boolean>(true);
   const [descuentos, setDescuentos] = useState<number>(0);
   const [itebis, setItebis] = useState<number>(0);
+  const [reset, setReset] = useState<boolean>(false);
   const navigation = useNavigation();
+
+  const itemProductRef = useRef<Record<string, ItemProductRef | null>>({});
+
+  const handleReset = () => {
+    Object.values(itemProductRef.current).forEach((ref) => {
+      ref?.reset(); // solo si existe
+    });
+  };
 
   useEffect(() => {
     Products.getAll(branch?.id!)
@@ -43,8 +52,6 @@ const HomeView = () => {
         console.error(err);
       });
   }, [branch]);
-
-
 
   const groupAndSumStock = (products: Product[]): Product[] => {
     const groupedProducts = products.reduce((acc, product) => {
@@ -164,7 +171,14 @@ const HomeView = () => {
               data={!search ? products : productsFiltered}
               style={{ height: ScreenHeight - 400, marginBottom: 10 }}
               renderItem={({ item, index }) => (
-                <ItemProduct key={index} product={item} add={addProducts} />
+                <ItemProduct
+                  ref={(ref) => {
+                    itemProductRef.current[item.id!] = ref;
+                  }}
+                  key={index}
+                  product={item}
+                  add={addProducts}
+                />
               )}
               keyExtractor={(item, index) => index.toString()}
             />
@@ -244,7 +258,7 @@ const HomeView = () => {
                         : Colors.dark.colors.primary,
                   }}
                 >
-                  RD$ {descuentos}.00
+                  DOP ${descuentos}.00
                 </Text>
               </View>
               <View
@@ -280,7 +294,7 @@ const HomeView = () => {
                         : Colors.dark.colors.primary,
                   }}
                 >
-                  RD${" "}
+                  DOP{" "}
                   {getTotalItbis().toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
@@ -320,7 +334,7 @@ const HomeView = () => {
                         : Colors.dark.colors.primary,
                   }}
                 >
-                  RD${" "}
+                  DOP{" "}
                   {getTotalPrice().toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
@@ -334,18 +348,21 @@ const HomeView = () => {
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              position: 'absolute',
+              position: "absolute",
               bottom: 10,
               left: 0,
               right: 0,
               padding: 16,
-              alignItems: 'center',
+              alignItems: "center",
             }}
           >
             <Button
               icon="trash-can-outline"
               mode="contained"
-              onPress={() => setSelectedProducts([])}
+              onPress={() => {
+                setSelectedProducts([]);
+                handleReset();
+              }}
               style={{ backgroundColor: "red" }}
             >
               Limpiar

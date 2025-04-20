@@ -324,8 +324,9 @@ export const InfoOrderView = () => {
               >
                 Metodos de pago
               </Text>
-              {formasDePago.map((f: any) => (
+              {formasDePago.map((f: any, key: number) => (
                 <TouchableOpacity
+                  key={key}
                   style={{ flexDirection: "row", marginTop: 20 }}
                   onPress={() => setPayMetho(f.value)}
                 >

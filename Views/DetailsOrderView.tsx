@@ -4,7 +4,7 @@ import { useRoute } from "@react-navigation/native";
 import React from "react";
 import { View, Text, FlatList, useColorScheme } from "react-native";
 import { Avatar, Badge, List } from "react-native-paper";
-import { Icon, MD3Colors } from 'react-native-paper';
+import { Icon, MD3Colors } from "react-native-paper";
 
 export const DetailsOrderView = () => {
   const theme = useColorScheme();
@@ -113,9 +113,7 @@ export const DetailsOrderView = () => {
           >
             Total de la orden:
           </Text>
-          <Text
-            style={{ fontSize: 14, color: "#555", marginLeft: 5 }}
-          >
+          <Text style={{ fontSize: 14, color: "#555", marginLeft: 5 }}>
             RD${" "}
             {order
               .products!.reduce((total, item) => total + item.productTotal!, 0)
@@ -146,6 +144,12 @@ export const DetailsOrderView = () => {
           <List.Item
             title={item.productName!}
             description={`RD$${item.productPrice}`}
+            titleStyle={{
+              color:
+                theme === "light"
+                  ? Colors.light.colors.primary
+                  : Colors.dark.colors.primary,
+            }}
             left={(props) => (
               <Avatar.Text
                 {...props}
