@@ -17,10 +17,13 @@ import ChargingApp from "@/components/CharginApp";
 import { Colors } from "@/constants/Colors";
 import { useUserContext } from "@/context/UserContext/UserContext";
 import { SelectProduct } from "@/Models/SelectProduct";
+import { useCountHook } from "@/Hooks/useCountHook";
 const ScreenHeight = Dimensions.get("window").height;
 
 const HomeView = () => {
   const theme = useColorScheme();
+  const { getTotalItbis, getTotalPrice, getTotalCantidadProducto } =
+    useCountHook();
   const { branch, company } = useUserContext();
   const [products, setProducts] = useState<Product[]>([]);
   // const [newOrder, setNewOrder] = useState<Order>({});
@@ -76,6 +79,7 @@ const HomeView = () => {
   };
 
   const addProducts = (id: number, product: Product, cantidad: number) => {
+    // product.itbis = desglosarPrecioConImpuesto(product.price!, product.itbis!);
     setSelectedProducts((prevProducts: SelectProduct[]) => {
       const existingProductIndex = prevProducts.findIndex(
         (p: SelectProduct) => p.id === id
@@ -93,26 +97,6 @@ const HomeView = () => {
           : prevProducts;
       }
     });
-  };
-
-  const getTotalItbis = () => {
-    return selectedProducts.reduce((total: number, item: any) => {
-      return (
-        total +
-        ((item.product.price * item.product.itbis) / 100) * item.cantidad
-      );
-    }, 0);
-  };
-
-  const getTotalPrice = () => {
-    return selectedProducts.reduce((total: number, item: any) => {
-      return total + item.cantidad * item.product.price;
-    }, 0);
-  };
-  const getTotalCantidadProducto = () => {
-    return selectedProducts.reduce((total: number, item: any) => {
-      return total + item.cantidad;
-    }, 0);
   };
 
   const aggInfoOrder = () => {
@@ -222,7 +206,7 @@ const HomeView = () => {
                         : Colors.dark.colors.primary,
                   }}
                 >
-                  {getTotalCantidadProducto()}
+                  {getTotalCantidadProducto(selectedProducts)}
                 </Text>
               </View>
               <View
@@ -295,7 +279,7 @@ const HomeView = () => {
                   }}
                 >
                   DOP{" "}
-                  {getTotalItbis().toLocaleString("en-US", {
+                  {getTotalItbis(selectedProducts).toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
                   })}
@@ -335,7 +319,7 @@ const HomeView = () => {
                   }}
                 >
                   DOP{" "}
-                  {getTotalPrice().toLocaleString("en-US", {
+                  {getTotalPrice(selectedProducts).toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
                   })}

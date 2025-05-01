@@ -41,6 +41,7 @@ const ProcessOrderView = () => {
     getTotalItbis,
     getTotalPrice,
     getTotalCantidadProducto,
+    getTotalItbisSingle
   } = useCountHook();
   const { printOrder } = usePrintHook();
 
@@ -51,10 +52,8 @@ const ProcessOrderView = () => {
       productName: p.product!.name,
       productAmount: p.cantidad,
       productPrice: p.product?.price,
-      //nota: se esta guardando el precio de los productos con el descuento agregado
-      //pero no se guarda el precio base ni el itebis con el descuento apicado
       productCode: p.product!.code,
-      itbis: getValuePercent(p.product!.price!, p.product!.itbis!),
+      itbis: getTotalItbisSingle(p.product!.price!, p.product!.itbis!),
       totalDiscount: getValuePercent(p.product!.price!, infoOrder.descuento!),
       discountPorcent: infoOrder.descuento,
     }));
@@ -85,15 +84,9 @@ const ProcessOrderView = () => {
       byDelivery: false,
       toCaja: false,
       deliveryId: 0,
-      total: getTotalPrice(
-        infoOrder.descuento!,
-        selectedProducts
-      ),
+      total: getTotalPrice(selectedProducts, infoOrder.descuento),
       dateHour: formattedDate,
-      payWith: getTotalPrice(
-        infoOrder.descuento!,
-        selectedProducts
-      ),
+      payWith: getTotalPrice(selectedProducts, infoOrder.descuento),
       hasComprobante: infoOrder.rnc ? true : false,
       products: newOrdenProducts,
     };
@@ -383,10 +376,10 @@ const ProcessOrderView = () => {
                           : Colors.dark.colors.primary,
                     }}
                   >
-                    RD
+                    DOP{" "}
                     {getTotalItbis(
-                      infoOrder.descuento!,
-                      selectedProducts
+                      selectedProducts,
+                      infoOrder.descuento!
                     ).toLocaleString("en-US", {
                       style: "currency",
                       currency: "USD",
@@ -426,10 +419,10 @@ const ProcessOrderView = () => {
                           : Colors.dark.colors.primary,
                     }}
                   >
-                    RD${" "}
+                    DOP{" "}
                     {getTotalPrice(
-                      infoOrder.descuento!,
-                      selectedProducts
+                      selectedProducts,
+                      infoOrder.descuento!
                     ).toLocaleString("en-US", {
                       style: "currency",
                       currency: "USD",

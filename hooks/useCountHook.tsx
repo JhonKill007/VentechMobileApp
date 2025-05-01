@@ -13,18 +13,41 @@ export const useCountHook = () => {
     return valorFinal * (porcentaje / (100 - porcentaje));
   };
 
-  const getTotalItbis = (descuento: number, Products: SelectProduct[]) => {
+  // const getTotalItbis = (descuento: number, Products: SelectProduct[]) => {
+  //   const total = Products.reduce((total: number, item: any) => {
+  //     return (
+  //       total +
+  //       ((item.product.price * item.product.itbis) / 100) * item.cantidad
+  //     );
+  //   }, 0);
+
+  //   return descuento ? total - (total * descuento) / 100 : total;
+  // };
+
+  const getTotalItbis = (Products: SelectProduct[], descuento?: number) => {
     const total = Products.reduce((total: number, item: any) => {
       return (
         total +
-        ((item.product.price * item.product.itbis) / 100) * item.cantidad
+        getTotalItbisSingle(item.product.price, item.product.itbis) *
+          item.cantidad
       );
     }, 0);
 
     return descuento ? total - (total * descuento) / 100 : total;
   };
 
-  const getTotalPrice = (descuento: number, Products: SelectProduct[]) => {
+  const getTotalItbisSingle = (
+    precioConImpuesto: number,
+    porcentajeImpuesto: number,
+    descuento?: number
+  ) => {
+    const factor = 1 + porcentajeImpuesto / 100;
+    const neto = +(precioConImpuesto / factor).toFixed(2);
+    const impuesto = +(precioConImpuesto - neto).toFixed(2);
+    return descuento ? impuesto - (impuesto * descuento) / 100 : impuesto;
+  };
+
+  const getTotalPrice = (Products: SelectProduct[], descuento?: number) => {
     const total = Products.reduce((total: number, item: any) => {
       return total + item.cantidad * item.product.price;
     }, 0);
@@ -38,11 +61,11 @@ export const useCountHook = () => {
     }, 0);
   };
 
-  const getTotalItbisSingle = (descuento: number, item: SelectProduct) => {
-    const total =
-      ((item.product!.price! * item.product!.itbis!) / 100) * item.cantidad!;
-    return descuento ? total - (total * descuento) / 100 : total;
-  };
+  // const getTotalItbisSingle = (descuento: number, item: SelectProduct) => {
+  //   const total =
+  //     ((item.product!.price! * item.product!.itbis!) / 100) * item.cantidad!;
+  //   return descuento ? total - (total * descuento) / 100 : total;
+  // };
 
   const getTotalPriceSingle = (descuento: number, item: SelectProduct) => {
     const total = item.cantidad! * item.product!.price!;

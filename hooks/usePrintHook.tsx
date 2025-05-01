@@ -8,7 +8,12 @@ import { useCountHook } from "./useCountHook";
 
 export const usePrintHook = () => {
   const { branch, company } = useUserContext();
-  const { getValuePercent, getValueDescont, getOriginValue } = useCountHook();
+  const {
+    getValuePercent,
+    getValueDescont,
+    getOriginValue,
+    getTotalItbisSingle,
+  } = useCountHook();
 
   const printOrder = async (orden: Order) => {
     try {
@@ -25,9 +30,23 @@ export const usePrintHook = () => {
             o.productPrice! * o.productAmount!,
             o.discountPorcent!
           );
-        totalItbis +=
-          o.itbis! * o.productAmount! -
-          getValuePercent(o.itbis! * o.productAmount!, o.discountPorcent!);
+        totalItbis += getTotalItbisSingle(
+          o.productPrice! * o.productAmount!,
+          o.itbis!,
+          o.discountPorcent! > 0 ? o.discountPorcent : undefined
+        );
+        console.log(
+          o.productPrice!,
+          o.productAmount!,
+          o.itbis!,
+          o.discountPorcent!,
+          getTotalItbisSingle(
+            o.productPrice! * o.productAmount!,
+            o.itbis!,
+            o.discountPorcent! > 0 ? o.discountPorcent : undefined
+          )
+        );
+
         montoDescuento += o.totalDiscount! * o.productAmount!;
       });
 
