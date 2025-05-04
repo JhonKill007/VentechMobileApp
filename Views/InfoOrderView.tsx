@@ -72,6 +72,8 @@ export const InfoOrderView = () => {
   const onToggleSwitch = () => setHasRnc(!hasRnc);
 
   const verifyClientInformation = (client: any) => {
+
+    
     setHasRnc(client.hasRnc);
     setRncOrCedula(client.rncOCedula);
     setCliente(client);
@@ -95,6 +97,13 @@ export const InfoOrderView = () => {
     Keyboard.dismiss();
   };
 
+  const setMetodoPago=(valor:string)=>{
+    setPayMetho(valor)
+
+    if(valor=="Crédito"){
+
+    }
+  }
   const viewOrdenDetails = () => {
     const infoOrden: InfoOrder = {
       clientId: cliente.id,
@@ -103,6 +112,7 @@ export const InfoOrderView = () => {
       razonSocial,
       descuento,
       metodoPago: payMetho,
+      credito:cliente.credito
     };
 
     navigation.navigate(
@@ -328,7 +338,7 @@ export const InfoOrderView = () => {
                 <TouchableOpacity
                   key={key}
                   style={{ flexDirection: "row", marginTop: 20 }}
-                  onPress={() => setPayMetho(f.value)}
+                  onPress={() => setMetodoPago(f.value)}
                 >
                   <RadioButton
                     color={
@@ -338,7 +348,7 @@ export const InfoOrderView = () => {
                     }
                     value={f.value}
                     status={payMetho === f.value ? "checked" : "unchecked"}
-                    onPress={() => setPayMetho(f.value)}
+                    onPress={() => setMetodoPago(f.value)}
                   />
                   <Text
                     style={{

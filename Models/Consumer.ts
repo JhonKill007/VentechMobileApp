@@ -6,5 +6,6 @@ export class Consumer {
     companyId?:number;
     hasRnc?:boolean;
     rncOCedula?:string;
+    credito?:number
     
 }

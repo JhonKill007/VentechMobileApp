@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -18,10 +18,9 @@ import { Order } from "@/Models/Order";
 import ItemOrdenProduct from "@/components/ItemOrdenProduct";
 import { SelectProduct } from "@/Models/SelectProduct";
 import { InfoOrder } from "@/Models/InfoOrder";
-import  {useCountHook}  from "@/hooks/useCountHook";
+import { useCountHook } from "@/hooks/useCountHook";
 
 import { usePrintHook } from "@/hooks/usePrintHook";
-
 
 const ScreenHeight = Dimensions.get("window").height;
 
@@ -37,16 +36,34 @@ const ProcessOrderView = () => {
   const [checking, setChecking] = useState<boolean>(false);
 
   const { company, branch } = useUserContext();
+  const [mensajeCredito, setMensajeCredito] = useState<string>("");
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const {
     getValuePercent,
     getTotalItbis,
     getTotalPrice,
     getTotalCantidadProducto,
-    getTotalItbisSingle
+    getTotalItbisSingle,
   } = useCountHook();
   const { printOrder } = usePrintHook();
 
+
+
+  useEffect(() => {
+    if (infoOrder.metodoPago === "Crédito") {
+      const total = getTotalPrice(selectedProducts, infoOrder.descuento);
+      if (total <= infoOrder.credito!) {
+        setIsDisabled(false);
+        setMensajeCredito("Total de Créditos Disponibles: " + infoOrder.credito);
+      } else {
+        setIsDisabled(true);
+        setMensajeCredito("Créditos Insuficientes: " + infoOrder.credito);
+      }
+    }
+  }, [infoOrder, selectedProducts]);
+
+  
   const CrearOrden = () => {
     setChecking(true);
     const newOrdenProducts = selectedProducts.map((p: SelectProduct) => ({
@@ -213,7 +230,7 @@ const ProcessOrderView = () => {
               </Text>
             </View>
 
-            <View style={{ flexDirection: "row", marginBottom: 20 }}>
+            <View style={{ flexDirection: "row"}}>
               <Text
                 style={{
                   color:
@@ -224,6 +241,7 @@ const ProcessOrderView = () => {
               >
                 Metodo de pago:
               </Text>
+              
               <Text
                 style={{
                   fontSize: 12,
@@ -235,7 +253,24 @@ const ProcessOrderView = () => {
               >
                 {infoOrder.metodoPago}
               </Text>
+           
+
             </View>
+            <View style={{ flexDirection: "row", marginBottom: 20 }}>
+            <Text
+                style={{
+                  fontSize: 12,
+                  color: "#27ae60",
+                  fontWeight: "bold",
+                  marginTop: 2,
+                
+                }}
+              >
+                {mensajeCredito}
+              </Text>
+
+            </View>
+             
 
             {/* <View style={{ flexDirection: "row" }}>
               <Text
@@ -293,7 +328,8 @@ const ProcessOrderView = () => {
               <FlatList
                 data={selectedProducts}
                 style={{
-                  height: ScreenHeight - 510,
+                  //cambiar aqui el height
+                  height: ScreenHeight - 610,
                   marginBottom: 5,
                 }}
                 renderItem={({ item, index }) => (
@@ -459,6 +495,7 @@ const ProcessOrderView = () => {
             <Button
               icon="check"
               mode="contained"
+              disabled={isDisabled}
               onPress={() => CrearOrden()}
               style={{ backgroundColor: "#3F75EA" }}
             >

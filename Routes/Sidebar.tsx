@@ -62,6 +62,7 @@ export const Sidebar = () => {
       <Drawer.Screen name="Venta" component={HomeView} />
       <Drawer.Screen name="Ordenes" component={OrdenesView} />
       <Drawer.Screen name="Cambiar de sucursales" component={SelectBranchView} />
+      <Drawer.Screen name="Configuracion" component={SelectBranchView} />
       <Drawer.Screen
         name="Cerrar Sesión"
         component={() => null}

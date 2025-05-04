@@ -5,4 +5,5 @@ export class InfoOrder{
     public razonSocial: string | undefined
     public descuento: number | undefined
     public metodoPago: string | undefined
+    public credito: number | undefined
 }
