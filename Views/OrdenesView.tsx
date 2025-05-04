@@ -28,6 +28,7 @@ import { Colors } from "@/constants/Colors";
 import { usePrintHook } from "@/hooks/usePrintHook";
 import { ItemOrden } from "@/components/ItemOrden";
 import { OrderProduct } from "@/Models/OrderProduct";
+import { useFocusEffect } from "@react-navigation/native";
 
 const OrdenesView = () => {
   const theme = useColorScheme();
@@ -47,9 +48,7 @@ const OrdenesView = () => {
   const ScreenHeight = Dimensions.get("window").height;
   const ScreenWidth = Dimensions.get("window").width;
 
-  useEffect(() => {
-    searchOrden();
-  }, []);
+
 
   const searchOrden = () => {
     console.log('entro');
@@ -72,7 +71,17 @@ const OrdenesView = () => {
       });
   };
 
-  
+  useFocusEffect(
+    React.useCallback(() => {
+      // Esta función se ejecutará cada vez que la pantalla sea enfocada (cuando se vuelve de otra vista)
+      searchOrden();
+      
+      // Si necesitas limpiar algo cuando la vista pierde el foco puedes hacerlo aquí
+      return () => {
+        // Limpiar si es necesario
+      };
+    }, []) // Dependencias vacías para que se ejecute cada vez que la pantalla tenga el foco
+  );
 
   return (
     <Provider>

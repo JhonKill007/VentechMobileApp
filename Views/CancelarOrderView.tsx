@@ -163,7 +163,7 @@ const CancelarOrderView = () => {
 
           {errorIsActive && <Text style={styles.errorText}>{error}</Text>}
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.buttonText}>Cancelar</Text>
+            <Text style={styles.buttonText}>Cancelar Orden</Text>
           </TouchableOpacity>
         </View>
       </View>

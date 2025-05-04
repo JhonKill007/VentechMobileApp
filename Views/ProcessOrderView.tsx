@@ -38,6 +38,7 @@ const ProcessOrderView = () => {
   const { company, branch } = useUserContext();
   const [mensajeCredito, setMensajeCredito] = useState<string>("");
   const [isDisabled, setIsDisabled] = useState(false);
+  const [listHeight, setListHeight] = useState(0);
 
   const {
     getValuePercent,
@@ -63,7 +64,11 @@ const ProcessOrderView = () => {
     }
   }, [infoOrder, selectedProducts]);
 
-  
+    const onLayout = (event: any) => {
+      const { height } = event.nativeEvent.layout; // Alto del contenedor
+      setListHeight(height);
+      
+    }// Guarda el alto disponible
   const CrearOrden = () => {
     setChecking(true);
     const newOrdenProducts = selectedProducts.map((p: SelectProduct) => ({
@@ -83,10 +88,11 @@ const ProcessOrderView = () => {
         o.productPrice * o.productAmount -
         getValuePercent(o.productPrice * o.productAmount, o.discountPorcent);
     });
+    
 
     const currentDate = new Date(); // Obtener la fecha y hora actual
     const formattedDate = currentDate.toLocaleString(); // Formatear la fecha y hora
-
+  
     const newOrden: Order = {
       consumer: {
         id: infoOrder.clientId ?? 0, // Valor por defecto si es null/undefined
@@ -272,30 +278,7 @@ const ProcessOrderView = () => {
             </View>
              
 
-            {/* <View style={{ flexDirection: "row" }}>
-              <Text
-                style={{
-                  color:
-                    theme === "light"
-                      ? Colors.light.colors.primary
-                      : Colors.dark.colors.primary,
-                }}
-              >
-                Total de la orden:
-              </Text>
-              <Text style={{ fontSize: 14, color: "#555", marginLeft: 5 }}>
-                RD${" "}
-                {order
-                  .products!.reduce(
-                    (total, item) => total + item.productTotal!,
-                    0
-                  )
-                  .toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  })}
-              </Text>
-            </View> */}
+       
           </View>
           {/* Título de Productos */}
           <View style={{ marginTop: 10 }}>
@@ -318,12 +301,15 @@ const ProcessOrderView = () => {
               style={[
                 styles.surface,
                 {
+                  
                   backgroundColor:
                     theme === "light"
                       ? Colors.light.colors.background
                       : Colors.dark.colors.background,
                 },
+                
               ]}
+              onLayout={onLayout}
             >
               <FlatList
                 data={selectedProducts}

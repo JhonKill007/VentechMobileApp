@@ -37,6 +37,7 @@ const HomeView = () => {
   const navigation = useNavigation();
 
   const itemProductRef = useRef<Record<string, ItemProductRef | null>>({});
+  const [listHeight, setListHeight] = useState(0);
 
   const handleReset = () => {
     Object.values(itemProductRef.current).forEach((ref) => {
@@ -55,6 +56,11 @@ const HomeView = () => {
         console.error(err);
       });
   }, [branch]);
+
+  const onLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout; // Alto del contenedor
+    setListHeight(height); // Guarda el alto disponible
+  };
 
   const groupAndSumStock = (products: Product[]): Product[] => {
     const groupedProducts = products.reduce((acc, product) => {
@@ -142,18 +148,21 @@ const HomeView = () => {
           />
           <Surface
             style={{
+              flex: 1,
               padding: 10,
               borderRadius: 10,
+              marginBottom:50,
               elevation: 4,
               backgroundColor:
                 theme === "light"
                   ? Colors.light.colors.background
                   : Colors.dark.colors.background,
             }}
+            onLayout={onLayout}
           >
             <FlatList
               data={!search ? products : productsFiltered}
-              style={{ height: ScreenHeight - 400, marginBottom: 10 }}
+              style={{ marginBottom: 10 }}
               renderItem={({ item, index }) => (
                 <ItemProduct
                   ref={(ref) => {
@@ -332,12 +341,14 @@ const HomeView = () => {
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
+              padding: 16,
+              backgroundColor: "white",
+              borderTopWidth: 1,
+              borderTopColor: "#ddd",
               position: "absolute",
-              bottom: 10,
               left: 0,
               right: 0,
-              padding: 16,
-              alignItems: "center",
+              bottom: 0,
             }}
           >
             <Button
