@@ -73,10 +73,12 @@ const LoginView = () => {
           <ChargingApp />
         ) : (
           <>
-            <Image
+            {/* <Image
               source={require("../assets/images/adaptive-icon.png")}
               style={{ width: 300, height: 100 }}
-            />
+            /> */}
+
+            <Text style={{color:'#1b1fb2', fontSize:70, textAlign:"center", marginBottom:20}}>Hatero</Text>
             {error && (
               <Text
                 style={{ color: "red", fontStyle: "italic", marginVertical: 8 }}
@@ -137,7 +139,7 @@ const LoginView = () => {
               <TouchableOpacity
                 disabled={checking}
                 style={{
-                  backgroundColor: "#007AFF",
+                  backgroundColor: "#1b1fb2",
                   borderRadius: 10,
                   paddingVertical: 15,
                   alignItems: "center",

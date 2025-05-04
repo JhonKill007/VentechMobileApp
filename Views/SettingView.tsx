@@ -20,116 +20,62 @@ export const SettingView = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={styles.touchableOpacity}
+        style={[styles.optionCard, { backgroundColor: theme === "light" ? "#fff" : "#1c1c1e" }]}
         onPress={() => navigation.navigate("ChangeMyinfoView" as never)}
       >
-        <Text
-          style={[
-            styles.text,
-            {
-              color:
-                theme === "light"
-                  ? Colors.light.colors.text
-                  : Colors.dark.colors.text,
-            },
-          ]}
-        >
-          <Icon source={"account"} size={20} color="#1b1fb2" />
-          Mi Informacion
+        <Icon source="account" size={22} color="#1b1fb2" />
+        <Text style={[styles.optionText, { color: theme === "light" ? Colors.light.colors.text : Colors.dark.colors.text }]}>
+          Mi Información
         </Text>
       </TouchableOpacity>
+  
       <TouchableOpacity
-        style={styles.touchableOpacity}
+        style={[styles.optionCard, { backgroundColor: theme === "light" ? "#fff" : "#1c1c1e" }]}
         onPress={() => navigation.navigate("changePassword" as never)}
       >
-        <Text
-          style={[
-            styles.text,
-            {
-              color:
-                theme === "light"
-                  ? Colors.light.colors.text
-                  : Colors.dark.colors.text,
-            },
-          ]}
-        >
-          <Icon source={"onepassword"} size={20} color="#1b1fb2" />
-          Cambiar contraseña
+        <Icon source="onepassword" size={22} color="#1b1fb2" />
+        <Text style={[styles.optionText, { color: theme === "light" ? Colors.light.colors.text : Colors.dark.colors.text }]}>
+          Cambiar Contraseña
         </Text>
       </TouchableOpacity>
-
-      {userData?.roleName == "Admin" && (
-      <TouchableOpacity
-        style={styles.touchableOpacity}
-        onPress={() => navigation.navigate("ChangeMyCompanyView" as never)}
-      >
-        <Text
-          style={[
-            styles.text,
-            {
-              color:
-                theme === "light"
-                  ? Colors.light.colors.text
-                  : Colors.dark.colors.text,
-            },
-          ]}
-        >
-          <Icon source={"office-building"} size={20} color="#1b1fb2" />
-          Mi Empresa
-        </Text>
-      </TouchableOpacity>
-      )}
-      {/* <TouchableOpacity
-          style={styles.touchableOpacity}
+  
+      {userData?.roleName === "Admin" && (
+        <TouchableOpacity
+          style={[styles.optionCard, { backgroundColor: theme === "light" ? "#fff" : "#1c1c1e" }]}
           onPress={() => navigation.navigate("ChangeMyCompanyView" as never)}
         >
-          <Text
-            style={[
-              styles.text,
-              {
-                color:
-                  theme === "light"
-                    ? Colors.light.colors.text
-                    : Colors.dark.colors.text,
-              },
-            ]}
-          >
-            Administrar Usuarios
+          <Icon source="office-building" size={22} color="#1b1fb2" />
+          <Text style={[styles.optionText, { color: theme === "light" ? Colors.light.colors.text : Colors.dark.colors.text }]}>
+            Mi Empresa
           </Text>
-          
-        </TouchableOpacity> */}
-      {/* <TouchableOpacity style={styles.touchableOpacity}>
-          <Text
-            style={[
-              styles.text,
-              {
-                color:
-                  theme === "light"
-                    ? Colors.light.colors.text
-                    : Colors.dark.colors.text,
-              },
-            ]}
-          >
-            Agregar cuenta
-          </Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
+      )}
     </View>
   );
+  
 };
 
 const styles = StyleSheet.create({
-  container: {},
-  touchableOpacity: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    // flexDirection: 'row',
-    padding: 10,
-    paddingLeft: 20,
+  container: {
+    flex: 1,
+    padding: 16,
   },
-  text: {
+  optionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  optionText: {
     fontSize: 17,
-    paddingTop: 5,
-    paddingLeft: 10,
+    marginLeft: 15,
+    fontWeight: "500",
   },
 });
+

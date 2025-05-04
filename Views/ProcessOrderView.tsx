@@ -25,8 +25,8 @@ import ProductsService from "@/Services/Products/ProductsService";
 import { Discount } from "@/Models/Discount";
 import { Product } from "@/Models/Product";
 import { OrderProduct } from "@/Models/OrderProduct";
+import { green } from "react-native-reanimated/lib/typescript/Colors";
 
-const ScreenHeight = Dimensions.get("window").height;
 
 const ProcessOrderView = () => {
   const theme = useColorScheme();
@@ -40,7 +40,7 @@ const ProcessOrderView = () => {
   const [checking, setChecking] = useState<boolean>(false);
   const [discounts, setDiscounts] = useState<Discount[]>([]);
 
-  const { company, branch , userData} = useUserContext();
+  const { company, branch, userData } = useUserContext();
   const [mensajeCredito, setMensajeCredito] = useState<string>("");
   const [isDisabled, setIsDisabled] = useState(false);
   const [listHeight, setListHeight] = useState(0);
@@ -55,9 +55,6 @@ const ProcessOrderView = () => {
   const { printOrder } = usePrintHook();
 
   useEffect(() => {
-    
-   
-    
     const fetchAndCheckCredit = async () => {
       await GetAllDiscount();
 
@@ -91,7 +88,7 @@ const ProcessOrderView = () => {
             (d: any) => d.type === 3 && d.productsId!.includes(prod.id)
           );
 
-          if (selectedProducts.filter((x) => x.id == prod.id).length >=2) {
+          if (selectedProducts.filter((x) => x.id == prod.id).length >= 2) {
           } else {
             if (Promotion && prod.cantidad! >= Promotion.amount!) {
               const newProduct: Product = {
@@ -120,8 +117,8 @@ const ProcessOrderView = () => {
 
   const onLayout = (event: any) => {
     const { height } = event.nativeEvent.layout; // Alto del contenedor
-    setListHeight(height);
-  }; // Guarda el alto disponible
+    setListHeight(height); // Guarda el alto disponible
+  };
   const CrearOrden = () => {
     setChecking(true);
     const newOrdenProducts = selectedProducts.map((p: SelectProduct) => ({
@@ -135,20 +132,12 @@ const ProcessOrderView = () => {
       discountPorcent: infoOrder.descuento,
     }));
 
-    
-
     let totalOrden = 0;
     newOrdenProducts.forEach((o: any) => {
       totalOrden +=
         o.productPrice * o.productAmount -
         getValuePercent(o.productPrice * o.productAmount, o.discountPorcent);
-
-        
     });
-
-   
-    
-
 
     const currentDate = new Date(); // Obtener la fecha y hora actual
     const formattedDate = currentDate.toLocaleString("es-DO"); // Formatear la fecha y hora
@@ -212,8 +201,8 @@ const ProcessOrderView = () => {
                 : Colors.dark.colors.background,
           }}
         >
-          <View style={{ padding: 20 }}>
-            <View style={{ flexDirection: "row", marginBottom: 20 }}>
+          <View style={{ paddingLeft: 20, paddingTop:20 }}>
+            <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <Text
                 style={{
                   fontSize: 16,
@@ -231,7 +220,7 @@ const ProcessOrderView = () => {
               <Text
                 style={{
                   fontSize: 16,
-                  fontWeight: "bold",
+                  marginLeft: 3,
                   marginBottom: 2,
                   color:
                     theme === "light"
@@ -242,72 +231,158 @@ const ProcessOrderView = () => {
                 {infoOrder.clientName}
               </Text>
             </View>
-
-            <View style={{ flexDirection: "row", marginBottom: 20 }}>
+            {infoOrder.rnc && infoOrder.rnc !== "null" && (
+            <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <Text
                 style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  marginBottom: 2,
                   color:
                     theme === "light"
                       ? Colors.light.colors.primary
                       : Colors.dark.colors.primary,
                 }}
               >
-                Comprobante fiscal:
+                RNC:
               </Text>
 
               <Text
                 style={{
-                  fontSize: 12,
-                  color: "#888",
-                  marginTop: 1,
-                  marginLeft: 5,
+                  fontSize: 16,
+                  marginLeft: 3,
+                  marginBottom: 2,
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
                 }}
               >
                 {infoOrder.rnc}
               </Text>
             </View>
+            )}
 
-            <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 14, color: "#555" }}>
-                <Text
-                  style={{
-                    color:
-                      theme === "light"
-                        ? Colors.light.colors.primary
-                        : Colors.dark.colors.primary,
-                  }}
-                >
-                  Descuento:
-                </Text>{" "}
-                {infoOrder.descuento + "%"}
-              </Text>
-            </View>
-
-            <View style={{ flexDirection: "row" }}>
+            {infoOrder.razonSocial && infoOrder.razonSocial !== "null" && (
+            <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <Text
                 style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  marginBottom: 2,
                   color:
                     theme === "light"
                       ? Colors.light.colors.primary
                       : Colors.dark.colors.primary,
                 }}
               >
-                Metodo de pago:
+                Razón social:
               </Text>
 
               <Text
                 style={{
-                  fontSize: 12,
-                  color: "#27ae60",
+                  fontSize: 16,
+                  marginLeft: 3,
+                  marginBottom: 2,
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
+                }}
+              >
+                {infoOrder.razonSocial}
+              </Text>
+            </View>
+
+)}
+            <View style={{ flexDirection: "row", marginBottom: 10 }}>
+              <Text
+                style={{
+                  fontSize: 16,
                   fontWeight: "bold",
-                  marginTop: 2,
-                  marginLeft: 5,
+                  marginBottom: 2,
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
+                }}
+              >
+                Descuento:
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 16,
+                  marginLeft: 3,
+                  marginBottom: 2,
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
+                }}
+              >
+                {infoOrder.descuento + "%"}
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", marginBottom: 10 }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  marginBottom: 2,
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
+                }}
+              >
+                Monto Total:
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 16,
+                  marginLeft: 3,
+                  marginBottom: 2,
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
+                }}
+              >
+                {getTotalPrice(selectedProducts).toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  })}
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", marginBottom: 10 }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  marginBottom: 2,
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.primary
+                      : Colors.dark.colors.primary,
+                }}
+              >
+                Método de pago:
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 16,
+                  marginLeft: 3,
+                  marginBottom: 2,
+                  color: "#27ae60",
                 }}
               >
                 {infoOrder.metodoPago}
               </Text>
             </View>
-            <View style={{ flexDirection: "row", marginBottom: 20 }}>
+            <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <Text
                 style={{
                   fontSize: 12,
@@ -320,8 +395,8 @@ const ProcessOrderView = () => {
               </Text>
             </View>
           </View>
-          {/* Título de Productos */}
-          <View style={{ marginTop: 10 }}>
+
+          <View style={{ flex: 1 }}>
             <Text
               style={{
                 fontSize: 18,
@@ -335,168 +410,69 @@ const ProcessOrderView = () => {
             >
               Productos
             </Text>
-
-            {/* Lista de Productos */}
             <Surface
-              style={[
-                styles.surface,
-                {
-                  backgroundColor:
-                    theme === "light"
-                      ? Colors.light.colors.background
-                      : Colors.dark.colors.background,
-                },
-              ]}
-              onLayout={onLayout}
+              style={{
+                flex: 1,
+                padding: 10,
+                borderRadius: 10,
+                elevation: 4,
+                backgroundColor:
+                  theme === "light"
+                    ? Colors.light.colors.background
+                    : Colors.dark.colors.background,
+              }}
             >
+              {/* FlatList que se adapta al espacio disponible */}
               <FlatList
                 data={selectedProducts}
-                style={{
-                  //cambiar aqui el height
-                  height: ScreenHeight - 610,
-                  marginBottom: 5,
-                }}
-                renderItem={({ item, index }) => (
-                  <ItemOrdenProduct OrdenItem={item} />
-                )}
+                contentContainerStyle={{ paddingBottom: 120 }}
+                renderItem={({ item }) => <ItemOrdenProduct OrdenItem={item} />}
                 keyExtractor={(item, index) => index.toString()}
               />
-              <View
-                style={{
-                  display: "flex",
-                  padding: 10,
-                  borderTopWidth: 1,
-                  borderColor: "gray",
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    backgroundColor:
-                      theme === "light"
-                        ? Colors.light.colors.background
-                        : Colors.dark.colors.background,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color:
-                        theme === "light"
-                          ? Colors.light.colors.primary
-                          : Colors.dark.colors.primary,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Cantidad de productos:
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color:
-                        theme === "light"
-                          ? Colors.light.colors.primary
-                          : Colors.dark.colors.primary,
-                    }}
-                  >
-                    {getTotalCantidadProducto(selectedProducts)}
-                  </Text>
-                </View>
 
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    backgroundColor:
-                      theme === "light"
-                        ? Colors.light.colors.background
-                        : Colors.dark.colors.background,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color:
-                        theme === "light"
-                          ? Colors.light.colors.primary
-                          : Colors.dark.colors.primary,
-                      fontWeight: "bold",
-                      marginLeft: 133,
-                    }}
-                  >
-                    Itebis:
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color:
-                        theme === "light"
-                          ? Colors.light.colors.primary
-                          : Colors.dark.colors.primary,
-                    }}
-                  >
-                    DOP{" "}
-                    {getTotalItbis(
-                      selectedProducts,
-                      infoOrder.descuento!
-                    ).toLocaleString("en-US", {
-                      style: "currency",
-                      currency: "USD",
-                    })}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    backgroundColor:
-                      theme === "light"
-                        ? Colors.light.colors.background
-                        : Colors.dark.colors.background,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color:
-                        theme === "light"
-                          ? Colors.light.colors.primary
-                          : Colors.dark.colors.primary,
-                      fontWeight: "bold",
-                      marginLeft: 138,
-                    }}
-                  >
-                    Total:
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color:
-                        theme === "light"
-                          ? Colors.light.colors.primary
-                          : Colors.dark.colors.primary,
-                    }}
-                  >
-                    DOP{" "}
-                    {getTotalPrice(
-                      selectedProducts,
-                      infoOrder.descuento!
-                    ).toLocaleString("en-US", {
-                      style: "currency",
-                      currency: "USD",
-                    })}
-                  </Text>
-                </View>
-              </View>
+              {/* Info de productos */}
+              <View
+                style={{ padding: 10, borderTopWidth: 1, borderColor: "gray" }}
+              ></View>
             </Surface>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                position: "absolute",
+                bottom: 10,
+                left: 0,
+                right: 0,
+                padding: 16,
+                backgroundColor:
+                  theme === "light"
+                    ? Colors.light.colors.background
+                    : Colors.dark.colors.background,
+              }}
+            >
+              <Button
+                icon="arrow-left"
+                mode="contained"
+                textColor="white"
+                onPress={() => navigation.goBack()}
+                style={{ backgroundColor: "orange" }}
+              >
+                Atras
+              </Button>
+              <Button
+                icon="check"
+                textColor="white"
+                mode="contained"
+                disabled={isDisabled}
+                onPress={() => CrearOrden()}
+                style={{ backgroundColor: "#3F75EA" }}
+              >
+                Procesar
+              </Button>
+            </View>
           </View>
 
-          {/* Botones de Acción */}
-          <View
+          {/* <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
@@ -511,6 +487,7 @@ const ProcessOrderView = () => {
             <Button
               icon="arrow-left"
               mode="contained"
+                textColor="white"
               onPress={() => navigation.goBack()}
               style={{ backgroundColor: "orange" }}
             >
@@ -518,6 +495,7 @@ const ProcessOrderView = () => {
             </Button>
             <Button
               icon="check"
+              textColor="white"
               mode="contained"
               disabled={isDisabled}
               onPress={() => CrearOrden()}
@@ -525,7 +503,7 @@ const ProcessOrderView = () => {
             >
               Procesar
             </Button>
-          </View>
+          </View> */}
         </View>
       )}
     </Provider>

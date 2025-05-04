@@ -140,42 +140,28 @@ export const InfoOrderView = () => {
     <Provider>
       <TouchableWithoutFeedback onPress={handlePressOutside}>
         {checking ? (
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
+          <View style={styles.centered}>
             <ChargingApp />
           </View>
         ) : (
           <View
-            style={{
-              flex: 1,
-              padding: 10,
-              backgroundColor:
-                theme === "light"
-                  ? Colors.light.colors.background
-                  : Colors.dark.colors.background,
-            }}
-          >
-            <View></View>
-
-            {/* Dropdown de Clientes */}
-            <Dropdown
-              style={{
-                width: "100%",
+            style={[
+              styles.container,
+              {
                 backgroundColor:
                   theme === "light"
                     ? Colors.light.colors.background
                     : Colors.dark.colors.background,
-                borderRadius: 8,
-                padding: 10,
-                borderWidth: 1,
-                borderColor: "#ccc",
-                marginBottom: 5,
-              }}
-              placeholderStyle={{ fontSize: 16, color: "#aaa" }}
-              selectedTextStyle={{ fontSize: 16, color: "red" }}
-              inputSearchStyle={{ height: 40, fontSize: 16 }}
-              iconStyle={{ width: 20, height: 20 }}
+              },
+            ]}
+          >
+            {/* Dropdown de Clientes */}
+            <Dropdown
+              style={[styles.dropdown, getThemeBackground(theme)]}
+              placeholderStyle={styles.placeholderText}
+              selectedTextStyle={styles.selectedText}
+              inputSearchStyle={styles.inputSearch}
+              iconStyle={styles.icon}
               data={consumer}
               search
               maxHeight={300}
@@ -187,75 +173,35 @@ export const InfoOrderView = () => {
               onChange={(item) => verifyClientInformation(item)}
               renderLeftIcon={() => (
                 <AntDesign
-                  style={{ marginRight: 5 }}
-                  color={
-                    theme === "light"
-                      ? Colors.light.colors.primary
-                      : Colors.dark.colors.primary
-                  }
+                  style={styles.iconMargin}
+                  color={getPrimaryColor(theme)}
                   name="user"
                   size={20}
                 />
               )}
             />
+  
             {/* Switch de Comprobante Fiscal */}
-            <View style={{ marginTop: 10, marginBottom: 10 }}>
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  color:
-                    theme === "light"
-                      ? Colors.light.colors.primary
-                      : Colors.dark.colors.primary,
-                }}
-              >
+            <View style={styles.switchContainer}>
+              <Text style={[styles.label, { color: getPrimaryColor(theme) }]}>
                 Comprobante Fiscal
               </Text>
               <Switch value={hasRnc} onValueChange={onToggleSwitch} />
             </View>
+  
             {/* Campo de RNC o Cédula */}
             {hasRnc && (
-              <View
-                style={{
-                  // marginTop: 10,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  borderWidth: 1,
-                  borderColor: "#ccc",
-                  marginBottom: 15,
-                }}
-              >
+              <View style={styles.rncContainer}>
                 <TextInput
                   label="RNC o Cédula"
                   value={rncOrCedula}
-                  style={{
-                    backgroundColor:
-                      theme === "light"
-                        ? Colors.light.colors.background
-                        : Colors.dark.colors.background,
-
-                    paddingHorizontal: 10,
-                    marginBottom: 5,
-
-                    flex: 1,
-                  }}
+                  style={[styles.input, getThemeBackground(theme)]}
                   onChangeText={(text) => {
                     setRncOrCedula(text);
-                    if (text.length >= 9) {
-
-                      getRNC(text);
-                    }
+                    if (text.length >= 9) getRNC(text);
                   }}
                 />
-                <Text
-                  style={{
-                    color:
-                      theme === "light"
-                        ? Colors.light.colors.primary
-                        : Colors.dark.colors.primary,
-                    marginRight: 10,
-                  }}
-                >
+                <Text style={[styles.razonSocial, { color: getPrimaryColor(theme) }]}>
                   {razonSocial}
                 </Text>
                 {rncOrCedula.length >= 9 && (
@@ -265,37 +211,19 @@ export const InfoOrderView = () => {
                       setRazonSocial("");
                     }}
                   >
-                    <Icon
-                      source="close"
-                      color={
-                        theme === "light"
-                          ? Colors.light.colors.primary
-                          : Colors.dark.colors.primary
-                      }
-                      size={30}
-                    />
+                    <Icon source="close" color={getPrimaryColor(theme)} size={30} />
                   </TouchableOpacity>
                 )}
               </View>
             )}
+  
             {/* Dropdown de Descuentos */}
-            <View style={{ marginBottom: 10 }}>
+            <View style={styles.section}>
               <Dropdown
-                style={{
-                  width: "100%",
-                  backgroundColor:
-                    theme === "light"
-                      ? Colors.light.colors.background
-                      : Colors.dark.colors.background,
-                  borderRadius: 8,
-                  padding: 10,
-                  borderWidth: 1,
-                  borderColor: "#ccc",
-                  marginBottom: 5,
-                }}
-                placeholderStyle={{ fontSize: 16, color: "#aaa" }}
-                selectedTextStyle={{ fontSize: 16, color: "blue" }}
-                inputSearchStyle={{ height: 40, fontSize: 16 }}
+                style={[styles.dropdown, getThemeBackground(theme)]}
+                placeholderStyle={styles.placeholderText}
+                selectedTextStyle={styles.selectedText}
+                inputSearchStyle={styles.inputSearch}
                 data={discount}
                 search
                 maxHeight={300}
@@ -307,87 +235,55 @@ export const InfoOrderView = () => {
                 onChange={(item) => setDescuento(item.valor)}
                 renderLeftIcon={() => (
                   <AntDesign
-                    style={{ marginRight: 5 }}
-                    color={
-                      theme === "light"
-                        ? Colors.light.colors.primary
-                        : Colors.dark.colors.primary
-                    }
+                    style={styles.iconMargin}
+                    color={getPrimaryColor(theme)}
                     name="tag"
                     size={20}
                   />
                 )}
               />
             </View>
-            {/* Dropdown de Metodo de pago */}
-            <View style={{ marginTop: 20 }}>
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  fontSize: 20,
-                  color:
-                    theme === "light"
-                      ? Colors.light.colors.primary
-                      : Colors.dark.colors.primary,
-                }}
-              >
+  
+            {/* Métodos de Pago */}
+            <View style={styles.paymentSection}>
+              <Text style={[styles.paymentTitle, { color: getPrimaryColor(theme) }]}>
                 Metodos de pago
               </Text>
               {formasDePago.map((f: any, key: number) => (
                 <TouchableOpacity
                   key={key}
-                  style={{ flexDirection: "row", marginTop: 20 }}
+                  style={styles.paymentOption}
                   onPress={() => setMetodoPago(f.value)}
                 >
                   <RadioButton
-                    color={
-                      theme === "light"
-                        ? Colors.light.colors.primary
-                        : Colors.dark.colors.primary
-                    }
+                    color={getPrimaryColor(theme)}
                     value={f.value}
                     status={payMetho === f.value ? "checked" : "unchecked"}
                     onPress={() => setMetodoPago(f.value)}
                   />
-                  <Text
-                    style={{
-                      marginTop: 10,
-                      color:
-                        theme === "light"
-                          ? Colors.light.colors.primary
-                          : Colors.dark.colors.primary,
-                    }}
-                  >
+                  <Text style={[styles.paymentText, { color: getPrimaryColor(theme) }]}>
                     {f.value}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
-            {/* Botones de Acción */}
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                position: "absolute",
-                bottom: 10,
-                left: 0,
-                right: 0,
-                padding: 16,
-                alignItems: "center",
-              }}
-            >
+  
+            {/* Botones */}
+            <View style={styles.footer}>
               <Button
                 icon="arrow-left"
                 mode="contained"
+                textColor="white"
                 onPress={() => navigation.goBack()}
                 style={{ backgroundColor: "orange" }}
               >
-                Atras
+                Atrás
               </Button>
               <Button
                 icon="arrow-right"
                 mode="contained"
-                onPress={() => viewOrdenDetails()}
+                textColor="white"
+                onPress={viewOrdenDetails}
                 style={{ backgroundColor: "#3F75EA" }}
               >
                 Siguiente
@@ -398,4 +294,110 @@ export const InfoOrderView = () => {
       </TouchableWithoutFeedback>
     </Provider>
   );
+  
 };
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+  dropdown: {
+    width: "100%",
+    borderRadius: 8,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 5,
+  },
+  placeholderText: {
+    fontSize: 16,
+    color: "#aaa",
+  },
+  selectedText: {
+    fontSize: 16,
+    color: "#27ae60",
+  },
+  inputSearch: {
+    height: 40,
+    fontSize: 16,
+  },
+  icon: {
+    width: 20,
+    height: 20,
+  },
+  iconMargin: {
+    marginRight: 5,
+  },
+  switchContainer: {
+    marginVertical: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+
+
+  },
+  label: {
+    fontWeight: "bold",
+    fontSize:20
+  },
+  rncContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 15,
+  },
+  input: {
+    paddingHorizontal: 10,
+    marginBottom: 5,
+    flex: 1,
+  },
+  razonSocial: {
+    marginRight: 10,
+  },
+  section: {
+    marginBottom: 10,
+  },
+  paymentSection: {
+    marginTop: 20,
+  },
+  paymentTitle: {
+    fontWeight: "bold",
+    fontSize: 20,
+  },
+  paymentOption: {
+    flexDirection: "row",
+    marginTop: 20,
+  },
+  paymentText: {
+    marginTop: 10,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    position: "absolute",
+    bottom: 10,
+    left: 0,
+    right: 0,
+    padding: 16,
+    alignItems: "center",
+  },
+});
+
+const getThemeBackground = (theme: string) => ({
+  backgroundColor:
+    theme === "light"
+      ? Colors.light.colors.background
+      : Colors.dark.colors.background,
+});
+
+const getPrimaryColor = (theme: string) =>
+  theme === "light"
+    ? Colors.light.colors.primary
+    : Colors.dark.colors.primary;
+

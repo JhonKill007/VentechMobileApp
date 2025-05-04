@@ -1,4 +1,6 @@
 import { useUserContext } from "@/context/UserContext/UserContext";
+import { Colors } from "@/constants/Colors";
+
 import { ChangePassword } from "@/Models/ChangePassword";
 import { User } from "@/Models/User";
 import UserService from "@/Services/User/UserService";
@@ -11,6 +13,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ToastAndroid,
+  useColorScheme,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -23,6 +26,7 @@ const ChangeMyinfoView = () => {
   const [validatePass, setValidatePass] = useState<boolean>(false);
   const [myUser, setMyUser] = useState<User>({});
 
+  const theme = useColorScheme();
 
   const [fullName, setFullName] = useState<string >(
     userData?.fullName!
@@ -71,17 +75,21 @@ const ChangeMyinfoView = () => {
           console.error(err);
         });
   };
+
+    const commonTextStyle = {
+      color: theme === 'light' ? Colors.light.colors.primary : Colors.dark.colors.primary,
+    };
   return (
     <>
       <View style={styles.container}>
         <Toast />
         <View style={styles.form}>
-          <Text>Nombre Completo</Text>
+          <Text style={commonTextStyle}>Nombre Completo</Text>
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
-              placeholder=" Nombre Completo"
+              style={[styles.input, commonTextStyle]}
+              placeholder="Nombre Completo"
               placeholderTextColor="gray"
               onChangeText={(text) => {
                 setFullName(text);
@@ -90,11 +98,11 @@ const ChangeMyinfoView = () => {
             />
            
           </View>
-          <Text>Correo electronico</Text>
+          <Text style={commonTextStyle}>Correo electronico</Text>
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, commonTextStyle]}
               placeholder="Correo electronico"
               placeholderTextColor="gray"
               onChangeText={(text) => {
@@ -104,11 +112,11 @@ const ChangeMyinfoView = () => {
             />
            
           </View>
-          <Text>Número de telefono </Text>
+          <Text style={commonTextStyle}>Número de telefono </Text>
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, commonTextStyle]}
               placeholder="Número de telefono"
               placeholderTextColor="gray"
               onChangeText={(text) => {

@@ -1,6 +1,5 @@
 import { Colors } from "@/constants/Colors";
 import { useUserContext } from "@/context/UserContext/UserContext";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { CancelOrder } from "@/Models/CancelOrder";
 import { ChangePassword } from "@/Models/ChangePassword";
 import { Order } from "@/Models/Order";
@@ -16,6 +15,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ToastAndroid,
+  useColorScheme,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -32,6 +32,7 @@ const CancelarOrderView = () => {
   const { order }: { order: Order } = route.params;
 
   useEffect(() => {
+    
     if (userData?.roleName == "Admin") {
       setCodigo(userData.authCode!);
     }
@@ -63,143 +64,197 @@ const CancelarOrderView = () => {
       });
   };
 
-  const commonTextStyle = {
-    color:
-      theme === "light"
-        ? Colors.light.colors.primary
-        : Colors.dark.colors.primary,
+ const commonTextStyle = {
+    color: theme === 'light' ? Colors.light.colors.primary : Colors.dark.colors.primary,
   };
   return (
-    <>
-      <View style={styles.container}>
-        <Toast />
-        <View style={styles.form}>
-          {/* Client Section */}
-          <View style={styles.section}>
-            <View style={styles.row}>
-              <Text style={[styles.label, commonTextStyle]}>Cliente: </Text>
-              <Text style={[styles.boldText, commonTextStyle]}>
-                {order.consumer?.name}
-              </Text>
-            </View>
-
-            {/* Date Section */}
-            <View style={styles.row}>
-              <Text style={commonTextStyle}>Fecha:</Text>
-              <Text style={styles.dateText}>
-                {new Date(order.dateHour!).toLocaleDateString("es-DO")}
-              </Text>
-            </View>
-
-            {/* Payment Method Section */}
-            <View style={styles.row}>
-              <Text style={commonTextStyle}>Metodo de pago:</Text>
-              <Text style={styles.paymentMethodText}>{order.payMethod}</Text>
-            </View>
-
-            {/* Products Count Section */}
-            <View style={styles.row}>
-              <Text style={[styles.label, commonTextStyle]}>
-                Cantidad de productos:
-              </Text>
-              <Text style={styles.productCountText}>
-                {order.products!.length} producto(s)
-              </Text>
-            </View>
-
-            {/* Total Section */}
-            <View style={styles.row}>
-              <Text style={[styles.label, commonTextStyle]}>
-                Total de la orden:
-              </Text>
-              <Text style={styles.totalText}>
-                RD${" "}
-                {order
-                  .products!.reduce(
-                    (total, item) => total + item.productTotal!,
-                    0
-                  )
-                  .toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  })}
-              </Text>
-            </View>
-          </View>
-
-          {userData?.roleName != "Admin" && (
-            <>
-              <Text>Codigo</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder=" Codigo"
-                  placeholderTextColor="gray"
-                  onChangeText={(text) => {
-                    setCodigo(text);
-                  }}
-                  value={codigo}
-                />
+    <View style={styles.container}>
+      <Toast />
+      <View style={styles.form}>
+  
+        {/* Información del cliente */}
+        <View style={styles.section}>
+                <View style={styles.row}>
+                  <Text style={[styles.label, commonTextStyle]}>Cliente:</Text>
+                  <Text style={[styles.value, commonTextStyle]}>{order.consumer?.name}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={[styles.label, commonTextStyle]}>NCF:</Text>
+                  <Text style={[styles.value, commonTextStyle]}>{order.ncf}</Text>
+                </View>
+          
+                <View style={styles.row}>
+                  <Text style={[styles.label, commonTextStyle]}>Fecha:</Text>
+                  <Text style={[styles.label, commonTextStyle]}>
+                    {new Date(order.dateHour!).toLocaleDateString('es-DO')}
+                  </Text>
+                </View>
+          
+                <View style={styles.row}>
+                  <Text style={[styles.label, commonTextStyle]}>Método de pago:</Text>
+                  <Text style={styles.paymentMethodText}>{order.payMethod}</Text>
+                </View>
+          
+                <View style={styles.row}>
+                  <Text style={[styles.label, commonTextStyle]}>Cantidad de productos:</Text>
+                  <Text style={[styles.label, commonTextStyle]}>{order.products!.length} producto(s)</Text>
+                </View>
+          
+                <View style={[styles.row, styles.totalRow]}>
+                  <Text style={[styles.label, commonTextStyle]}>Total:</Text>
+                  <Text style={styles.totalText}>
+                    RD
+                    {order.products!
+                      .reduce((total, item) => total + item.productTotal!, 0)
+                      .toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      })}
+                  </Text>
+                </View>
               </View>
-            </>
-          )}
-
-          <Text>Motivo</Text>
-
-          <View style={styles.inputContainer}>
+  
+        {/* Campos adicionales para no admins */}
+        {userData?.roleName !== "Admin" && (
+          <View style={{ marginBottom: 30,
+            paddingBottom: 10,}}>
+            <Text style={[styles.label, commonTextStyle]}>Código</Text>
             <TextInput
-              style={styles.inputArea}
-              multiline={true}
-              placeholder=" Motivo"
+              style={styles.input}
+              placeholder="Código"
               placeholderTextColor="gray"
-              onChangeText={(text) => {
-                setMotivo(text);
-              }}
-              value={motivo}
+              onChangeText={setCodigo}
+              value={codigo}
             />
           </View>
-
-          {errorIsActive && <Text style={styles.errorText}>{error}</Text>}
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.buttonText}>Cancelar Orden</Text>
-          </TouchableOpacity>
+        )}
+  
+        {/* Motivo */}
+        <View style={{ marginBottom: 30,
+    paddingBottom: 10,}}>
+          <Text style={[styles.label, commonTextStyle]}>Motivo</Text>
+          <TextInput
+            style={styles.inputArea}
+            placeholder="Motivo de la cancelación"
+            placeholderTextColor="gray"
+            multiline
+            onChangeText={setMotivo}
+            value={motivo}
+          />
         </View>
+  
+        {/* Error */}
+        {errorIsActive && <Text style={styles.errorText}>{error}</Text>}
+  
+        {/* Botón */}
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.buttonText}>Cancelar Orden</Text>
+        </TouchableOpacity>
       </View>
-    </>
+    </View>
   );
+  
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    marginTop: 20,
+    paddingTop: 20,
   },
   form: {
     width: "90%",
   },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  section: {
+    marginBottom: 30,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  value: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  dateText: {
+    fontSize: 14,
+  },
+  paymentMethodText: {
+    fontSize: 14,
+    color: '#27ae60',
+    fontWeight: '600',
+  },
+  productCountText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  totalRow: {
+   
+  },
+  totalText: {
+    fontSize: 16,
+    color: '#1b1fb2',
+    fontWeight: 'bold',
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
     marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 10,
+  },
+  productTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    
+  },
+  productItem: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    paddingVertical: 8,
+  },
+  avatar: {
+    marginRight: 10,
+  },
+  productInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 25,
+    backgroundColor: "#27ae60",
+    height: 30,
+    padding: 5,
+  },
+  productAmount: {
+    fontSize: 14,
+    marginLeft: 5,
+    fontWeight: '600',
+    
   },
   input: {
-    height: 40,
-    flex: 1,
-    paddingHorizontal: 10,
+    height: 45,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    paddingHorizontal: 15,
     color: "black",
+    backgroundColor: "#f9f9f9",
   },
   inputArea: {
-    height: 80,
-    flex: 1,
-    paddingHorizontal: 10,
+    height: 90,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingTop: 10,
     color: "black",
-  },
-  iconContainer: {
-    padding: 10,
+    backgroundColor: "#f9f9f9",
+    textAlignVertical: "top",
   },
   errorText: {
     color: "red",
@@ -208,75 +263,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   saveButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#e53935",
     borderRadius: 10,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    marginTop: 10,
     alignItems: "center",
   },
   buttonText: {
     color: "white",
     fontSize: 16,
-  },
-  text: {
-    fontSize: 17,
-    paddingTop: 5,
-    paddingLeft: 10,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  row: {
-    flexDirection: "row",
-    marginBottom: 15,
-    alignItems: "center",
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 2,
-  },
-  boldText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  dateText: {
-    fontSize: 12,
-    color: "#888",
-    marginLeft: 5,
-  },
-  paymentMethodText: {
-    fontSize: 12,
-    color: "#27ae60",
-    fontWeight: "bold",
-    marginLeft: 5,
-  },
-  productCountText: {
-    fontSize: 14,
-    color: "#555",
-  },
-  totalText: {
-    fontSize: 14,
-    color: "#555",
-    marginLeft: 5,
-  },
-  sectionTitle: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  productTitle: {
-    fontSize: 16,
-  },
-  avatar: {
-    marginRight: 10,
-  },
-  productInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  productAmount: {
-    fontSize: 14,
-    marginLeft: 5,
+    fontWeight: "600",
   },
 });
 

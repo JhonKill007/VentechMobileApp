@@ -151,7 +151,7 @@ const HomeView = () => {
               flex: 1,
               padding: 10,
               borderRadius: 10,
-              marginBottom:50,
+              marginBottom:70,
               elevation: 4,
               backgroundColor:
                 theme === "light"
@@ -251,7 +251,10 @@ const HomeView = () => {
                         : Colors.dark.colors.primary,
                   }}
                 >
-                  DOP ${descuentos}.00
+                  DOP {descuentos.toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  })}
                 </Text>
               </View>
               <View
@@ -342,7 +345,10 @@ const HomeView = () => {
               flexDirection: "row",
               justifyContent: "space-between",
               padding: 16,
-              backgroundColor: "white",
+              backgroundColor:
+                           theme === "light"
+                             ? Colors.light.colors.background
+                             : Colors.dark.colors.background,
               borderTopWidth: 1,
               borderTopColor: "#ddd",
               position: "absolute",
@@ -354,18 +360,23 @@ const HomeView = () => {
             <Button
               icon="trash-can-outline"
               mode="contained"
+              textColor="white"
               onPress={() => {
                 setSelectedProducts([]);
                 handleReset();
               }}
-              style={{ backgroundColor: "red" }}
+              style={{ backgroundColor: "red", }}
             >
+             
               Limpiar
+             
+              
             </Button>
 
             <Button
               icon="arrow-right"
               mode="contained"
+              textColor="white"
               onPress={() =>
                 selectedProducts.length > 0 ? aggInfoOrder() : null
               }

@@ -16,66 +16,66 @@ export const DetailsOrderView = () => {
   };
   return (
     <View style={styles.container}>
-      {/* Client Section */}
+      {/* Sección Detalles de Orden */}
       <View style={styles.section}>
         <View style={styles.row}>
           <Text style={[styles.label, commonTextStyle]}>Cliente:</Text>
-          <Text style={[styles.boldText, commonTextStyle]}>
-            {order.consumer?.name }
-          </Text>
+          <Text style={[styles.value, commonTextStyle]}>{order.consumer?.name}</Text>
         </View>
-
-        {/* Date Section */}
         <View style={styles.row}>
-          <Text style={commonTextStyle}>Fecha:</Text>
-          <Text style={styles.dateText}>
+          <Text style={[styles.label, commonTextStyle]}>NCF:</Text>
+          <Text style={[styles.value, commonTextStyle]}>{order.ncf}</Text>
+        </View>
+  
+        <View style={styles.row}>
+          <Text style={[styles.label, commonTextStyle]}>Fecha:</Text>
+          <Text style={[styles.label, commonTextStyle]}>
             {new Date(order.dateHour!).toLocaleDateString('es-DO')}
           </Text>
         </View>
-
-        {/* Payment Method Section */}
+  
         <View style={styles.row}>
-          <Text style={commonTextStyle}>Metodo de pago:</Text>
+          <Text style={[styles.label, commonTextStyle]}>Método de pago:</Text>
           <Text style={styles.paymentMethodText}>{order.payMethod}</Text>
         </View>
-
-        {/* Products Count Section */}
+  
         <View style={styles.row}>
           <Text style={[styles.label, commonTextStyle]}>Cantidad de productos:</Text>
-          <Text style={styles.productCountText}>{order.products!.length} producto(s)</Text>
+          <Text style={[styles.label, commonTextStyle]}>{order.products!.length} producto(s)</Text>
         </View>
-
-        {/* Total Section */}
-        <View style={styles.row}>
-          <Text style={[styles.label, commonTextStyle]}>Total de la orden:</Text>
+  
+        <View style={[styles.row, styles.totalRow]}>
+          <Text style={[styles.label, commonTextStyle]}>Total:</Text>
           <Text style={styles.totalText}>
-            RD${' '}
-            {order.products!.reduce((total, item) => total + item.productTotal!, 0)
-              .toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+            RD
+            {order.products!
+              .reduce((total, item) => total + item.productTotal!, 0)
+              .toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+              })}
           </Text>
         </View>
       </View>
-
-      {/* Products Section */}
-      <Text style={[styles.sectionTitle, commonTextStyle]}>Productos:</Text>
+  
+      {/* Sección de Productos */}
+      <Text style={[styles.sectionTitle, commonTextStyle]}>Productos</Text>
       <FlatList
         data={order.products}
         renderItem={({ item }) => (
           <List.Item
+            style={styles.productItem}
             title={item.productName}
-            description={`RD$${item.productPrice}`}
+            description={`RD${(item.productPrice!).toLocaleString("en-US", {
+              style: "currency",
+              currency: "USD",
+            })}`}
             titleStyle={[styles.productTitle, commonTextStyle]}
-            left={(props) => (
-              <Avatar.Text
-                {...props}
-                style={[styles.avatar, { backgroundColor: theme === 'light' ? Colors.light.colors.background : Colors.dark.colors.background }]}
-                color={commonTextStyle.color}
-                label={item.productName!.charAt(0)}
-              />
-            )}
+            descriptionStyle={commonTextStyle}
+           
             right={() => (
               <View style={styles.productInfo}>
-                <Text style={[styles.label, commonTextStyle]}>Cantidad:</Text>
+                <Text style={[styles.label, commonTextStyle]}>Cant:</Text>
                 <Text style={[commonTextStyle, styles.productAmount]}>{item.productAmount}</Text>
               </View>
             )}
@@ -85,57 +85,71 @@ export const DetailsOrderView = () => {
       />
     </View>
   );
+  
 };
 
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 20,
+    
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 30,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
   row: {
     flexDirection: 'row',
-    marginBottom: 15,
-    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
   },
   label: {
     fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 2,
+    fontWeight: '600',
   },
-  boldText: {
+  value: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   dateText: {
-    fontSize: 12,
-    color: '#888',
-    marginLeft: 5,
+    fontSize: 14,
+    color: '#666',
   },
   paymentMethodText: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#27ae60',
-    fontWeight: 'bold',
-    marginLeft: 5,
+    fontWeight: '600',
   },
   productCountText: {
     fontSize: 14,
     color: '#555',
+    fontWeight: '500',
+  },
+  totalRow: {
+   
   },
   totalText: {
-    fontSize: 14,
-    color: '#555',
-    marginLeft: 5,
+    fontSize: 16,
+    color: '#1b1fb2',
+    fontWeight: 'bold',
   },
   sectionTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '700',
     marginBottom: 10,
   },
   productTitle: {
     fontSize: 16,
+    fontWeight: 'bold',
+    
+  },
+  productItem: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    paddingVertical: 8,
   },
   avatar: {
     marginRight: 10,
@@ -143,9 +157,16 @@ const styles = StyleSheet.create({
   productInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    borderRadius: 25,
+    backgroundColor: "#27ae60",
+    height: 30,
+    padding: 5,
   },
   productAmount: {
     fontSize: 14,
     marginLeft: 5,
+    fontWeight: '600',
+    
   },
 });
+

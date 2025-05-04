@@ -2,6 +2,8 @@ import { useUserContext } from "@/context/UserContext/UserContext";
 import { ChangePassword } from "@/Models/ChangePassword";
 import { Company } from "@/Models/Company";
 import { User } from "@/Models/User";
+import { Colors } from "@/constants/Colors";
+
 import  CompanyService  from "@/Services/Company/CompanyService";
 import UserService from "@/Services/User/UserService";
 import { useNavigation } from "@react-navigation/native";
@@ -13,6 +15,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ToastAndroid,
+  useColorScheme,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -27,8 +30,11 @@ const ChangeMyCompanyView = () => {
   const [address, setAddress] = useState<string>("");
   const [cellphone, setCellphone] = useState<string >("");
 
+  const theme = useColorScheme();
 
-
+   const commonTextStyle = {
+      color: theme === 'light' ? Colors.light.colors.primary : Colors.dark.colors.primary,
+    };
 
   useEffect(() => {
     CompanyService.getById(company?.id!)
@@ -77,11 +83,11 @@ const ChangeMyCompanyView = () => {
       <View style={styles.container}>
         <Toast />
         <View style={styles.form}>
-          <Text>Razon Social</Text>
+          <Text style={commonTextStyle}>Razon Social</Text>
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, commonTextStyle]}
               placeholder=" Nombre Completo"
               placeholderTextColor="gray"
               onChangeText={(text) => {
@@ -91,11 +97,11 @@ const ChangeMyCompanyView = () => {
             />
            
           </View>
-          <Text>RNC</Text>
+          <Text style={commonTextStyle}>RNC</Text>
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, commonTextStyle]}
               placeholder="Correo electronico"
               placeholderTextColor="gray"
               onChangeText={(text) => {
@@ -105,11 +111,11 @@ const ChangeMyCompanyView = () => {
             />
            
           </View>
-          <Text>Direccion </Text>
+          <Text style={commonTextStyle}>Direccion </Text>
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, commonTextStyle]}
               placeholder="Número de telefono"
               placeholderTextColor="gray"
               onChangeText={(text) => {
@@ -119,11 +125,11 @@ const ChangeMyCompanyView = () => {
             />
            
           </View>
-          <Text>Número de telefono </Text>
+          <Text style={commonTextStyle}>Número de telefono </Text>
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, commonTextStyle]}
               placeholder="Número de telefono"
               placeholderTextColor="gray"
               onChangeText={(text) => {

@@ -52,7 +52,7 @@ const ItemOrdenProduct = ({ OrdenItem }: IItemOrdenProduct) => {
             marginRight: -20,
             marginTop: 20,
             borderRadius: 25,
-            backgroundColor: "red",
+            backgroundColor: "#27ae60",
             height: 30,
             padding: 5,
           }}

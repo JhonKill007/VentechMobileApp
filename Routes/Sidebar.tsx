@@ -38,14 +38,28 @@ export const Sidebar = () => {
           >
             Ventech
           </Text> */}
-          <Image
+          {/* <Image
             source={require("../assets/images/title-logo.png")}
             style={{
               width: 150,
               height: 30,
               // borderRadius: 50,
             }}
-          />
+          /> */}
+
+          <Text
+            style={{
+              color: "#1b1fb2",
+              fontSize: 30,
+              textAlign: "center",
+              backgroundColor:
+              theme === "light"
+                ? Colors.light.colors.background
+                : '#16161a',
+            }}
+          >
+            Hatero
+          </Text>
         </View>
       ),
     }),
@@ -62,7 +76,10 @@ export const Sidebar = () => {
     >
       <Drawer.Screen name="Venta" component={HomeView} />
       <Drawer.Screen name="Ordenes" component={OrdenesView} />
-      <Drawer.Screen name="Cambiar de sucursales" component={SelectBranchView} />
+      <Drawer.Screen
+        name="Cambiar de sucursales"
+        component={SelectBranchView}
+      />
       <Drawer.Screen name="Configuracion" component={SettingView} />
       <Drawer.Screen
         name="Cerrar Sesión"
