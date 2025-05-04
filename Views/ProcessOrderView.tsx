@@ -58,7 +58,7 @@ const ProcessOrderView = () => {
         setMensajeCredito("Total de Créditos Disponibles: " + infoOrder.credito);
       } else {
         setIsDisabled(true);
-        setMensajeCredito("Créditos Insuficientes: " + infoOrder.credito);
+        setMensajeCredito("Créditos Insuficientes: " + (infoOrder.credito??0.00));
       }
     }
   }, [infoOrder, selectedProducts]);

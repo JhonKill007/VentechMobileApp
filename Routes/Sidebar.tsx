@@ -10,6 +10,7 @@ import HomeView from "@/Views/HomeView";
 import { useUserContext } from "@/context/UserContext/UserContext";
 import { Colors } from "@/constants/Colors";
 import SelectBranchView from "@/Views/SelectBranchView";
+import { SettingView } from "@/Views/SettingView";
 
 export const Sidebar = () => {
   const Drawer = createDrawerNavigator();
@@ -62,7 +63,7 @@ export const Sidebar = () => {
       <Drawer.Screen name="Venta" component={HomeView} />
       <Drawer.Screen name="Ordenes" component={OrdenesView} />
       <Drawer.Screen name="Cambiar de sucursales" component={SelectBranchView} />
-      <Drawer.Screen name="Configuracion" component={SelectBranchView} />
+      <Drawer.Screen name="Configuracion" component={SettingView} />
       <Drawer.Screen
         name="Cerrar Sesión"
         component={() => null}

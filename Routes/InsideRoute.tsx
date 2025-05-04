@@ -8,6 +8,8 @@ import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { DetailsOrderView } from "@/Views/DetailsOrderView";
 import { InfoOrderView } from "@/Views/InfoOrderView";
+import ChangePasswordView from "@/Views/Setting/ChangePasswordView";
+import ChangeMyinfoView from "@/Views/Setting/ChangeMyinfoView";
 
 const Stack = createStackNavigator();
 
@@ -50,6 +52,22 @@ export const InsideRoute = () => {
         component={DetailsOrderView}
         options={{
           headerTitle: "Detalles del pedido",
+          headerBackTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="changePassword"
+        component={ChangePasswordView}
+        options={{
+          headerTitle: "Cambiar Contraseña",
+          headerBackTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="ChangeMyinfoView"
+        component={ChangeMyinfoView}
+        options={{
+          headerTitle: "Cambiar mi informacion",
           headerBackTitle: "",
         }}
       />
