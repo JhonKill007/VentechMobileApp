@@ -1,6 +1,7 @@
 import { Order } from "@/Models/Order";
 import Http from "../Http/HttpClient";
 import { IOrderService } from "@/Interface/Order/IOrderService";
+import { CancelOrder } from "@/Models/CancelOrder";
 
 export class OrderService implements IOrderService {
   async getAll(branchId: number, desde:string, hasta:string): Promise<any> {
@@ -19,6 +20,18 @@ export class OrderService implements IOrderService {
   async create(model: Order): Promise<any> {
     let result = await new Promise<any>((resolve, reject) => {
       Http.post(`/api/Order`,model)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+    return result;
+  }
+  async CancelOrder(model: CancelOrder): Promise<any> {
+    let result = await new Promise<any>((resolve, reject) => {
+      Http.put(`/api/Order/cancelarOrder`,model)
         .then((res) => {
           resolve(res);
         })

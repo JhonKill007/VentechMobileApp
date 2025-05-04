@@ -11,9 +11,11 @@ import {
   StyleSheet,
   useColorScheme,
 } from "react-native";
+import { useUserContext } from "@/context/UserContext/UserContext";
 export const SettingView = () => {
   const theme = useColorScheme();
   const navigation = useNavigation();
+  const { userData, updateUser } = useUserContext();
 
   return (
     <View style={styles.container}>
@@ -55,6 +57,8 @@ export const SettingView = () => {
           Cambiar contraseña
         </Text>
       </TouchableOpacity>
+
+      {userData?.roleName == "Admin" && (
       <TouchableOpacity
         style={styles.touchableOpacity}
         onPress={() => navigation.navigate("ChangeMyCompanyView" as never)}
@@ -70,12 +74,11 @@ export const SettingView = () => {
             },
           ]}
         >
-         
-            <Icon source={"office-building"} size={20} color="#1b1fb2" />
-       
-           Mi Empresa
+          <Icon source={"office-building"} size={20} color="#1b1fb2" />
+          Mi Empresa
         </Text>
       </TouchableOpacity>
+      )}
       {/* <TouchableOpacity
           style={styles.touchableOpacity}
           onPress={() => navigation.navigate("ChangeMyCompanyView" as never)}

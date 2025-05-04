@@ -11,6 +11,8 @@ import { InfoOrderView } from "@/Views/InfoOrderView";
 import ChangePasswordView from "@/Views/Setting/ChangePasswordView";
 import ChangeMyinfoView from "@/Views/Setting/ChangeMyinfoView";
 import ChangeMyCompanyView from "@/Views/Setting/ChangeMyCompany";
+import CancelarOrderView from "@/Views/CancelarOrderView";
+import OrdenesView from "@/Views/OrdenesView";
 
 const Stack = createStackNavigator();
 
@@ -33,10 +35,26 @@ export const InsideRoute = () => {
         }}
       />
       <Stack.Screen
+        name="Ordenes"
+        component={OrdenesView}
+        options={{
+          headerTitle: "Ordenes",
+          headerTitleStyle: { color: headerTitleColor, fontSize: 20 },
+        }}
+      />
+      <Stack.Screen
         name="InfoOrderView"
         component={InfoOrderView}
         options={{
           headerTitle: "Informacion de Orden",
+          headerBackTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="CancelarOrderView"
+        component={CancelarOrderView}
+        options={{
+          headerTitle: "Cancelar Orden",
           headerBackTitle: "",
         }}
       />

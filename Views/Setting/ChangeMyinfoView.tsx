@@ -32,7 +32,7 @@ const ChangeMyinfoView = () => {
     string | undefined
   >("");
   useEffect(() => {
-    console.log('entro');
+    console.log(userData);
     UserService.getMyInfo(userData?.id!)
     .then((e: any) => {
       const data = e.data.data;

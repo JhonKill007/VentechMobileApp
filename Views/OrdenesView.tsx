@@ -52,6 +52,8 @@ const OrdenesView = () => {
   }, []);
 
   const searchOrden = () => {
+    console.log('entro');
+    
     OrderService.getAll(
       branch?.id!,
       selectedFromDate!
