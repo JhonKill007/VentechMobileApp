@@ -1,6 +1,8 @@
 import { useUserContext } from "@/context/UserContext/UserContext";
 import { ChangePassword } from "@/Models/ChangePassword";
+import { Company } from "@/Models/Company";
 import { User } from "@/Models/User";
+import  CompanyService  from "@/Services/Company/CompanyService";
 import UserService from "@/Services/User/UserService";
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
@@ -14,33 +16,31 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 
-const ChangeMyinfoView = () => {
+const ChangeMyCompanyView = () => {
   const navigation = useNavigation();
-  const { userData, updateUser } = useUserContext();
+  const { userData, updateUser , company} = useUserContext();
 
-  const [error, setError] = useState<string>("");
   const [errorIsActive, setErrorIsActive] = useState<boolean>(false);
-  const [validatePass, setValidatePass] = useState<boolean>(false);
-  const [myUser, setMyUser] = useState<User>({});
+  const [myCompany, setMyCompany] = useState<Company>({});
+  const [razonSocial, setRazonSocial] = useState<string >("");
+  const [rnc, setRnc] = useState<string >("");
+  const [address, setAddress] = useState<string>("");
+  const [cellphone, setCellphone] = useState<string >("");
 
 
-  const [fullName, setFullName] = useState<string >(
-    userData?.fullName!
-  );
-  const [email, setEmail] = useState<string >(userData?.email!);
-  const [cellphone, setCellphone] = useState<
-    string | undefined
-  >("");
+
+
   useEffect(() => {
     console.log('entro');
-    UserService.getMyInfo(userData?.id!)
+    CompanyService.getById(company?.id!)
     .then((e: any) => {
       const data = e.data.data;
       
-      setMyUser(data);
-      setFullName(data.fullName );
-      setEmail(data.email );
-      setCellphone(data.cellphone)
+        setMyCompany(data);
+        setRazonSocial(data.name);
+        setRnc(data.rnc);
+        setAddress(data.address)
+        setCellphone(data.telefono)
 
     })
     .catch((err: any) => {
@@ -52,11 +52,12 @@ const ChangeMyinfoView = () => {
 
   const handleSave = () => {
 
-    myUser.fullName= fullName;
-    myUser.cellphone= cellphone;
-    myUser.email= email;
+    myCompany.name= razonSocial;
+    myCompany.rnc= rnc;
+    myCompany.address= address;
+    myCompany.telefono= cellphone;
 
-    UserService.UpdateUser(userData?.id!,myUser)
+    CompanyService.update(myCompany)
         .then((e: any) => {
           console.log(e);
           
@@ -78,7 +79,7 @@ const ChangeMyinfoView = () => {
       <View style={styles.container}>
         <Toast />
         <View style={styles.form}>
-          <Text>Nombre Completo</Text>
+          <Text>Razon Social</Text>
 
           <View style={styles.inputContainer}>
             <TextInput
@@ -86,13 +87,13 @@ const ChangeMyinfoView = () => {
               placeholder=" Nombre Completo"
               placeholderTextColor="gray"
               onChangeText={(text) => {
-                setFullName(text);
+                setRazonSocial(text);
               }}
-              value={fullName}
+              value={razonSocial}
             />
            
           </View>
-          <Text>Correo electronico</Text>
+          <Text>RNC</Text>
 
           <View style={styles.inputContainer}>
             <TextInput
@@ -100,9 +101,23 @@ const ChangeMyinfoView = () => {
               placeholder="Correo electronico"
               placeholderTextColor="gray"
               onChangeText={(text) => {
-                setEmail(text);
+                setRnc(text);
               }}
-              value={email}
+              value={rnc}
+            />
+           
+          </View>
+          <Text>Direccion </Text>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Número de telefono"
+              placeholderTextColor="gray"
+              onChangeText={(text) => {
+                setAddress(text);
+              }}
+              value={address}
             />
            
           </View>
@@ -120,7 +135,6 @@ const ChangeMyinfoView = () => {
             />
            
           </View>
-          {errorIsActive && <Text style={styles.errorText}>{error}</Text>}
           <TouchableOpacity style={styles.saveButton}  onPress={handleSave}>
             <Text style={styles.buttonText}>Actualizar</Text>
           </TouchableOpacity>
@@ -179,4 +193,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChangeMyinfoView;
+export default ChangeMyCompanyView;

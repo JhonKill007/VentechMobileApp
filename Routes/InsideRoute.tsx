@@ -10,6 +10,7 @@ import { DetailsOrderView } from "@/Views/DetailsOrderView";
 import { InfoOrderView } from "@/Views/InfoOrderView";
 import ChangePasswordView from "@/Views/Setting/ChangePasswordView";
 import ChangeMyinfoView from "@/Views/Setting/ChangeMyinfoView";
+import ChangeMyCompanyView from "@/Views/Setting/ChangeMyCompany";
 
 const Stack = createStackNavigator();
 
@@ -68,6 +69,14 @@ export const InsideRoute = () => {
         component={ChangeMyinfoView}
         options={{
           headerTitle: "Cambiar mi informacion",
+          headerBackTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="ChangeMyCompanyView"
+        component={ChangeMyCompanyView}
+        options={{
+          headerTitle: "Mi Empresa",
           headerBackTitle: "",
         }}
       />

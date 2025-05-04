@@ -57,7 +57,7 @@ export const SettingView = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.touchableOpacity}
-          onPress={() => navigation.navigate("VerifyAcount" as never)}
+          onPress={() => navigation.navigate("ChangeMyCompanyView" as never)}
         >
           <Text
             style={[
@@ -76,7 +76,7 @@ export const SettingView = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.touchableOpacity}
-          onPress={() => navigation.navigate("DeleteOrDesactiveAccount" as never)}
+          onPress={() => navigation.navigate("ChangeMyCompanyView" as never)}
         >
           <Text
             style={[

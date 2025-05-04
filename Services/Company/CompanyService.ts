@@ -1,5 +1,6 @@
 import { ICompanyService } from "@/Interface/Company/ICompanyService";
 import Http from "../Http/HttpClient";
+import { Company } from "@/Models/Company";
 
 export class CompanyService implements ICompanyService {
   async getAllBranches(UserID: number): Promise<any> {
@@ -29,7 +30,36 @@ export class CompanyService implements ICompanyService {
     });
     return result;
   }
+  async getById(Id: number): Promise<any> {
+
+    
+    let result = await new Promise<any>((resolve, reject) => {
+      Http.get(`/api/company/${Id}`)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+    return result;
+  
+}
+  async update(model: Company): Promise<any> {
+
+    
+    let result = await new Promise<any>((resolve, reject) => {
+      Http.put(`/api/company`,model)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+    return result;
+  }
 }
 
-const Company = new CompanyService();
-export default Company;
+const CompanyS = new CompanyService();
+export default CompanyS;
