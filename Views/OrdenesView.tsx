@@ -25,7 +25,7 @@ import { Order } from "@/Models/Order";
 import { useUserContext } from "@/context/UserContext/UserContext";
 import Calendar from "@/components/Modals/Calendar";
 import { Colors } from "@/constants/Colors";
-import { usePrintHook } from "@/Hooks/usePrintHook";
+import { usePrintHook } from "@/hooks/usePrintHook";
 import { ItemOrden } from "@/components/ItemOrden";
 import { OrderProduct } from "@/Models/OrderProduct";
 

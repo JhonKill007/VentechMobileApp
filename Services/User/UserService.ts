@@ -10,6 +10,7 @@ export class UserService implements IUserService {
           resolve(res);
         })
         .catch((err) => {
+          console.log(err)
           reject(err);
         });
     });

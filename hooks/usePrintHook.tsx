@@ -4,7 +4,7 @@ import { Company } from "@/Models/Company";
 import { Order } from "@/Models/Order";
 import * as Print from "expo-print";
 import { Alert } from "react-native";
-import { useCountHook } from "./useCountHook";
+import { useCountHook } from "@/hooks/useCountHook";
 
 export const usePrintHook = () => {
   const { branch, company } = useUserContext();
@@ -126,9 +126,10 @@ export const usePrintHook = () => {
                   <div class="section">
                     <table style="border: none; width: 100%">
                       <tr>
-                        <th style="border: none">Descripción</th>
-                        <th style="border: none">itbis</th>
-                        <th style="border: none">valor</th>
+                        <th style="border: none;">Descripción</th>
+                        <th style="border: none;">Precio</th>
+                        <th style="border: none;">ITBIS</th>
+                        <th style="border: none;">Total</th>
                       </tr>
                       ${orden
                         .products!.map(
@@ -137,22 +138,18 @@ export const usePrintHook = () => {
                         <td style="border: none">${a.productName} * ${
                             a.productAmount
                           }</td>
-                        <td style="border: none">
-                          ${(a.itbis! * a.productAmount!).toLocaleString(
-                            "en-US",
-                            { style: "currency", currency: "USD" }
-                          )}
-                        </td>
-                        <td style="border: none">
-                          ${(a.productPrice! * a.productAmount!).toLocaleString(
-                            "en-US",
-                            {
-                              style: "currency",
-                              currency: "USD",
-                            }
-                          )}
-                        </td>
-                      </tr>
+                       <td style="border: none;">${(a.productPrice! -a.itbis! ).toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        })}</td>
+        <td style="border: none;">${(a.itbis! ).toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        })}</td>
+        <td style="border: none;">${(
+            a.productPrice! * a.productAmount!
+        ).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+        </tr>
                       `
                         )
                         .join("")}
@@ -319,26 +316,27 @@ ${branchSelected.address}
 <table style="border: none; width: 100%;">
 <tr>
 <th style="border: none;">Descripción</th>
-<th style="border: none;">itbis</th>
-<th style="border: none;">valor</th>
+ <th style="border: none;">Precio</th>
+  <th style="border: none;">ITBIS</th>
+  <th style="border: none;">Total</th>
 </tr>
 ${ordenAImprimir
   .products!.map(
     (a) => `
   <tr>
     <td style="border: none;">${a.productName} * ${a.productAmount}</td>
-    <td style="border: none;">${getOriginValue(
-      a.itbis! * a.productAmount!,
-      a.discountPorcent!
-    ).toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    })}</td>
-    <td style="border: none;">${getOriginValue(
-      a.productPrice! * a.productAmount!,
-      a.discountPorcent!
-    ).toLocaleString("en-US", { style: "currency", currency: "USD" })}</td>
-    </tr>
+     <td style="border: none;">${(a.productPrice! -a.itbis! ).toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        })}</td>
+        <td style="border: none;">${(a.itbis! ).toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        })}</td>
+        <td style="border: none;">${(
+            a.productPrice! * a.productAmount!
+        ).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+        </tr>
 `
   )
   .join("")}

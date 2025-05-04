@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/Colors";
-import { usePrintHook } from "@/Hooks/usePrintHook";
+import { usePrintHook } from "@/hooks/usePrintHook";
 import { Order } from "@/Models/Order";
 import { useNavigation } from "expo-router";
 import { View, TouchableOpacity, Text, useColorScheme } from "react-native";

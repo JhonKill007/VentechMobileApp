@@ -18,8 +18,10 @@ import { Order } from "@/Models/Order";
 import ItemOrdenProduct from "@/components/ItemOrdenProduct";
 import { SelectProduct } from "@/Models/SelectProduct";
 import { InfoOrder } from "@/Models/InfoOrder";
-import { useCountHook } from "@/Hooks/useCountHook";
-import { usePrintHook } from "@/Hooks/usePrintHook";
+import  {useCountHook}  from "@/hooks/useCountHook";
+
+import { usePrintHook } from "@/hooks/usePrintHook";
+
 
 const ScreenHeight = Dimensions.get("window").height;
 
