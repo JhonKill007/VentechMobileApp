@@ -34,7 +34,6 @@ export class UserService implements IUserService {
     return login;
   }
   async ChangePassword(params: ChangePassword): Promise<any> {
-    console.log(params);
     
     let login = await new Promise<any>((resolve, reject) => {
       Http.post("api/Users/changePassword", params)
@@ -49,7 +48,6 @@ export class UserService implements IUserService {
     return login;
   }
   async UpdateUser(userdId:number,params: User): Promise<any> {
-    console.log(params);
     
     let login = await new Promise<any>((resolve, reject) => {
       Http.put(`api/Users/${userdId}`, params)

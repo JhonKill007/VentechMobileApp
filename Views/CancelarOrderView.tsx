@@ -45,11 +45,9 @@ const CancelarOrderView = () => {
       branchId: branch?.id,
     };
 
-    console.log(userData);
 
     OrderService.CancelOrder(cancelar)
       .then((e: any) => {
-        console.log(e.data);
 
         if (e.data.success) {
           ToastAndroid.show("Cancelada con Exito!", ToastAndroid.SHORT);

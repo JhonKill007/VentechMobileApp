@@ -21,6 +21,10 @@ import { InfoOrder } from "@/Models/InfoOrder";
 import { useCountHook } from "@/hooks/useCountHook";
 
 import { usePrintHook } from "@/hooks/usePrintHook";
+import ProductsService from "@/Services/Products/ProductsService";
+import { Discount } from "@/Models/Discount";
+import { Product } from "@/Models/Product";
+import { OrderProduct } from "@/Models/OrderProduct";
 
 const ScreenHeight = Dimensions.get("window").height;
 
@@ -34,8 +38,9 @@ const ProcessOrderView = () => {
   }: { selectedProducts: SelectProduct[]; infoOrder: InfoOrder } = route.params;
 
   const [checking, setChecking] = useState<boolean>(false);
+  const [discounts, setDiscounts] = useState<Discount[]>([]);
 
-  const { company, branch } = useUserContext();
+  const { company, branch , userData} = useUserContext();
   const [mensajeCredito, setMensajeCredito] = useState<string>("");
   const [isDisabled, setIsDisabled] = useState(false);
   const [listHeight, setListHeight] = useState(0);
@@ -49,26 +54,74 @@ const ProcessOrderView = () => {
   } = useCountHook();
   const { printOrder } = usePrintHook();
 
-
-
   useEffect(() => {
-    if (infoOrder.metodoPago === "Crédito") {
-      const total = getTotalPrice(selectedProducts, infoOrder.descuento);
-      if (total <= infoOrder.credito!) {
-        setIsDisabled(false);
-        setMensajeCredito("Total de Créditos Disponibles: " + infoOrder.credito);
-      } else {
-        setIsDisabled(true);
-        setMensajeCredito("Créditos Insuficientes: " + (infoOrder.credito??0.00));
+    
+   
+    
+    const fetchAndCheckCredit = async () => {
+      await GetAllDiscount();
+
+      if (infoOrder.metodoPago === "Crédito") {
+        const total = getTotalPrice(selectedProducts, infoOrder.descuento);
+        if (total <= infoOrder.credito!) {
+          setIsDisabled(false);
+          setMensajeCredito(
+            "Total de Créditos Disponibles: " + infoOrder.credito
+          );
+        } else {
+          setIsDisabled(true);
+          setMensajeCredito(
+            "Créditos Insuficientes: " + (infoOrder.credito ?? 0.0)
+          );
+        }
       }
-    }
+    };
+
+    fetchAndCheckCredit();
   }, [infoOrder, selectedProducts]);
 
-    const onLayout = (event: any) => {
-      const { height } = event.nativeEvent.layout; // Alto del contenedor
-      setListHeight(height);
-      
-    }// Guarda el alto disponible
+  const GetAllDiscount = async () => {
+    try {
+      const e = await ProductsService.getAllDiscount(company?.id!);
+      if (e.data.success) {
+        setDiscounts(e.data.data);
+
+        for (const prod of selectedProducts) {
+          const Promotion = e.data.data.find(
+            (d: any) => d.type === 3 && d.productsId!.includes(prod.id)
+          );
+
+          if (selectedProducts.filter((x) => x.id == prod.id).length >=2) {
+          } else {
+            if (Promotion && prod.cantidad! >= Promotion.amount!) {
+              const newProduct: Product = {
+                id: prod.id,
+                name: prod.product?.name,
+                price: 0,
+                code: prod.product?.code,
+                itbis: 0,
+              };
+
+              const selectedProduc: SelectProduct = {
+                cantidad: 1,
+                product: newProduct,
+                id: prod.id,
+              };
+
+              selectedProducts.push(selectedProduc);
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const onLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout; // Alto del contenedor
+    setListHeight(height);
+  }; // Guarda el alto disponible
   const CrearOrden = () => {
     setChecking(true);
     const newOrdenProducts = selectedProducts.map((p: SelectProduct) => ({
@@ -82,17 +135,24 @@ const ProcessOrderView = () => {
       discountPorcent: infoOrder.descuento,
     }));
 
+    
+
     let totalOrden = 0;
     newOrdenProducts.forEach((o: any) => {
       totalOrden +=
         o.productPrice * o.productAmount -
         getValuePercent(o.productPrice * o.productAmount, o.discountPorcent);
+
+        
     });
+
+   
     
 
+
     const currentDate = new Date(); // Obtener la fecha y hora actual
-    const formattedDate = currentDate.toLocaleString(); // Formatear la fecha y hora
-  
+    const formattedDate = currentDate.toLocaleString("es-DO"); // Formatear la fecha y hora
+
     const newOrden: Order = {
       consumer: {
         id: infoOrder.clientId ?? 0, // Valor por defecto si es null/undefined
@@ -109,6 +169,7 @@ const ProcessOrderView = () => {
       byDelivery: false,
       toCaja: false,
       deliveryId: 0,
+      cajero: userData?.fullName,
       total: getTotalPrice(selectedProducts, infoOrder.descuento),
       dateHour: formattedDate,
       payWith: getTotalPrice(selectedProducts, infoOrder.descuento),
@@ -131,20 +192,6 @@ const ProcessOrderView = () => {
         console.error(err);
       });
   };
-
-  // const formatDate = (apiDate: any) => {
-  //   const date = new Date(apiDate);
-  //   const options = {
-  //     year: "2-digit",
-  //     month: "2-digit",
-  //     day: "2-digit",
-  //     hour: "2-digit",
-  //     minute: "2-digit",
-  //     second: "2-digit",
-  //     hour12: true,
-  //   } as const;
-  //   return date.toLocaleString("es-ES", options);
-  // };
 
   return (
     <Provider>
@@ -236,7 +283,7 @@ const ProcessOrderView = () => {
               </Text>
             </View>
 
-            <View style={{ flexDirection: "row"}}>
+            <View style={{ flexDirection: "row" }}>
               <Text
                 style={{
                   color:
@@ -247,7 +294,7 @@ const ProcessOrderView = () => {
               >
                 Metodo de pago:
               </Text>
-              
+
               <Text
                 style={{
                   fontSize: 12,
@@ -259,26 +306,19 @@ const ProcessOrderView = () => {
               >
                 {infoOrder.metodoPago}
               </Text>
-           
-
             </View>
             <View style={{ flexDirection: "row", marginBottom: 20 }}>
-            <Text
+              <Text
                 style={{
                   fontSize: 12,
                   color: "#27ae60",
                   fontWeight: "bold",
                   marginTop: 2,
-                
                 }}
               >
                 {mensajeCredito}
               </Text>
-
             </View>
-             
-
-       
           </View>
           {/* Título de Productos */}
           <View style={{ marginTop: 10 }}>
@@ -301,13 +341,11 @@ const ProcessOrderView = () => {
               style={[
                 styles.surface,
                 {
-                  
                   backgroundColor:
                     theme === "light"
                       ? Colors.light.colors.background
                       : Colors.dark.colors.background,
                 },
-                
               ]}
               onLayout={onLayout}
             >

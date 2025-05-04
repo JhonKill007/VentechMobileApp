@@ -8,8 +8,7 @@ export class Discount{
     name?:string;
     canExpire?:boolean
     expDate?:string;
-    productsId?:number[];
-    amount?:number;
-
+    productsId?:number[]
+    amount?:number
 
 }

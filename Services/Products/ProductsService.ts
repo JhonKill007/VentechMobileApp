@@ -14,6 +14,18 @@ export class ProductsService implements IProductsService {
     });
     return result;
   }
+  async getAllDiscount(companyID: number): Promise<any> {
+    let result = await new Promise<any>((resolve, reject) => {
+      Http.get(`/api/Discount?companyId=${companyID}`)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+    return result;
+  }
 }
 
 const Products = new ProductsService();

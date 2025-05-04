@@ -45,7 +45,6 @@ Http.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      console.log("Token expirado, redirigir a login...");
       // await AsyncStorage.removeItem("token");
       // Aquí puedes navegar a la pantalla de login
     }

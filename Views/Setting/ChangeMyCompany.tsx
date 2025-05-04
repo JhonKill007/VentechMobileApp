@@ -31,7 +31,6 @@ const ChangeMyCompanyView = () => {
 
 
   useEffect(() => {
-    console.log('entro');
     CompanyService.getById(company?.id!)
     .then((e: any) => {
       const data = e.data.data;
@@ -59,7 +58,6 @@ const ChangeMyCompanyView = () => {
 
     CompanyService.update(myCompany)
         .then((e: any) => {
-          console.log(e);
           
           if (e.data.success ) {
 

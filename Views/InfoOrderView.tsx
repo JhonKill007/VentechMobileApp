@@ -242,7 +242,6 @@ export const InfoOrderView = () => {
                   onChangeText={(text) => {
                     setRncOrCedula(text);
                     if (text.length >= 9) {
-                      console.log(text);
 
                       getRNC(text);
                     }

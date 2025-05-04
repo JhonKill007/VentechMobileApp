@@ -16,6 +16,8 @@ export const usePrintHook = () => {
   } = useCountHook();
 
   const printOrder = async (orden: Order) => {
+    
+
     try {
       var totalOrden = 0;
       var totalItbis = 0;
@@ -30,22 +32,10 @@ export const usePrintHook = () => {
             o.productPrice! * o.productAmount!,
             o.discountPorcent!
           );
-        totalItbis += getTotalItbisSingle(
-          o.productPrice! * o.productAmount!,
-          o.itbis!,
-          o.discountPorcent! > 0 ? o.discountPorcent : undefined
-        );
-        console.log(
-          o.productPrice!,
-          o.productAmount!,
-          o.itbis!,
-          o.discountPorcent!,
-          getTotalItbisSingle(
-            o.productPrice! * o.productAmount!,
-            o.itbis!,
-            o.discountPorcent! > 0 ? o.discountPorcent : undefined
-          )
-        );
+
+        totalItbis += o.itbis! * o.productAmount!
+         
+        console.log(totalItbis);
 
         montoDescuento += o.totalDiscount! * o.productAmount!;
       });
@@ -113,9 +103,9 @@ export const usePrintHook = () => {
                       <br />TEL:${branchSelected.cellPhone} <br />RNC: ${
         companySelected.rnc
       }
-                      <br />NCF: ${orden.ncf} <br />Fecha: ${formatDate(
+                      <br />NCF: ${orden.ncf} <br />Fecha: ${
         orden.dateHour
-      )}
+                      }
                     </p>
                     <hr />
                     <div style="text-align: center">
@@ -138,17 +128,19 @@ export const usePrintHook = () => {
                         <td style="border: none">${a.productName} * ${
                             a.productAmount
                           }</td>
-                       <td style="border: none;">${(a.productPrice! -a.itbis! ).toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        })}</td>
-        <td style="border: none;">${(a.itbis! ).toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
+                       <td style="border: none;">${(
+                         a.productPrice! - a.itbis!
+                       ).toLocaleString("en-US", {
+                         style: "currency",
+                         currency: "USD",
+                       })}</td>
+        <td style="border: none;">${a.itbis!.toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
         })}</td>
         <td style="border: none;">${(
-            a.productPrice! * a.productAmount!
-        ).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+          a.productPrice! * a.productAmount!
+        ).toLocaleString("en-US", { style: "currency", currency: "USD" })}</td>
         </tr>
                       `
                         )
@@ -193,7 +185,7 @@ export const usePrintHook = () => {
         orden.payWith! - totalOrden
       ).toLocaleString("en-US", { style: "currency", currency: "USD" })}
               
-                      <br />Cajero(a): ${orden.cajero}
+                      <br />Vendedor(a): ${orden.cajero}
                     </p>
                   </div>
                   <hr />
@@ -325,17 +317,20 @@ ${ordenAImprimir
     (a) => `
   <tr>
     <td style="border: none;">${a.productName} * ${a.productAmount}</td>
-     <td style="border: none;">${(a.productPrice! -a.itbis! ).toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        })}</td>
-        <td style="border: none;">${(a.itbis! ).toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
+     <td style="border: none;">${(a.productPrice! - a.itbis!).toLocaleString(
+       "en-US",
+       {
+         style: "currency",
+         currency: "USD",
+       }
+     )}</td>
+        <td style="border: none;">${a.itbis!.toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
         })}</td>
         <td style="border: none;">${(
-            a.productPrice! * a.productAmount!
-        ).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+          a.productPrice! * a.productAmount!
+        ).toLocaleString("en-US", { style: "currency", currency: "USD" })}</td>
         </tr>
 `
   )

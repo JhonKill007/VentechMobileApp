@@ -32,7 +32,6 @@ const ChangeMyinfoView = () => {
     string | undefined
   >("");
   useEffect(() => {
-    console.log(userData);
     UserService.getMyInfo(userData?.id!)
     .then((e: any) => {
       const data = e.data.data;
@@ -58,7 +57,6 @@ const ChangeMyinfoView = () => {
 
     UserService.UpdateUser(userData?.id!,myUser)
         .then((e: any) => {
-          console.log(e);
           
           if (e.data.success ) {
 
