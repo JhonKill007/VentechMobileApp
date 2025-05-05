@@ -144,10 +144,10 @@ const ProcessOrderView = () => {
 
     const newOrden: Order = {
       consumer: {
-        id: infoOrder.clientId ?? 0, // Valor por defecto si es null/undefined
+        id: infoOrder.clientId , // Valor por defecto si es null/undefined
         name: infoOrder.clientName ?? "", // Valor por defecto si es null/undefined
-        address: "",
-        cellPhone: "",
+        address: infoOrder.clientAddress,
+        cellPhone: infoOrder.clientCellPhone,
       },
       rncOCedula: infoOrder.rnc,
       branchId: branch?.id!,
@@ -165,6 +165,9 @@ const ProcessOrderView = () => {
       hasComprobante: infoOrder.rnc ? true : false,
       products: newOrdenProducts,
     };
+
+    console.log(newOrden);
+    
 
     OrderS.create(newOrden)
       .then((e: any) => {

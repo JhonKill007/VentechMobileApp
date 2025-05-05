@@ -1,6 +1,8 @@
 export class InfoOrder{
     public clientId: number | undefined
     public clientName: string | undefined
+    public clientCellPhone: string | undefined
+    public clientAddress: string | undefined
     public rnc: string | undefined
     public razonSocial: string | undefined
     public descuento: number | undefined
