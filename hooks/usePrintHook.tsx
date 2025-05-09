@@ -4,7 +4,7 @@ import { Company } from "@/Models/Company";
 import { Order } from "@/Models/Order";
 import * as Print from "expo-print";
 import { Alert } from "react-native";
-import { useCountHook } from "@/hooks/useCountHook";
+import { useCountHook } from "./useCountHook";
 
 export const usePrintHook = () => {
   const { branch, company } = useUserContext();

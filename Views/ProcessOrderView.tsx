@@ -18,9 +18,9 @@ import { Order } from "@/Models/Order";
 import ItemOrdenProduct from "@/components/ItemOrdenProduct";
 import { SelectProduct } from "@/Models/SelectProduct";
 import { InfoOrder } from "@/Models/InfoOrder";
-import { useCountHook } from "@/hooks/useCountHook";
+import { useCountHook } from "@/Hooks/useCountHook";
 
-import { usePrintHook } from "@/hooks/usePrintHook";
+import { usePrintHook } from "@/Hooks/usePrintHook";
 import ProductsService from "@/Services/Products/ProductsService";
 import { Discount } from "@/Models/Discount";
 import { Product } from "@/Models/Product";
