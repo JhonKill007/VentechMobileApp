@@ -55,7 +55,7 @@ export const Sidebar = () => {
               backgroundColor:
               theme === "light"
                 ? Colors.light.colors.background
-                : '#16161a',
+                : '#121212',
             }}
           >
             Hatero

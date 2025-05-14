@@ -28,53 +28,43 @@ const ModalItemCant = ({
   save,
   saveText,
 }: ModalItemCant) => {
-  //   console.log(itemToEdit);
 
   const theme = useColorScheme();
   const [value, setValue] = useState<string>(itemToEdit);
-  //   const [users, setUsers] = useState<UserModel[]>();
-  //   const [isMentioning, setIsMentioning] = useState<boolean>(false);
+
   const MAX_CHARACTERS = 200;
 
   const handleReactionChange = (text: string) => {
-    setValue(text);
+    console.log("item"+itemToEdit);
+    
+    const numericRegex = /^\d*\.?\d*$/;
 
-    // const mentionMatch = text.match(/@(\w+)$/);
-    // if (mentionMatch) {
-    //   setIsMentioning(true);
-    //   Search(mentionMatch[1], 1);
-    // } else {
-    //   setIsMentioning(false);
-    // }
+  if (numericRegex.test(text)) {
+    setValue(text);
+  }
   };
 
   const handleReactionSubmit = () => {
+
+    console.log(value);
+    
+    if(value != "0"){
     save(value.trim());
     setModalVisible(false);
+    }else{
+      if(value == "0"){
+     save("0");
+    setModalVisible(false);
+      }
+    }
+
   };
 
   const toggleModal = () => {
-    // setValue(itemToEdit);
     setModalVisible(!isModalVisible);
   };
 
-  //   const Search = (e: string, section: number) => {
-  //     if (e !== undefined && e !== "") {
-  //       User.SearchUser(e, section)
-  //         .then((res: any) => {
-  //           setUsers(res.data);
-  //         })
-  //         .catch((res: any) => {
-  //           console.log(res);
-  //         });
-  //     }
-  //   };
 
-  //   const handleUserSelect = (username: string) => {
-  //     const updatedValue = value.replace(/@\w*$/, `@${username} `);
-  //     setValue(updatedValue);
-  //     setIsMentioning(false);
-  //   };
 
   return (
     <Modal visible={isModalVisible} transparent animationType="fade">
@@ -102,6 +92,7 @@ const ModalItemCant = ({
               {tittle}
             </Text>
             <TextInput
+            key={itemToEdit?.toString()}
               style={{
                 height: 40,
                 color:
@@ -110,11 +101,7 @@ const ModalItemCant = ({
                     : Colors.dark.colors.text,
                 borderRadius: 15,
                 fontSize: 16,
-                // borderWidth: 1,
-                // borderColor:
-                //   theme === "light"
-                //     ? Colors.light.colors.primary
-                //     : Colors.dark.colors.primary,
+     
                 paddingVertical: 8,
                 paddingHorizontal: 10,
               }}

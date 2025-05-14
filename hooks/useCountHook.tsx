@@ -57,7 +57,7 @@ export const useCountHook = () => {
 
   const getTotalCantidadProducto = (Products: SelectProduct[]) => {
     return Products.reduce((total: number, item: any) => {
-      return total + item.cantidad;
+      return parseFloat(`${total}`) + parseFloat(`${item.cantidad}`);
     }, 0);
   };
 

@@ -13,7 +13,6 @@ import ModalItemCant from "./Modals/ModalItemCant";
 interface IItemProduct {
   product: Product;
   add: Function;
-  // reset: boolean;
 }
 
 export type ItemProductRef = {
@@ -29,7 +28,6 @@ const ItemProduct = forwardRef<ItemProductRef, IItemProduct>(
 
     const showModal = () => setVisible(true);
     const hideModal = () => setVisible(false);
-    // const containerStyle = { backgroundColor: "white", padding: 20 };
 
     const sumarCant = () => {
       add(product.id, product, cantidad + 1);
@@ -50,6 +48,7 @@ const ItemProduct = forwardRef<ItemProductRef, IItemProduct>(
     };
 
     const setFromModal=(cantidad:any)=>{
+      
        if (cantidad >= 0) {
         add(product.id, product, cantidad );
         setCantidad(cantidad );
@@ -61,16 +60,12 @@ const ItemProduct = forwardRef<ItemProductRef, IItemProduct>(
       },
     }));
 
-    // useEffect(() => {
-    //   if (reset) {
-    //     setCantidad(0);
-    //   }
-    // }, [reset]);
 
     return (
       <>
         <TouchableOpacity onPress={showModal}>
           <List.Item
+           
             title={product.name!}
             description={`RD$${product.price}`}
             left={(props) =>
@@ -175,18 +170,7 @@ const ItemProduct = forwardRef<ItemProductRef, IItemProduct>(
           />
         </TouchableOpacity>
 
-        {/* <Modal visible={visible} onDismiss={hideModal}>
-          <View
-            style={{
-              width: "100%",
-              height: 400,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text>Example Modal. Click outside this area to dismiss.</Text>
-          </View>
-        </Modal> */}
+      
         <ModalItemCant
           isModalVisible={visible}
           setModalVisible={setVisible}
