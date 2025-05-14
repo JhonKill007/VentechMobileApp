@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   TextInput,
   View,
@@ -7,6 +7,9 @@ import {
   TouchableWithoutFeedback,
   Modal,
   Text,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { Button } from "react-native-paper";
@@ -28,49 +31,81 @@ const ModalItemCant = ({
   save,
   saveText,
 }: ModalItemCant) => {
-
   const theme = useColorScheme();
   const [value, setValue] = useState<string>(itemToEdit);
+  const inputRef = useRef<TextInput>(null);
 
   const MAX_CHARACTERS = 200;
 
   const handleReactionChange = (text: string) => {
-    console.log("item"+itemToEdit);
-    
+    console.log("item" + itemToEdit);
+
     const numericRegex = /^\d*\.?\d*$/;
 
-  if (numericRegex.test(text)) {
-    setValue(text);
-  }
+    if (numericRegex.test(text)) {
+      setValue(text);
+    }
   };
 
   const handleReactionSubmit = () => {
-
     console.log(value);
-    
-    if(value != "0"){
-    save(value.trim());
-    setModalVisible(false);
-    }else{
-      if(value == "0"){
-     save("0");
-    setModalVisible(false);
+
+    if (value != "0") {
+      save(value.trim());
+      setModalVisible(false);
+    } else {
+      if (value == "0") {
+        save("0");
+        setModalVisible(false);
       }
     }
-
   };
+  const [keyboardStatus, setKeyboardStatus] = useState(false);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardStatus(true);
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardStatus(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isModalVisible && !keyboardStatus && value=="") {
+      console.log("use " +value);
+      
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isModalVisible, keyboardStatus]);
+
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
-
-
   return (
-    <Modal visible={isModalVisible} transparent animationType="fade">
-      <TouchableWithoutFeedback onPress={toggleModal}>
+    <Modal
+      visible={isModalVisible}
+      transparent
+      animationType="fade"
+      onShow={() => {
+        setTimeout(() => inputRef.current?.focus(), 100);
+      }}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.modalBackdrop}>
-          <View
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
             style={{
               backgroundColor:
                 theme === "light"
@@ -92,7 +127,8 @@ const ModalItemCant = ({
               {tittle}
             </Text>
             <TextInput
-            key={itemToEdit?.toString()}
+              ref={inputRef}
+              autoFocus={true}
               style={{
                 height: 40,
                 color:
@@ -101,28 +137,22 @@ const ModalItemCant = ({
                     : Colors.dark.colors.text,
                 borderRadius: 15,
                 fontSize: 16,
-     
                 paddingVertical: 8,
                 paddingHorizontal: 10,
               }}
-              placeholder="0.0"
               value={value}
               onChangeText={handleReactionChange}
-              placeholderTextColor="#ccc"
               keyboardType="decimal-pad"
               maxLength={MAX_CHARACTERS}
-              autoFocus
             />
-
             <Button
               mode="contained"
-              textColor="white"
-              onPress={() => handleReactionSubmit()}
-              style={{ backgroundColor: "#3F75EA", marginTop:15 }}
+              onPress={handleReactionSubmit}
+              style={{ backgroundColor: "#3F75EA", marginTop: 15 }}
             >
               Agregar
             </Button>
-          </View>
+          </KeyboardAvoidingView>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
