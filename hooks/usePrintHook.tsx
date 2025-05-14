@@ -224,6 +224,8 @@ export const usePrintHook = () => {
       var razonSocial = "";
       var tipoDeFactura = "";
       var montoDescuento = 0;
+      console.log(ordenAImprimir);
+      
 
       ordenAImprimir.products!.forEach((o) => {
         totalOrden += o.productPrice! * o.productAmount!;

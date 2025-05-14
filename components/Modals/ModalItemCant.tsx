@@ -9,6 +9,7 @@ import {
   Text,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
+import { Button } from "react-native-paper";
 
 interface ModalItemCant {
   isModalVisible: boolean;
@@ -27,7 +28,7 @@ const ModalItemCant = ({
   save,
   saveText,
 }: ModalItemCant) => {
-//   console.log(itemToEdit);
+  //   console.log(itemToEdit);
 
   const theme = useColorScheme();
   const [value, setValue] = useState<string>(itemToEdit);
@@ -37,6 +38,7 @@ const ModalItemCant = ({
 
   const handleReactionChange = (text: string) => {
     setValue(text);
+
     // const mentionMatch = text.match(/@(\w+)$/);
     // if (mentionMatch) {
     //   setIsMentioning(true);
@@ -124,6 +126,15 @@ const ModalItemCant = ({
               maxLength={MAX_CHARACTERS}
               autoFocus
             />
+
+            <Button
+              mode="contained"
+              textColor="white"
+              onPress={() => handleReactionSubmit()}
+              style={{ backgroundColor: "#3F75EA", marginTop:15 }}
+            >
+              Agregar
+            </Button>
           </View>
         </View>
       </TouchableWithoutFeedback>

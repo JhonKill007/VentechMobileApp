@@ -37,12 +37,24 @@ const ItemProduct = forwardRef<ItemProductRef, IItemProduct>(
     };
 
     const restarCant = () => {
-      if (cantidad > 0) {
-        add(product.id, product, cantidad - 1);
+      if (cantidad > 0.0001) {
+
+        if(cantidad - 1<0){
+
+        }else{
+ add(product.id, product, cantidad - 1);
         setCantidad(cantidad - 1);
+        }
+       
       }
     };
 
+    const setFromModal=(cantidad:any)=>{
+       if (cantidad >= 0) {
+        add(product.id, product, cantidad );
+        setCantidad(cantidad );
+      }
+    }
     useImperativeHandle(ref, () => ({
       reset() {
         setCantidad(0);
@@ -121,10 +133,10 @@ const ItemProduct = forwardRef<ItemProductRef, IItemProduct>(
                     -
                   </Text>
                 </TouchableOpacity>
-                <View style={{ width: 25 }}>
+                <View style={{ width: 50 }}>
                   <Text
                     style={{
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: "bold",
                       textAlign: "center",
                       color:
@@ -180,7 +192,7 @@ const ItemProduct = forwardRef<ItemProductRef, IItemProduct>(
           setModalVisible={setVisible}
           tittle="Cantidad:"
           itemToEdit={cantidad}
-          save={(c: number) => setCantidad(c)}
+          save={(c: number) => setFromModal(c)}
           saveText={"Guardar"}
         />
       </>
