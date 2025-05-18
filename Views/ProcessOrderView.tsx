@@ -443,7 +443,7 @@ const ProcessOrderView = () => {
                 flexDirection: "row",
                 justifyContent: "space-between",
                 position: "absolute",
-                bottom: 10,
+                bottom: 35,
                 left: 0,
                 right: 0,
                 padding: 16,

@@ -9,15 +9,11 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   TextInput,
+  ScrollView,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import {
-  RadioButton,
-  Switch,
-  IconButton,
-  MD3Colors,
-} from "react-native-paper";
+import { RadioButton, Switch, IconButton, MD3Colors } from "react-native-paper";
 import { Button, Provider } from "react-native-paper";
 import { useNavigation } from "expo-router";
 import ConsumerService from "@/Services/Common/ConsumerService";
@@ -31,6 +27,7 @@ import { useUserContext } from "@/context/UserContext/UserContext";
 import { Icon } from "react-native-paper";
 import { SelectProduct } from "@/Models/SelectProduct";
 import { InfoOrder } from "@/Models/InfoOrder";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export const InfoOrderView = () => {
   const theme = useColorScheme();
@@ -117,16 +114,15 @@ export const InfoOrderView = () => {
     }
   };
   const viewOrdenDetails = () => {
-
-    if(cliente.id!>0){
-        cliente.cellPhone = consumer.find(x=>x.id == cliente.id)?.cellPhone;
-        cliente.address = consumer.find(x=>x.id == cliente.id)?.address;
+    if (cliente.id! > 0) {
+      cliente.cellPhone = consumer.find((x) => x.id == cliente.id)?.cellPhone;
+      cliente.address = consumer.find((x) => x.id == cliente.id)?.address;
     }
     const infoOrden: InfoOrder = {
-      clientId: formCliente? 0: cliente.id,
-      clientName: formCliente? clientName:cliente.name,
-      clientCellPhone: formCliente? clientCell:cliente.cellPhone,
-      clientAddress: formCliente? clientAddress:cliente.address,
+      clientId: formCliente ? 0 : cliente.id,
+      clientName: formCliente ? clientName : cliente.name,
+      clientCellPhone: formCliente ? clientCell : cliente.cellPhone,
+      clientAddress: formCliente ? clientAddress : cliente.address,
       rnc: rncOrCedula,
       razonSocial,
       descuento,
@@ -177,196 +173,211 @@ export const InfoOrderView = () => {
               },
             ]}
           >
-            {/* Dropdown de Clientes */}
-            <View style={{ flexDirection: "row" }}>
-              <Dropdown
-                style={[styles.dropdown_cliente, getThemeBackground(theme!)]}
-                placeholderStyle={styles.placeholderText}
-                selectedTextStyle={styles.selectedText}
-                inputSearchStyle={styles.inputSearch}
-                iconStyle={styles.icon}
-                data={consumer}
-                search
-                maxHeight={300}
-                labelField="name"
-                valueField="id"
-                placeholder="Clientes"
-                searchPlaceholder="Buscar..."
-                value={cliente}
-                onChange={(item) => verifyClientInformation(item)}
-                renderLeftIcon={() => (
-                  <AntDesign
-                    style={styles.iconMargin}
-                    color={getPrimaryColor(theme!)}
-                    name="user"
-                    size={20}
-                  />
-                )}
-              />
-
-              {formCliente ? (
-                <IconButton
-                  icon="close"
-                  iconColor={MD3Colors.error50}
-                  size={20}
-                  onPress={() => getFormCliente()}
-                />
-              ) : (
-                <IconButton
-                  icon="account-plus"
-                  iconColor={MD3Colors.error50}
-                  size={20}
-                  onPress={() => getFormCliente()}
-                />
-              )}
-            </View>
-
-            {formCliente && (
-              <View style={styles.form}>
-                <Text style={commonTextStyle}>Nombre</Text>
-
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={[styles.input, commonTextStyle]}
-                    placeholder="Nombre Completo"
-                    placeholderTextColor="gray"
-                    onChangeText={(text) => {
-                      setClientName(text);
-                    }}
-                    value={clientName}
-                  />
-                </View>
-                <Text style={commonTextStyle}>Teléfono</Text>
-
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={[styles.input, commonTextStyle]}
-                    placeholder="Teléfono"
-                    placeholderTextColor="gray"
-                    onChangeText={(text) => {
-                      setClientCell(text);
-                    }}
-                    value={clientCell}
-                  />
-                </View>
-                <Text style={commonTextStyle}>Dirección </Text>
-
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={[styles.input, commonTextStyle]}
-                    placeholder="Dirección"
-                    placeholderTextColor="gray"
-                    onChangeText={(text) => {
-                      setClientAddress(text);
-                    }}
-                    value={clientAddress}
-                  />
-                </View>
-              </View>
-            )}
-            {/* Switch de Comprobante Fiscal */}
-            <View style={styles.switchContainer}>
-              <Text style={[styles.label, { color: getPrimaryColor(theme) }]}>
-                Comprobante Fiscal
-              </Text>
-              <Switch value={hasRnc} onValueChange={onToggleSwitch} />
-            </View>
-
-            {/* Campo de RNC o Cédula */}
-            {hasRnc && (
-              <View style={styles.rncContainer}>
-                <TextInput
-                  label="RNC o Cédula"
-                  value={rncOrCedula}
-                  style={[styles.input, getThemeBackground(theme)]}
-                  onChangeText={(text) => {
-                    setRncOrCedula(text);
-                    if (text.length >= 9) getRNC(text);
-                  }}
-                />
-                <Text
-                  style={[
-                    styles.razonSocial,
-                    { color: getPrimaryColor(theme) },
-                  ]}
-                >
-                  {razonSocial}
-                </Text>
-                {rncOrCedula.length >= 9 && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setRncOrCedula("");
-                      setRazonSocial("");
-                    }}
-                  >
-                    <Icon
-                      source="close"
-                      color={getPrimaryColor(theme)}
-                      size={30}
+            <SafeAreaProvider >
+              <SafeAreaView  >
+                <ScrollView style={{marginBottom:100}}>
+                  {/* Dropdown de Clientes */}
+                  <View style={{ flexDirection: "row" }}>
+                    <Dropdown
+                      style={[
+                        styles.dropdown_cliente,
+                        getThemeBackground(theme!),
+                      ]}
+                      placeholderStyle={styles.placeholderText}
+                      selectedTextStyle={styles.selectedText}
+                      inputSearchStyle={styles.inputSearch}
+                      iconStyle={styles.icon}
+                      data={consumer}
+                      search
+                      maxHeight={300}
+                      labelField="name"
+                      valueField="id"
+                      placeholder="Clientes"
+                      searchPlaceholder="Buscar..."
+                      value={cliente}
+                      onChange={(item) => verifyClientInformation(item)}
+                      renderLeftIcon={() => (
+                        <AntDesign
+                          style={styles.iconMargin}
+                          color={getPrimaryColor(theme!)}
+                          name="user"
+                          size={20}
+                        />
+                      )}
                     />
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
 
-            {/* Dropdown de Descuentos */}
-            <View style={styles.section}>
-              <Dropdown
-                style={[styles.dropdown, getThemeBackground(theme)]}
-                placeholderStyle={styles.placeholderText}
-                selectedTextStyle={styles.selectedText}
-                inputSearchStyle={styles.inputSearch}
-                data={discount}
-                search
-                maxHeight={300}
-                labelField="name"
-                valueField="valor"
-                placeholder="Descuentos"
-                searchPlaceholder="Buscar..."
-                value={descuento}
-                onChange={(item) => setDescuento(item.valor)}
-                renderLeftIcon={() => (
-                  <AntDesign
-                    style={styles.iconMargin}
-                    color={getPrimaryColor(theme)}
-                    name="tag"
-                    size={20}
-                  />
-                )}
-              />
-            </View>
+                    {formCliente ? (
+                      <IconButton
+                        icon="close"
+                        iconColor={MD3Colors.error50}
+                        size={20}
+                        onPress={() => getFormCliente()}
+                      />
+                    ) : (
+                      <IconButton
+                        icon="account-plus"
+                        iconColor={MD3Colors.error50}
+                        size={20}
+                        onPress={() => getFormCliente()}
+                      />
+                    )}
+                  </View>
 
-            {/* Métodos de Pago */}
-            <View style={styles.paymentSection}>
-              <Text
-                style={[styles.paymentTitle, { color: getPrimaryColor(theme) }]}
-              >
-                Metodos de pago
-              </Text>
-              {formasDePago.map((f: any, key: number) => (
-                <TouchableOpacity
-                  key={key}
-                  style={styles.paymentOption}
-                  onPress={() => setMetodoPago(f.value)}
-                >
-                  <RadioButton
-                    color={getPrimaryColor(theme)}
-                    value={f.value}
-                    status={payMetho === f.value ? "checked" : "unchecked"}
-                    onPress={() => setMetodoPago(f.value)}
-                  />
-                  <Text
-                    style={[
-                      styles.paymentText,
-                      { color: getPrimaryColor(theme) },
-                    ]}
-                  >
-                    {f.value}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+                  {formCliente && (
+                    <View style={styles.form}>
+                      <Text style={commonTextStyle}>Nombre</Text>
 
+                      <View style={styles.inputContainer}>
+                        <TextInput
+                          style={[styles.input, commonTextStyle]}
+                          placeholder="Nombre Completo"
+                          placeholderTextColor="gray"
+                          onChangeText={(text) => {
+                            setClientName(text);
+                          }}
+                          value={clientName}
+                        />
+                      </View>
+                      <Text style={commonTextStyle}>Teléfono</Text>
+
+                      <View style={styles.inputContainer}>
+                        <TextInput
+                          style={[styles.input, commonTextStyle]}
+                          placeholder="Teléfono"
+                          placeholderTextColor="gray"
+                          onChangeText={(text) => {
+                            setClientCell(text);
+                          }}
+                          value={clientCell}
+                        />
+                      </View>
+                      <Text style={commonTextStyle}>Dirección </Text>
+
+                      <View style={styles.inputContainer}>
+                        <TextInput
+                          style={[styles.input, commonTextStyle]}
+                          placeholder="Dirección"
+                          placeholderTextColor="gray"
+                          onChangeText={(text) => {
+                            setClientAddress(text);
+                          }}
+                          value={clientAddress}
+                        />
+                      </View>
+                    </View>
+                  )}
+                  {/* Switch de Comprobante Fiscal */}
+                  <View style={styles.switchContainer}>
+                    <Text
+                      style={[styles.label, { color: getPrimaryColor(theme) }]}
+                    >
+                      RNC del cliente
+                    </Text>
+                    <Switch value={hasRnc} onValueChange={onToggleSwitch} />
+                  </View>
+
+                  {/* Campo de RNC o Cédula */}
+                  {hasRnc && (
+                    <View style={styles.rncContainer}>
+                      <TextInput
+                        label="RNC o Cédula"
+                        value={rncOrCedula}
+                        style={[styles.input, commonTextStyle]}
+                        onChangeText={(text) => {
+                          setRncOrCedula(text);
+                          if (text.length >= 9) getRNC(text);
+                        }}
+                      />
+                      <Text
+                        style={[
+                          styles.razonSocial,
+                          { color: getPrimaryColor(theme) },
+                        ]}
+                      >
+                        {razonSocial}
+                      </Text>
+                      {rncOrCedula.length >= 9 && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setRncOrCedula("");
+                            setRazonSocial("");
+                          }}
+                        >
+                          <Icon
+                            source="close"
+                            color={getPrimaryColor(theme)}
+                            size={30}
+                          />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  )}
+
+                  {/* Dropdown de Descuentos */}
+                  <View style={styles.section}>
+                    <Dropdown
+                      style={[styles.dropdown, getThemeBackground(theme)]}
+                      placeholderStyle={styles.placeholderText}
+                      selectedTextStyle={styles.selectedText}
+                      inputSearchStyle={styles.inputSearch}
+                      data={discount}
+                      search
+                      maxHeight={300}
+                      labelField="name"
+                      valueField="valor"
+                      placeholder="Descuentos"
+                      searchPlaceholder="Buscar..."
+                      value={descuento}
+                      onChange={(item) => setDescuento(item.valor)}
+                      renderLeftIcon={() => (
+                        <AntDesign
+                          style={styles.iconMargin}
+                          color={getPrimaryColor(theme)}
+                          name="tag"
+                          size={20}
+                        />
+                      )}
+                    />
+                  </View>
+
+                  {/* Métodos de Pago */}
+                  <View style={styles.paymentSection}>
+                    <Text
+                      style={[
+                        styles.paymentTitle,
+                        { color: getPrimaryColor(theme) },
+                      ]}
+                    >
+                      Metodos de pago
+                    </Text>
+                    {formasDePago.map((f: any, key: number) => (
+                      <TouchableOpacity
+                        key={key}
+                        style={styles.paymentOption}
+                        onPress={() => setMetodoPago(f.value)}
+                      >
+                        <RadioButton
+                          color={getPrimaryColor(theme)}
+                          value={f.value}
+                          status={
+                            payMetho === f.value ? "checked" : "unchecked"
+                          }
+                          onPress={() => setMetodoPago(f.value)}
+                        />
+                        <Text
+                          style={[
+                            styles.paymentText,
+                            { color: getPrimaryColor(theme) },
+                          ]}
+                        >
+                          {f.value}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </SafeAreaView>
+            </SafeAreaProvider>
             {/* Botones */}
             <View style={styles.footer}>
               <Button
@@ -497,7 +508,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     position: "absolute",
-    bottom: 10,
+    bottom: 35,
     left: 0,
     right: 0,
     padding: 16,

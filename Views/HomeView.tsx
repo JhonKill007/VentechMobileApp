@@ -151,7 +151,7 @@ const HomeView = () => {
               flex: 1,
               padding: 10,
               borderRadius: 10,
-              marginBottom:70,
+              marginBottom: 70,
               elevation: 4,
               backgroundColor:
                 theme === "light"
@@ -162,7 +162,7 @@ const HomeView = () => {
           >
             <FlatList
               data={!search ? products : productsFiltered}
-              style={{ marginBottom: 10 }}
+              style={{ marginBottom: 130 }}
               renderItem={({ item, index }) => (
                 <ItemProduct
                   ref={(ref) => {
@@ -175,6 +175,23 @@ const HomeView = () => {
               )}
               keyExtractor={(item, index) => index.toString()}
             />
+          </Surface>
+
+          <View
+            style={{
+              
+              backgroundColor:
+                theme === "light"
+                  ? Colors.light.colors.background
+                  : Colors.dark.colors.background,
+              borderTopWidth: 1,
+              borderTopColor: "#ddd",
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 35,
+            }}
+          >
             <View
               style={{
                 display: "flex",
@@ -251,7 +268,8 @@ const HomeView = () => {
                         : Colors.dark.colors.primary,
                   }}
                 >
-                  DOP {descuentos.toLocaleString("en-US", {
+                  DOP{" "}
+                  {descuentos.toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
                   })}
@@ -338,52 +356,41 @@ const HomeView = () => {
                 </Text>
               </View>
             </View>
-          </Surface>
-
-          <View
-            style={{
+            <View  style={{
               flexDirection: "row",
               justifyContent: "space-between",
               padding: 16,
               backgroundColor:
-                           theme === "light"
-                             ? Colors.light.colors.background
-                             : Colors.dark.colors.background,
-              borderTopWidth: 1,
-              borderTopColor: "#ddd",
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 0,
-            }}
-          >
-            <Button
-              icon="trash-can-outline"
-              mode="contained"
-              textColor="white"
-              onPress={() => {
-                setSelectedProducts([]);
-                handleReset();
-              }}
-              style={{ backgroundColor: "red", }}
-            >
+                theme === "light"
+                  ? Colors.light.colors.background
+                  : Colors.dark.colors.background,
              
-              Limpiar
-             
-              
-            </Button>
+            }}>
+              <Button
+                icon="trash-can-outline"
+                mode="contained"
+                textColor="white"
+                onPress={() => {
+                  setSelectedProducts([]);
+                  handleReset();
+                }}
+                style={{ backgroundColor: "red" }}
+              >
+                Limpiar
+              </Button>
 
-            <Button
-              icon="arrow-right"
-              mode="contained"
-              textColor="white"
-              onPress={() =>
-                selectedProducts.length > 0 ? aggInfoOrder() : null
-              }
-              style={{ backgroundColor: "#3F75EA" }}
-            >
-              Siguiente
-            </Button>
+              <Button
+                icon="arrow-right"
+                mode="contained"
+                textColor="white"
+                onPress={() =>
+                  selectedProducts.length > 0 ? aggInfoOrder() : null
+                }
+                style={{ backgroundColor: "#3F75EA" }}
+              >
+                Siguiente
+              </Button>
+            </View>
           </View>
         </View>
       )}

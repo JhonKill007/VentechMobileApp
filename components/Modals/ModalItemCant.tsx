@@ -63,10 +63,10 @@ const ModalItemCant = ({
   const [keyboardStatus, setKeyboardStatus] = useState(false);
 
   useEffect(() => {
-    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardStatus(true);
     });
-    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
       setKeyboardStatus(false);
     });
 
@@ -77,17 +77,16 @@ const ModalItemCant = ({
   }, []);
 
   useEffect(() => {
-    if (isModalVisible && !keyboardStatus && value=="") {
-      console.log("use " +value);
-      
+    if (isModalVisible && !keyboardStatus && value == "") {
+      console.log("use " + value);
+
       const timer = setTimeout(() => {
         inputRef.current?.focus();
       }, 300);
-      
+
       return () => clearTimeout(timer);
     }
   }, [isModalVisible, keyboardStatus]);
-
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -116,16 +115,31 @@ const ModalItemCant = ({
               width: "90%",
             }}
           >
-            <Text
-              style={{
-                color:
-                  theme === "light"
-                    ? Colors.light.colors.text
-                    : Colors.dark.colors.text,
-              }}
-            >
-              {tittle}
-            </Text>
+            <View style={{ flexDirection: "row",
+              justifyContent: "space-between",}}>
+              <Text
+                style={{
+                  color:
+                    theme === "light"
+                      ? Colors.light.colors.text
+                      : Colors.dark.colors.text,
+                      fontSize:16
+                }}
+              >
+                {tittle}
+              </Text>
+              <Button
+               
+                mode="contained"
+                textColor="white"
+                onPress={() => toggleModal()}
+                style={{width:5,backgroundColor: "red"}}
+                
+              >
+                X
+              </Button>
+            </View>
+
             <TextInput
               ref={inputRef}
               autoFocus={true}

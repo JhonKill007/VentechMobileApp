@@ -49,6 +49,7 @@ export const usePrintHook = () => {
       const companySelected: Company = {
         name: company?.name,
         rnc: company?.rnc,
+        photo:company?.photo
       };
       const branchSelected: Branch = {
         address: branch?.address,
@@ -85,6 +86,24 @@ export const usePrintHook = () => {
                     .totals {
                       text-align: right;
                     }
+                      .firma-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    text-align: center;
+    flex-wrap: wrap;
+  }
+
+  .firma {
+    width: 100%;
+    max-width: 300px;
+    margin: 1rem;
+  }
+
+  @media (min-width: 600px) {
+    .firma {
+      width: 45%;
+    }
                     @media print {
                       /* Indicar al navegador que divida las páginas cuando el contenido exceda el límite */
                       .corte {
@@ -95,6 +114,9 @@ export const usePrintHook = () => {
                 </head>
                 <body>
                   <div class="header">
+                   <img style="width:100px" src="data:image/png;base64,${
+       companySelected.photo
+   }" alt="MDN" /> 
                     <h2>${companySelected.name}</h2>
                   </div>
                   <div class="section">
@@ -204,6 +226,17 @@ export const usePrintHook = () => {
                     <br />Tel: ${orden.consumer!.cellPhone} <br />Dirección:
                     ${orden.consumer!.address}
                   </p>
+
+                  <div class="firma-container">
+  <div class="firma">
+    <div>_________________</div>
+    <div>Vendedor</div>
+  </div>
+  <div class="firma">
+    <div>_________________</div>
+    <div>Comprador</div>
+  </div>
+</div>
                   <div class="corte"></div>
                 </body>
               </html>
@@ -224,7 +257,6 @@ export const usePrintHook = () => {
       var razonSocial = "";
       var tipoDeFactura = "";
       var montoDescuento = 0;
-      console.log(ordenAImprimir);
       
 
       ordenAImprimir.products!.forEach((o) => {
@@ -245,6 +277,7 @@ export const usePrintHook = () => {
       const companySelected: Company = {
         name: company?.name,
         rnc: company?.rnc,
+        photo:company?.photo
       };
       const branchSelected: Branch = {
         address: branch?.address,
@@ -280,6 +313,24 @@ text-align: left;
 .totals {
 text-align: right;
 }
+ .firma-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    text-align: center;
+    flex-wrap: wrap;
+  }
+
+  .firma {
+    width: 100%;
+    max-width: 300px;
+    margin: 1rem;
+  }
+
+  @media (min-width: 600px) {
+    .firma {
+      width: 45%;
+    }
 @media print {
 /* Indicar al navegador que divida las páginas cuando el contenido exceda el límite */
 .corte {
@@ -290,6 +341,10 @@ text-align: right;
 </head>
 <body>
 <div class="header">
+
+<img style="width:100px" src="data:image/png;base64,${
+       companySelected.photo
+   }" alt="MDN" />  
 <h2>${companySelected.name}</h2>
 </div>
 <div class="section">
@@ -392,6 +447,17 @@ Cliente:${ordenAImprimir.consumer!.name}
 <br />Tel: ${ordenAImprimir.consumer!.cellPhone}
 <br />Dirección: ${ordenAImprimir.consumer!.address}</p>
 <div class="corte"></div>
+
+<div class="firma-container">
+  <div class="firma">
+    <div>_________________</div>
+    <div>Vendedor</div>
+  </div>
+  <div class="firma">
+    <div>_________________</div>
+    <div>Comprador</div>
+  </div>
+</div>
 </body>
 </html>`;
 
