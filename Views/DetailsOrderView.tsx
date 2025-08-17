@@ -38,6 +38,10 @@ export const DetailsOrderView = () => {
           <Text style={[styles.label, commonTextStyle]}>Método de pago:</Text>
           <Text style={styles.paymentMethodText}>{order.payMethod}</Text>
         </View>
+        <View style={styles.row}>
+          <Text style={[styles.label, commonTextStyle]}>Vendedor:</Text>
+          <Text style={styles.paymentMethodText}>{order.cajero}</Text>
+        </View>
   
         <View style={styles.row}>
           <Text style={[styles.label, commonTextStyle]}>Cantidad de productos:</Text>

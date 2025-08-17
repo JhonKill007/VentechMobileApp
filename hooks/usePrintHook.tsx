@@ -124,7 +124,9 @@ export const usePrintHook = () => {
                       ${branchSelected.address}
                       <br />TEL:${branchSelected.cellPhone} <br />RNC: ${
         companySelected.rnc
-      }
+      }<br />Fecha Vencimiento Secuencia: ${
+            orden.fechaVencimientoSecuencia
+        } 
                       <br />NCF: ${orden.ncf} <br />Fecha: ${
         orden.dateHour
                       }
@@ -351,6 +353,9 @@ text-align: right;
 <p>
 ${branchSelected.address}
 <br />TEL:${branchSelected.cellPhone} <br />RNC: ${companySelected.rnc} 
+<br />Fecha Vencimiento Secuencia: ${
+            ordenAImprimir.fechaVencimientoSecuencia
+        } 
 <br />NCF: ${ordenAImprimir.ncf} 
 <br />Fecha: ${formatDate(ordenAImprimir.dateHour)}
 </p>

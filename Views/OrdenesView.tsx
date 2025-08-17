@@ -29,6 +29,8 @@ import { ItemOrden } from "@/components/ItemOrden";
 import { useFocusEffect } from "@react-navigation/native";
 
 const OrdenesView = () => {
+    const { userData} = useUserContext();
+
   const theme = useColorScheme();
   const { branch} = useUserContext();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -50,6 +52,8 @@ const OrdenesView = () => {
 
   const searchOrden = () => {
     
+    
+    
     OrderService.getAll(
       branch?.id!,
       selectedFromDate!
@@ -57,7 +61,8 @@ const OrdenesView = () => {
         : new Date().toLocaleDateString("es-DO"),
       selectedToDate
         ? selectedToDate.toLocaleDateString("es-DO")
-        : new Date().toLocaleDateString("es-DO")
+        : new Date().toLocaleDateString("es-DO"),
+        userData?.roleName== "Admin"?"":userData?.username!
     )
       .then((e: any) => {
         setOrders(e.data.data);

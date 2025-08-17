@@ -27,7 +27,6 @@ import { Product } from "@/Models/Product";
 import { OrderProduct } from "@/Models/OrderProduct";
 import { green } from "react-native-reanimated/lib/typescript/Colors";
 
-
 const ProcessOrderView = () => {
   const theme = useColorScheme();
   const route = useRoute();
@@ -144,7 +143,7 @@ const ProcessOrderView = () => {
 
     const newOrden: Order = {
       consumer: {
-        id: infoOrder.clientId , // Valor por defecto si es null/undefined
+        id: infoOrder.clientId, // Valor por defecto si es null/undefined
         name: infoOrder.clientName ?? "", // Valor por defecto si es null/undefined
         address: infoOrder.clientAddress,
         cellPhone: infoOrder.clientCellPhone,
@@ -167,14 +166,19 @@ const ProcessOrderView = () => {
     };
 
     console.log(newOrden);
-    
 
     OrderS.create(newOrden)
       .then((e: any) => {
         newOrden.ncf = e.data.data;
-
+        newOrden.ncf = e.data.data.ncf;
+        newOrden.fechaVencimientoSecuencia =
+          e.data.data.fechaVencimientoSecuencia;
         setChecking(false);
         printOrder(newOrden);
+
+        if (newOrden?.rncOCedula!.length >= 9) {
+          generate607(newOrden);
+        }
         navigation.reset({
           index: 0,
           routes: [{ name: "initalApp" as never }],
@@ -183,6 +187,45 @@ const ProcessOrderView = () => {
       .catch((err: any) => {
         console.error(err);
       });
+
+    const generate607 = (orden: Order) => {
+      var invoice607 = {
+        rncCedulaPasaporte: orden.rncOCedula,
+        tipoIdentificacion: 0,
+        numeroComprobanteFiscal: orden.ncf,
+        tipoIngreso: 1,
+        fechaComprobante: orden.dateHour,
+        fechaRetencion: orden.dateHour,
+        montoFacturado: orden.total,
+        itbisFacturado: orden
+          .products!.map((x) => x.itbis * x.productAmount)
+          .reduce((total, itbis) => total + itbis, 0),
+        itbisRetenidoporTerceros: 0,
+        itbisPercibido: 0,
+        retencionRentaporTerceros: 0,
+        isrPercibido: 0,
+        impuestoSelectivoalConsumo: 0,
+        otrosImpuestos_Tasas: 0,
+        montoPropinaLegal: 0,
+        efectivo: orden.payMethod == "Efectivo" ? orden.total : 0,
+        cheque_Transferencia_Deposito: 0,
+        tarjetaDebito_Credito: orden.payMethod == "Tarjeta" ? orden.total : 0,
+        ventaACredito: orden.payMethod == "Crédito" ? orden.total : 0,
+        bonosOCertificadosRegalo: 0,
+        permuta: 0,
+        otrasFormasVentas: 0,
+        companyID: orden.companyId,
+      };
+      if (orden.rncOCedula?.length == 11) {
+        invoice607.tipoIdentificacion = 2;
+      } else if (orden.rncOCedula?.length == 9) {
+        invoice607.tipoIdentificacion = 1;
+      } else {
+        invoice607.tipoIdentificacion = 3;
+      }
+
+      OrderS.conformar607(invoice607).then((e: any) => {});
+    };
   };
 
   return (
@@ -204,7 +247,7 @@ const ProcessOrderView = () => {
                 : Colors.dark.colors.background,
           }}
         >
-          <View style={{ paddingLeft: 20, paddingTop:20 }}>
+          <View style={{ paddingLeft: 20, paddingTop: 20 }}>
             <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <Text
                 style={{
@@ -235,69 +278,68 @@ const ProcessOrderView = () => {
               </Text>
             </View>
             {infoOrder.rnc && infoOrder.rnc !== "null" && (
-            <View style={{ flexDirection: "row", marginBottom: 10 }}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  marginBottom: 2,
-                  color:
-                    theme === "light"
-                      ? Colors.light.colors.primary
-                      : Colors.dark.colors.primary,
-                }}
-              >
-                RNC:
-              </Text>
+              <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    marginBottom: 2,
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
+                  }}
+                >
+                  RNC:
+                </Text>
 
-              <Text
-                style={{
-                  fontSize: 16,
-                  marginLeft: 3,
-                  marginBottom: 2,
-                  color:
-                    theme === "light"
-                      ? Colors.light.colors.primary
-                      : Colors.dark.colors.primary,
-                }}
-              >
-                {infoOrder.rnc}
-              </Text>
-            </View>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    marginLeft: 3,
+                    marginBottom: 2,
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
+                  }}
+                >
+                  {infoOrder.rnc}
+                </Text>
+              </View>
             )}
 
             {infoOrder.razonSocial && infoOrder.razonSocial !== "null" && (
-            <View style={{ flexDirection: "row", marginBottom: 10 }}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  marginBottom: 2,
-                  color:
-                    theme === "light"
-                      ? Colors.light.colors.primary
-                      : Colors.dark.colors.primary,
-                }}
-              >
-                Razón social:
-              </Text>
+              <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    marginBottom: 2,
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
+                  }}
+                >
+                  Razón social:
+                </Text>
 
-              <Text
-                style={{
-                  fontSize: 16,
-                  marginLeft: 3,
-                  marginBottom: 2,
-                  color:
-                    theme === "light"
-                      ? Colors.light.colors.primary
-                      : Colors.dark.colors.primary,
-                }}
-              >
-                {infoOrder.razonSocial}
-              </Text>
-            </View>
-
-)}
+                <Text
+                  style={{
+                    fontSize: 16,
+                    marginLeft: 3,
+                    marginBottom: 2,
+                    color:
+                      theme === "light"
+                        ? Colors.light.colors.primary
+                        : Colors.dark.colors.primary,
+                  }}
+                >
+                  {infoOrder.razonSocial}
+                </Text>
+              </View>
+            )}
             <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <Text
                 style={{
@@ -354,9 +396,9 @@ const ProcessOrderView = () => {
                 }}
               >
                 {getTotalPrice(selectedProducts).toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  })}
+                  style: "currency",
+                  currency: "USD",
+                })}
               </Text>
             </View>
             <View style={{ flexDirection: "row", marginBottom: 10 }}>

@@ -8,6 +8,8 @@ export class Order {
   public branchId: number | undefined;
   public companyId: number | undefined;
   public payWith: number | undefined;
+  public fechaVencimientoSecuencia?:string;
+
   public rncOCedula: string | undefined;
   public hasComprobante: boolean | undefined;
   public payMethod: string | undefined;
