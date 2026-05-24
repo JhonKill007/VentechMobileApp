@@ -3,11 +3,36 @@ import { Order } from "@/Models/Order";
 import { useNavigation } from "expo-router";
 import { View, TouchableOpacity, Text, useColorScheme } from "react-native";
 import { Icon } from "react-native-paper";
+import OrderS from "@/Services/Order/OrderService";
+import { useUserContext } from "@/context/UserContext/UserContext";
 
 export const ItemOrden = ({ orden }: { orden: Order }) => {
   const theme = useColorScheme();
   const navigation = useNavigation();
   const { rePrintOrder } = usePrintHook();
+  const { company } = useUserContext();
+
+
+
+  const reInmprimirOrden = (order: Order) => {
+
+       OrderS.getResultDGII(company?.id!, order.ncf!)
+      .then((res) => {
+        if (res.data.statusCode === 1) {
+          rePrintOrder(order, res.data.data)
+
+        } else {
+          
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+       
+      });
+
+
+  }
+
 
   const OrdenDetails = (order: Order) => {
     navigation.navigate(
@@ -128,7 +153,7 @@ export const ItemOrden = ({ orden }: { orden: Order }) => {
             flexDirection: "row",
             alignItems: "center",
           }}
-          onPress={() => rePrintOrder(orden)}
+          onPress={() => reInmprimirOrden(orden)}
         >
           <Icon source="printer" size={18} color={"white"} />
           <Text style={{ color: "white", marginLeft: 6 }}>Imprimir</Text>

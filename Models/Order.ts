@@ -22,5 +22,6 @@ export class Order {
   public total: number | undefined;
   public byDelivery: boolean | undefined;
   public toCaja: boolean | undefined;
+  public sentDgii: boolean | undefined;
   public deliveryId: number | undefined;
 }

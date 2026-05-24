@@ -8,4 +8,5 @@ export class InfoOrder{
     public descuento: number | undefined
     public metodoPago: string | undefined
     public credito: number | undefined
+    public sendDgii: boolean | false | undefined
 }

@@ -12,6 +12,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const API_URL = "https://api.ventech.countechrd.com";
+//const API_URL = "http://192.168.1.145:7188";
 
 const Http = axios.create({
   baseURL: API_URL,
@@ -24,12 +25,12 @@ const excludedRoutes = ["/auth/login", "/auth/register"];
 // Interceptor para agregar el token de autenticación
 Http.interceptors.request.use(
   async (config) => {
-
-    if (excludedRoutes.some(route => config.url?.includes(route))) {
+    
+    if (excludedRoutes.some((route) => config.url?.includes(route))) {
       return config;
     }
     const token = await AsyncStorage.getItem("TK");
-    
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

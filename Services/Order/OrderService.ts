@@ -53,6 +53,22 @@ export class OrderService implements IOrderService {
     });
     return result;
   }
+
+  async getResultDGII(companyId:number, encf: string): Promise<any> {
+    let result = await new Promise<any>((resolve, reject) => {
+      Http.get(`/api/FacturadorElectronico/responsedgii?companyId=${companyId}&encf=${encf}`)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+    return result;
+  }
+  
+
+
 }
 
 const OrderS = new OrderService();

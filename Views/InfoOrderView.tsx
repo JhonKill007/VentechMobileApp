@@ -47,6 +47,7 @@ export const InfoOrderView = () => {
   const [cliente, setCliente] = useState<Consumer>({});
   const [rncOrCedula, setRncOrCedula] = useState<string>("");
   const [hasRnc, setHasRnc] = useState<boolean>(false);
+  const [sendToDGII, setSendToDGII] = useState<boolean>(false);
 
   const [payMetho, setPayMetho] = useState<string>("Efectivo");
   const [clientName, setClientName] = useState<string>("");
@@ -77,6 +78,7 @@ export const InfoOrderView = () => {
   }, []);
 
   const onToggleSwitch = () => setHasRnc(!hasRnc);
+  const onToggleSwitchSendDGII = () => setSendToDGII(!sendToDGII);
 
   const verifyClientInformation = (client: any) => {
     setHasRnc(client.hasRnc);
@@ -128,6 +130,7 @@ export const InfoOrderView = () => {
       descuento,
       metodoPago: payMetho,
       credito: cliente.credito,
+      sendDgii: sendToDGII,
     };
 
     navigation.navigate(
@@ -339,7 +342,15 @@ export const InfoOrderView = () => {
                       )}
                     />
                   </View>
-
+{/* Switch de enviar a DGII */}
+                  <View style={styles.switchContainer}>
+                    <Text
+                      style={[styles.label, { color: getPrimaryColor(theme) }]}
+                    >
+                      Enviar comprobante a DGII
+                    </Text>
+                    <Switch value={sendToDGII} onValueChange={onToggleSwitchSendDGII} />
+                  </View>
                   {/* Métodos de Pago */}
                   <View style={styles.paymentSection}>
                     <Text

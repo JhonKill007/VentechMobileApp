@@ -162,6 +162,7 @@ const ProcessOrderView = () => {
       dateHour: formattedDate,
       payWith: getTotalPrice(selectedProducts, infoOrder.descuento),
       hasComprobante: infoOrder.rnc ? true : false,
+      sentDgii: infoOrder.sendDgii,
       products: newOrdenProducts,
     };
 
@@ -169,12 +170,13 @@ const ProcessOrderView = () => {
 
     OrderS.create(newOrden)
       .then((e: any) => {
-        newOrden.ncf = e.data.data;
+        //newOrden.ncf = e.data.data;
         newOrden.ncf = e.data.data.ncf;
         newOrden.fechaVencimientoSecuencia =
-          e.data.data.fechaVencimientoSecuencia;
+          e.data.data.fvs;
+          
         setChecking(false);
-        printOrder(newOrden);
+        printOrder(newOrden, e.data.data.resultDgii);
 
         if (newOrden?.rncOCedula!.length >= 9) {
           generate607(newOrden);

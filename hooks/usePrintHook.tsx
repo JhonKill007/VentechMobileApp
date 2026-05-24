@@ -5,6 +5,8 @@ import { Order } from "@/Models/Order";
 import * as Print from "expo-print";
 import { Alert } from "react-native";
 import { useCountHook } from "./useCountHook";
+import { ResultadoDGII } from "@/Models/ResultadoDGII";
+import RNQRGenerator from 'rn-qr-generator';
 
 export const usePrintHook = () => {
   const { branch, company } = useUserContext();
@@ -15,8 +17,31 @@ export const usePrintHook = () => {
     getTotalItbisSingle,
   } = useCountHook();
 
-  const printOrder = async (orden: Order) => {
+
+  const generateBase64= async (text: string) => {
+        try {
+
+         const response = await RNQRGenerator.generate({
+            value: text,
+            height: 200,
+            width: 200,
+            base64: true,
+        });
+
+        return `data:image/png;base64,${response.base64}`;
+
+             
+        } catch (err) {
+            console.error('Error generando QR:', err);
+            return '';
+        }
+    }
+
+
+  const printOrder = async (orden: Order, resultadoDgii: ResultadoDGII) => {
     
+    console.log(resultadoDgii);
+      var qr = await generateBase64(resultadoDgii?.urlCodigoQr??"");
 
     try {
       var totalOrden = 0;
@@ -229,7 +254,28 @@ export const usePrintHook = () => {
                     ${orden.consumer!.address}
                   </p>
 
-                  <div class="firma-container">
+  <div style='display: flex; justify-content: space-between;' >
+<div> <img src='${qr}' style='width: 100px;' > 
+
+
+         <div style='font-size: 10px;  margin-left:14px'>
+                        <div style='display: flex; align-items: center;'>
+                           <strong>Código de Seguridad:</strong>
+                           <span style='margin-left: 5px;'>${
+                               resultadoDgii?.codigoSeguridad ?? ''
+                           }</span>
+                        </div>
+
+                        <div style='display: flex; align-items: center; margin-top: 5px;'>
+                           <strong>Fecha de Firma Digital:</strong>
+                           <span style='margin-left: 5px;'>${formatDatewithHMS(
+                               resultadoDgii?.fechaFirma
+                           )}</span>
+                        </div>
+                     </div>
+        
+        </div>
+<div class="firma-container">
   <div class="firma">
     <div>_________________</div>
     <div>Vendedor</div>
@@ -238,6 +284,7 @@ export const usePrintHook = () => {
     <div>_________________</div>
     <div>Comprador</div>
   </div>
+</div>
 </div>
                   <div class="corte"></div>
                 </body>
@@ -251,7 +298,7 @@ export const usePrintHook = () => {
     }
   };
 
-  const rePrintOrder = async (orden: Order) => {
+  const rePrintOrder = async (orden: Order, resultadoDgii: ResultadoDGII) => {
     try {
       var ordenAImprimir = { ...orden };
       var totalOrden = 0;
@@ -260,6 +307,7 @@ export const usePrintHook = () => {
       var tipoDeFactura = "";
       var montoDescuento = 0;
       
+              var qr = await generateBase64(resultadoDgii?.urlCodigoQr??"");
 
       ordenAImprimir.products!.forEach((o) => {
         totalOrden += o.productPrice! * o.productAmount!;
@@ -453,6 +501,27 @@ Cliente:${ordenAImprimir.consumer!.name}
 <br />Dirección: ${ordenAImprimir.consumer!.address}</p>
 <div class="corte"></div>
 
+<div style='display: flex; justify-content: space-between;' >
+<div> <img src='${qr}' style='width: 100px;' > 
+
+
+         <div style='font-size: 10px;  margin-left:14px'>
+                        <div style='display: flex; align-items: center;'>
+                           <strong>Código de Seguridad:</strong>
+                           <span style='margin-left: 5px;'>${
+                               resultadoDgii?.codigoSeguridad ?? ''
+                           }</span>
+                        </div>
+
+                        <div style='display: flex; align-items: center; margin-top: 5px;'>
+                           <strong>Fecha de Firma Digital:</strong>
+                           <span style='margin-left: 5px;'>${formatDatewithHMS(
+                               resultadoDgii?.fechaFirma
+                           )}</span>
+                        </div>
+                     </div>
+        
+        </div>
 <div class="firma-container">
   <div class="firma">
     <div>_________________</div>
@@ -462,6 +531,7 @@ Cliente:${ordenAImprimir.consumer!.name}
     <div>_________________</div>
     <div>Comprador</div>
   </div>
+</div>
 </div>
 </body>
 </html>`;
@@ -487,5 +557,20 @@ Cliente:${ordenAImprimir.consumer!.name}
     return date.toLocaleString("es-ES", options);
   };
 
+  const formatDatewithHMS = (apiDate: any) => {
+    const date = new Date(apiDate);
+    const options = {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    } as const;
+    return date.toLocaleString("es-ES", options);
+  };
+
+  
   return { printOrder, rePrintOrder };
 };
