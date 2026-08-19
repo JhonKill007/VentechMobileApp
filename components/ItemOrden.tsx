@@ -15,7 +15,7 @@ export const ItemOrden = ({ orden }: { orden: Order }) => {
 
 
   const reInmprimirOrden = (order: Order) => {
-
+console.log("Reimprimiendo orden:", order);
        OrderS.getResultDGII(company?.id!, order.ncf!)
       .then((res) => {
         if (res.data.statusCode === 1) {
@@ -27,7 +27,7 @@ export const ItemOrden = ({ orden }: { orden: Order }) => {
       })
       .catch((e) => {
         console.log(e);
-       
+       rePrintOrder(order, {urlCodigoQr: null, codigoSeguridad: null, trackId: null, codigo: null, secuenciaUtilizada: false, estado: "ERROR", mensaje: "Error al obtener el resultado de DGII", codigoDeMensaje: "ERROR"});
       });
 
 
